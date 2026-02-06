@@ -1,0 +1,163 @@
+// VEX Robotics ELO & Skills - Prisma Schema
+// Vercel-compatible PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  teamId    String   @unique
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Team {
+  id                    String    @id @default(cuid())
+  teamNumber            Int       @unique // Unique robot team number
+  provinceState         String?
+  country               String?
+  drivetrainType        String?
+  autonomousSide        String?   // left / right / skills / etc
+  autonReliabilityPct   Float?
+  notes                 String?  @db.Text
+  strategyTags          String[] // e.g. ["defensive", "fast auton"]
+  // ELO & uncertainty
+  rating                Float     @default(100)
+  uncertainty           Float     @default(50) // base / sqrt(matchesPlayed)
+  matchesPlayed         Int       @default(0)
+  // Relations
+  user                  User?
+  ratingHistory         RatingHistory[]
+  teamMatchStats        TeamMatchStats[]
+  skillsRecords         SkillsRecord[]
+  connectionsFrom       Connection[] @relation("ConnectionFrom")
+  connectionsTo         Connection[] @relation("ConnectionTo")
+  sharedNotesFrom       Note[]       @relation("NoteFrom")
+  sharedNotesTo         Note[]       @relation("NoteTo")
+  matchComments         MatchComment[]
+  matchesAsRed1         Match[]      @relation("RedTeam1")
+  matchesAsRed2         Match[]      @relation("RedTeam2")
+  matchesAsRed3         Match[]      @relation("RedTeam3")
+  matchesAsBlue1        Match[]      @relation("BlueTeam1")
+  matchesAsBlue2        Match[]      @relation("BlueTeam2")
+  matchesAsBlue3        Match[]      @relation("BlueTeam3")
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Match {
+  id          String   @id @default(cuid())
+  eventName   String
+  date        DateTime
+  redScore    Int
+  blueScore   Int
+  // Alliance team IDs (stored as team numbers for clarity; we join via Team)
+  redTeam1Id  String
+  redTeam2Id  String
+  redTeam3Id  String
+  blueTeam1Id String
+  blueTeam2Id String
+  blueTeam3Id String
+  redTeam1    Team     @relation("RedTeam1", fields: [redTeam1Id], references: [id])
+  redTeam2    Team     @relation("RedTeam2", fields: [redTeam2Id], references: [id])
+  redTeam3    Team     @relation("RedTeam3", fields: [redTeam3Id], references: [id])
+  blueTeam1   Team     @relation("BlueTeam1", fields: [blueTeam1Id], references: [id])
+  blueTeam2   Team     @relation("BlueTeam2", fields: [blueTeam2Id], references: [id])
+  blueTeam3   Team     @relation("BlueTeam3", fields: [blueTeam3Id], references: [id])
+  teamMatchStats TeamMatchStats[]
+  comments    MatchComment[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TeamMatchStats {
+  id          String   @id @default(cuid())
+  matchId     String
+  teamId      String
+  match       Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  alliance    String   // "red" | "blue"
+  score       Int
+  ratingBefore Float
+  ratingAfter  Float
+  expectedScore Float
+  actualScore   Float   // 1 win, 0 loss, 0.5 draw if ever used
+  createdAt   DateTime @default(now())
+  @@unique([matchId, teamId])
+  @@index([teamId])
+  @@index([matchId])
+}
+
+model RatingHistory {
+  id          String   @id @default(cuid())
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  rating      Float
+  uncertainty Float
+  matchId     String?
+  createdAt   DateTime @default(now())
+  @@index([teamId])
+}
+
+model SkillsRecord {
+  id                  String   @id @default(cuid())
+  teamId              String
+  team                Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  driverSkillsScore   Int?
+  autonomousSkillsScore Int?
+  combinedSkillsScore Int?
+  provincialSkillsRank Int?
+  worldwideSkillsRank Int?
+  lastUpdated         DateTime @default(now())
+  @@index([teamId])
+}
+
+model Connection {
+  id        String   @id @default(cuid())
+  fromTeamId String
+  toTeamId   String
+  status    String   // "pending" | "accepted" | "denied"
+  fromTeam  Team     @relation("ConnectionFrom", fields: [fromTeamId], references: [id], onDelete: Cascade)
+  toTeam    Team     @relation("ConnectionTo", fields: [toTeamId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([fromTeamId, toTeamId])
+  @@index([toTeamId])
+  @@index([fromTeamId])
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  fromTeamId String
+  toTeamId   String
+  type      String   // "strategy" | "scouting"
+  content   String   @db.Text
+  fromTeam  Team     @relation("NoteFrom", fields: [fromTeamId], references: [id], onDelete: Cascade)
+  toTeam    Team     @relation("NoteTo", fields: [toTeamId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([fromTeamId])
+  @@index([toTeamId])
+}
+
+model MatchComment {
+  id        String   @id @default(cuid())
+  matchId   String
+  teamId    String
+  content   String   @db.Text
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([matchId])
+  @@index([teamId])
+}

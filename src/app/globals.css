@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --vex-red: #e63946;
+  --vex-blue: #457b9d;
+  --vex-dark: #1d3557;
+  --vex-darker: #0d1b2a;
+  --vex-accent: #a8dadc;
+}
+
+body {
+  @apply bg-vex-darker text-gray-100;
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-vex-dark bg-vex-dark/60 p-4 shadow-lg backdrop-blur;
+  }
+  .btn-primary {
+    @apply rounded-lg bg-vex-blue px-4 py-2 font-medium text-white transition hover:bg-vex-blue/90 focus:outline-none focus:ring-2 focus:ring-vex-accent;
+  }
+  .btn-secondary {
+    @apply rounded-lg border border-vex-dark bg-vex-dark/80 px-4 py-2 font-medium text-gray-200 transition hover:bg-vex-dark focus:outline-none focus:ring-2 focus:ring-vex-accent;
+  }
+  .input {
+    @apply w-full rounded-lg border border-vex-dark bg-vex-dark/80 px-3 py-2 text-gray-100 placeholder-gray-500 focus:border-vex-blue focus:outline-none focus:ring-1 focus:ring-vex-blue;
+  }
+}
