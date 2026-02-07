@@ -9,10 +9,14 @@ export default async function AddMatchPage() {
   if (!session?.user) return null;
   const teamId = (session.user as { teamId: string }).teamId;
 
-  const teams = await prisma.team.findMany({
+  const teams = (await prisma.team.findMany({
     orderBy: { teamNumber: "asc" },
-    select: { id: true, teamNumber: true, rating: true },
-  });
+    select: { id: true, teamNumber: true, performanceRating: true },
+  })).map((t) => ({
+    id: t.id,
+    teamNumber: t.teamNumber,
+    label: `${t.teamNumber} (Rating: ${Math.round(t.performanceRating)})`,
+  }));
 
   return (
     <div className="space-y-6">

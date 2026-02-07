@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { confidenceFromUncertainty } from "@/lib/elo";
+import { confidenceFromUncertainty, INITIAL_UNCERTAINTY } from "@/lib/bayesian";
 import { TeamProfileCard } from "@/components/TeamProfileCard";
 import { TeamProfileForm } from "@/components/TeamProfileForm";
 import { SkillsForm } from "@/components/SkillsForm";
@@ -24,13 +24,13 @@ export default async function TeamProfilePage({
     where: { teamNumber: num },
     include: {
       skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
-      ratingHistory: { orderBy: { createdAt: "desc" }, take: 20 },
+      performanceHistory: { orderBy: { createdAt: "desc" }, take: 20 },
     },
   });
   if (!team) notFound();
 
   const skills = team.skillsRecords[0] ?? null;
-  const confidence = confidenceFromUncertainty(team.uncertainty);
+  const confidence = confidenceFromUncertainty(team.ratingUncertainty, INITIAL_UNCERTAINTY);
   const isOwn = team.id === myTeamId;
 
   return (

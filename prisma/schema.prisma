@@ -30,13 +30,18 @@ model Team {
   autonReliabilityPct   Float?
   notes                 String?  @db.Text
   strategyTags          String[] // e.g. ["defensive", "fast auton"]
-  // ELO & uncertainty
-  rating                Float     @default(100)
-  uncertainty           Float     @default(50) // base / sqrt(matchesPlayed)
-  matchesPlayed         Int       @default(0)
+  // Bayesian performance model
+  performanceRating     Float     @default(100)
+  ratingUncertainty     Float     @default(50)
+  matchCount            Int       @default(0)
+  
+  // Scouting data (user-inputted)
+  autoStrength          Float?    // 0-10 scale
+  driverStrength        Float?    // 0-10 scale
+
   // Relations
   user                  User?
-  ratingHistory         RatingHistory[]
+  performanceHistory    PerformanceHistory[]
   teamMatchStats        TeamMatchStats[]
   skillsRecords         SkillsRecord[]
   connectionsFrom       Connection[] @relation("ConnectionFrom")
@@ -50,6 +55,7 @@ model Team {
   matchesAsBlue1        Match[]      @relation("BlueTeam1")
   matchesAsBlue2        Match[]      @relation("BlueTeam2")
   matchesAsBlue3        Match[]      @relation("BlueTeam3")
+  taskColumns           TaskColumn[]
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 }
@@ -87,24 +93,28 @@ model TeamMatchStats {
   team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   alliance    String   // "red" | "blue"
   score       Int
-  ratingBefore Float
-  ratingAfter  Float
-  expectedScore Float
-  actualScore   Float   // 1 win, 0 loss, 0.5 draw if ever used
+
+  performanceBefore     Float
+  performanceAfter      Float
+  uncertaintyBefore     Float
+  uncertaintyAfter      Float
+  expectedOutcome       Float   // 0-1 probability
+  carryFactor           Float   // Credit distribution for this team
+  surpriseFactor        Float   // |A - E| for uncertainty update
   createdAt   DateTime @default(now())
   @@unique([matchId, teamId])
   @@index([teamId])
   @@index([matchId])
 }
 
-model RatingHistory {
-  id          String   @id @default(cuid())
-  teamId      String
-  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  rating      Float
-  uncertainty Float
-  matchId     String?
-  createdAt   DateTime @default(now())
+model PerformanceHistory {
+  id                String   @id @default(cuid())
+  teamId            String
+  team              Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  performanceRating Float
+  uncertainty       Float
+  matchId           String?
+  createdAt         DateTime @default(now())
   @@index([teamId])
 }
 
@@ -161,3 +171,56 @@ model MatchComment {
   @@index([matchId])
   @@index([teamId])
 }
+
+// ============== Task Board Models ==============
+
+model TaskColumn {
+  id        String   @id @default(cuid())
+  name      String   // e.g., "To Do", "In Progress", "Done"
+  order     Int      @default(0)
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([teamId])
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?      @db.Text
+  priority    String       @default("medium") // low, medium, high
+  dueDate     DateTime?
+  order       Int          @default(0)
+  columnId    String
+  column      TaskColumn   @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  assignees   String[]     // Array of team member names
+  tags        String[]     // e.g., ["mechanical", "programming"]
+  subtasks    Subtask[]
+  comments    TaskComment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  @@index([columnId])
+}
+
+model Subtask {
+  id        String   @id @default(cuid())
+  title     String
+  completed Boolean  @default(false)
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@index([taskId])
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  author    String   // Name of commenter
+  content   String   @db.Text
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@index([taskId])
+}
+

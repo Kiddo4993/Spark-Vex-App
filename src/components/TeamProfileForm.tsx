@@ -12,6 +12,8 @@ type Team = {
   autonReliabilityPct: number | null;
   notes: string | null;
   strategyTags: string[];
+  autoStrength: number | null;
+  driverStrength: number | null;
 };
 
 export function TeamProfileForm({ team }: { team: Team }) {
@@ -22,6 +24,12 @@ export function TeamProfileForm({ team }: { team: Team }) {
   const [autonomousSide, setAutonomousSide] = useState(team.autonomousSide ?? "");
   const [autonReliabilityPct, setAutonReliabilityPct] = useState(
     team.autonReliabilityPct != null ? String(team.autonReliabilityPct) : ""
+  );
+  const [autoStrength, setAutoStrength] = useState(
+    team.autoStrength != null ? String(team.autoStrength) : ""
+  );
+  const [driverStrength, setDriverStrength] = useState(
+    team.driverStrength != null ? String(team.driverStrength) : ""
   );
   const [notes, setNotes] = useState(team.notes ?? "");
   const [strategyTags, setStrategyTags] = useState(team.strategyTags.join(", "));
@@ -42,6 +50,8 @@ export function TeamProfileForm({ team }: { team: Team }) {
           drivetrainType: drivetrainType || null,
           autonomousSide: autonomousSide || null,
           autonReliabilityPct: autonReliabilityPct ? parseFloat(autonReliabilityPct) : null,
+          autoStrength: autoStrength ? parseFloat(autoStrength) : null,
+          driverStrength: driverStrength ? parseFloat(driverStrength) : null,
           notes: notes || null,
           strategyTags: strategyTags
             ? strategyTags.split(",").map((s) => s.trim()).filter(Boolean)
@@ -115,6 +125,38 @@ export function TeamProfileForm({ team }: { team: Team }) {
           onChange={(e) => setAutonReliabilityPct(e.target.value)}
           className="input mt-1"
         />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="block text-sm font-medium text-gray-400">Autonomous Strength (0-10)</label>
+          <div className="mt-1 flex items-center gap-3">
+            <input
+              type="range"
+              min="0"
+              max="10"
+              step="0.5"
+              value={autoStrength || 0}
+              onChange={(e) => setAutoStrength(e.target.value)}
+              className="flex-1 accent-vex-accent"
+            />
+            <span className="w-8 text-right font-medium text-white">{autoStrength || "—"}</span>
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-400">Driver Strength (0-10)</label>
+          <div className="mt-1 flex items-center gap-3">
+            <input
+              type="range"
+              min="0"
+              max="10"
+              step="0.5"
+              value={driverStrength || 0}
+              onChange={(e) => setDriverStrength(e.target.value)}
+              className="flex-1 accent-vex-accent"
+            />
+            <span className="w-8 text-right font-medium text-white">{driverStrength || "—"}</span>
+          </div>
+        </div>
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-400">Strategy tags (comma-separated)</label>

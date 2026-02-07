@@ -44,12 +44,12 @@ export function computeSkillsRanks(
     byProvince.get(key)!.push(t);
   }
   const provincialRanks = new Map<string, Map<string, number>>();
-  for (const [prov, list] of byProvince) {
+  byProvince.forEach((list, prov) => {
     const ranked = rankByCombinedSkills(list);
     const m = new Map<string, number>();
     ranked.forEach((r) => m.set((r as SkillsInput & { teamId: string }).teamId, (r as SkillsInput & { rank: number }).rank));
     provincialRanks.set(prov, m);
-  }
+  });
   const result = new Map<string, { worldwideRank: number; provincialRank: number | null }>();
   worldwide.forEach((r) => {
     const teamId = (r as SkillsInput & { teamId: string }).teamId;

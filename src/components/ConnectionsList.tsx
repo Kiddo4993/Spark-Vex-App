@@ -3,6 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 
+type Team = {
+  id: string;
+  teamNumber: number;
+  provinceState: string | null;
+  country: string | null;
+};
+
 type ConnectionSent = {
   id: string;
   status: string;
@@ -12,13 +19,14 @@ type ConnectionSent = {
 type ConnectionReceived = {
   id: string;
   status: string;
-  fromTeam: { id: string; teamNumber: number; provinceState: string | null; country: string | null };
+  fromTeam: Team;
 };
 
 type ConnectionAccepted = {
   id: string;
-  fromTeam: { id: string; teamNumber: number };
-  toTeam: { id: string; teamNumber: number };
+  fromTeamId: string;
+  fromTeam: Team;
+  toTeam: Team;
 };
 
 export function ConnectionsList({

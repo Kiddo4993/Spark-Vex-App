@@ -6,8 +6,11 @@ import { signOut } from "next-auth/react";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/dashboard/tasks", label: "Tasks" },
   { href: "/dashboard/matches", label: "Matches" },
   { href: "/dashboard/teams", label: "Teams" },
+  { href: "/dashboard/alliance-selection", label: "Alliance Selection" },
+  { href: "/dashboard/import", label: "Import" },
   { href: "/dashboard/connections", label: "Connections" },
 ];
 
@@ -19,11 +22,10 @@ export function DashboardNav() {
         <Link
           key={href}
           href={href}
-          className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-            pathname === href
-              ? "bg-vex-dark text-white"
-              : "text-gray-400 hover:bg-vex-dark/60 hover:text-gray-200"
-          }`}
+          className={`rounded-lg px-3 py-2 text-sm font-medium transition ${pathname === href
+            ? "bg-vex-dark text-white"
+            : "text-gray-400 hover:bg-vex-dark/60 hover:text-gray-200"
+            }`}
         >
           {label}
         </Link>

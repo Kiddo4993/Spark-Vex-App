@@ -9,9 +9,11 @@ type Team = {
   autonReliabilityPct: number | null;
   notes: string | null;
   strategyTags: string[];
-  rating: number;
-  uncertainty: number;
-  matchesPlayed: number;
+  performanceRating: number;
+  ratingUncertainty: number;
+  matchCount: number;
+  autoStrength: number | null;
+  driverStrength: number | null;
 };
 
 type Skills = {
@@ -20,7 +22,7 @@ type Skills = {
   combinedSkillsScore: number | null;
   provincialSkillsRank: number | null;
   worldwideSkillsRank: number | null;
-  lastUpdated: string;
+  lastUpdated: string | Date;
 } | null;
 
 export function TeamProfileCard({
@@ -37,15 +39,15 @@ export function TeamProfileCard({
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <div className="card">
-        <p className="text-sm font-medium text-gray-400">ELO & confidence</p>
-        <p className="mt-1 text-2xl font-bold text-white">{Math.round(team.rating)}</p>
+        <p className="text-sm font-medium text-gray-400">Performance Rating</p>
+        <p className="mt-1 text-2xl font-bold text-white">{Math.round(team.performanceRating)}</p>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-vex-dark">
           <div
             className="h-full rounded-full bg-vex-accent"
             style={{ width: `${confidence}%` }}
           />
         </div>
-        <p className="mt-1 text-xs text-gray-500">{team.matchesPlayed} matches · ±{team.uncertainty.toFixed(0)}</p>
+        <p className="mt-1 text-xs text-gray-500">{team.matchCount} matches · ±{team.ratingUncertainty.toFixed(0)}</p>
       </div>
       <div className="card">
         <p className="text-sm font-medium text-gray-400">Skills</p>
@@ -66,6 +68,12 @@ export function TeamProfileCard({
         <p className="text-sm text-gray-400">Auton side: {team.autonomousSide ?? "—"}</p>
         {team.autonReliabilityPct != null && (
           <p className="text-sm text-gray-400">Auton reliability: {team.autonReliabilityPct}%</p>
+        )}
+        {team.autoStrength != null && (
+          <p className="text-sm text-gray-400">Auton Strength: {team.autoStrength}/10</p>
+        )}
+        {team.driverStrength != null && (
+          <p className="text-sm text-gray-400">Driver Strength: {team.driverStrength}/10</p>
         )}
       </div>
       {(team.notes || team.strategyTags?.length) ? (

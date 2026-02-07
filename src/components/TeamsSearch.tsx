@@ -8,9 +8,9 @@ type Team = {
   teamNumber: number;
   provinceState: string | null;
   country: string | null;
-  rating: number;
-  uncertainty: number;
-  matchesPlayed: number;
+  performanceRating: number;
+  ratingUncertainty: number;
+  matchCount: number;
   skillsRecords: Array<{
     combinedSkillsScore: number | null;
     driverSkillsScore: number | null;
@@ -48,11 +48,11 @@ export function TeamsSearch({
     search.trim().length < 2
       ? teams
       : teams.filter(
-          (t) =>
-            t.teamNumber.toString().includes(search) ||
-            (t.provinceState?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
-            (t.country?.toLowerCase().includes(search.toLowerCase()) ?? false)
-        );
+        (t) =>
+          t.teamNumber.toString().includes(search) ||
+          (t.provinceState?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
+          (t.country?.toLowerCase().includes(search.toLowerCase()) ?? false)
+      );
 
   return (
     <div className="space-y-4">
@@ -76,7 +76,7 @@ export function TeamsSearch({
               <tr className="border-b border-vex-dark bg-vex-dark/40">
                 <th className="px-4 py-3 font-medium text-gray-300">Team</th>
                 <th className="px-4 py-3 font-medium text-gray-300">Region</th>
-                <th className="px-4 py-3 font-medium text-gray-300">ELO</th>
+                <th className="px-4 py-3 font-medium text-gray-300">Rating</th>
                 <th className="px-4 py-3 font-medium text-gray-300">Matches</th>
                 <th className="px-4 py-3 font-medium text-gray-300">Skills</th>
                 <th className="px-4 py-3 font-medium text-gray-300"></th>
@@ -91,8 +91,8 @@ export function TeamsSearch({
                     <td className="px-4 py-3 text-gray-400">
                       {[t.provinceState, t.country].filter(Boolean).join(", ") || "—"}
                     </td>
-                    <td className="px-4 py-3 text-gray-200">{Math.round(t.rating)}</td>
-                    <td className="px-4 py-3 text-gray-400">{t.matchesPlayed}</td>
+                    <td className="px-4 py-3 text-gray-200">{Math.round(t.performanceRating)}</td>
+                    <td className="px-4 py-3 text-gray-400">{t.matchCount}</td>
                     <td className="px-4 py-3 text-gray-400">{skills?.combinedSkillsScore ?? "—"}</td>
                     <td className="px-4 py-3">
                       <Link
