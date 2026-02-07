@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sparks VEX - Task Board</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vex: {
+                            red: "#DA291C",
+                            bg: "#111111",
+                            dark: "#1A1A1A", 
+                            darker: "#0A0A0A",
+                            accent: "#FF3B30",
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #111111; color: white; font-family: system-ui, -apple-system, sans-serif; }
+        .column { min-height: 200px; }
+        .drag-over { background-color: rgba(255, 59, 48, 0.1); border: 2px dashed #DA291C; }
+        .task-card { cursor: grab; }
+        .task-card:active { cursor: grabbing; }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1A1A1A; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body class="p-4 sm:p-8 min-h-screen">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rotate-45 rounded bg-vex-red"></div>
+                <h1 class="text-2xl font-bold">Sparks VEX Task Board</h1>
+            </div>
+            <button onclick="resetBoard()" class="text-xs text-gray-500 hover:text-red-500 transition">Reset Board</button>
+        </div>
+
+        <p class="text-sm text-gray-400">Manage your team's build season tasks. Data is saved to your browser.</p>
+
+        <!-- Board -->
+        <div class="flex gap-4 overflow-x-auto pb-4" id="board">
+            <!-- Columns will be injected here -->
+        </div>
+    </div>
+
+    <!-- Add Task Modal (Simple Prompt replacement for now) -->
+
+    <script>
+        // Default Data
+        const defaultColumns = [
+            { id: "todo", name: "To Do", order: 0 },
+            { id: "inprogress", name: "In Progress", order: 1 },
+            { id: "review", name: "Review", order: 2 },
+            { id: "done", name: "Done", order: 3 }
+        ];
+
+        const defaultTasks = [
+            { id: "t1", title: "Design Chassis", columnId: "todo", priority: "high", tags: ["mech"] },
+            { id: "t2", title: "Code Auton", columnId: "inprogress", priority: "medium", tags: ["code"] }
+        ];
+
+        // State
+        let columns = JSON.parse(localStorage.getItem('vex_columns')) || defaultColumns;
+        let tasks = JSON.parse(localStorage.getItem('vex_tasks')) || defaultTasks;
+
+        // Render
+        function renderBoard() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+
+            columns.forEach(col => {
+                const colTasks = tasks.filter(t => t.columnId === col.id);
+                
+                const colEl = document.createElement('div');
+                colEl.className = 'flex-shrink-0 w-80 bg-vex-darker rounded-xl p-4 border border-vex-dark flex flex-col gap-4';
+                colEl.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-white">${col.name}</h3>
+                        <span class="text-xs text-gray-500 bg-vex-dark px-2 py-1 rounded-full">${colTasks.length}</span>
+                    </div>
+                    <div class="column flex-1 space-y-3" id="${col.id}" 
+                         ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="leaveDrag(event)">
+                        <!-- Tasks go here -->
+                    </div>
+                    <button onclick="addNewTask('${col.id}')" 
+                            class="w-full text-left text-sm text-gray-500 hover:text-white py-2 px-3 rounded-lg hover:bg-vex-dark/50 transition-colors">
+                        + Add task
+                    </button>
+                `;
+
+                const taskContainer = colEl.querySelector('.column');
+                
+                colTasks.forEach(task => {
+                    const taskEl = document.createElement('div');
+                    taskEl.className = 'task-card bg-vex-bg rounded-lg p-3 border border-vex-dark hover:border-vex-accent transition-colors group relative';
+                    taskEl.draggable = true;
+                    taskEl.id = task.id;
+                    taskEl.ondragstart = drag;
+                    
+                    const priorityClass = task.priority === 'high' ? 'bg-red-500/20 text-red-400 border-red-500/50' : 
+                                          task.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' : 
+                                          'bg-green-500/20 text-green-400 border-green-500/50';
+
+                    taskEl.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-sm font-medium text-white">${task.title}</span>
+                            <button onclick="deleteTask('${task.id}')" class="text-gray-600 hover:text-red-500 text-xs opacity-0 group-hover:opacity-100 transition">✕</button>
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            <span class="text-[10px] px-1.5 py-0.5 rounded border ${priorityClass}">${task.priority}</span>
+                            ${task.tags.map(tag => `<span class="text-[10px] px-1.5 py-0.5 rounded bg-vex-dark text-gray-300">${tag}</span>`).join('')}
+                        </div>
+                    `;
+                    taskContainer.appendChild(taskEl);
+                });
+
+                board.appendChild(colEl);
+            });
+        }
+
+        // Drag & Drop
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
+
+        function leaveDrag(ev) {
+            ev.currentTarget.classList.remove('drag-over');
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            const taskId = ev.dataTransfer.getData("text");
+            const newColumnId = ev.currentTarget.id;
+
+            // Update State
+            tasks = tasks.map(t => t.id === taskId ? { ...t, columnId: newColumnId } : t);
+            save();
+            renderBoard();
+        }
+
+        // Actions
+        function addNewTask(columnId) {
+            const title = prompt("Enter task title:");
+            if (!title) return;
+            
+            const newTask = {
+                id: 't' + Date.now(),
+                title: title,
+                columnId: columnId,
+                priority: "medium", // Default
+                tags: []
+            };
+            
+            tasks.push(newTask);
+            save();
+            renderBoard();
+        }
+
+        function deleteTask(taskId) {
+            if (confirm("Delete this task?")) {
+                tasks = tasks.filter(t => t.id !== taskId);
+                save();
+                renderBoard();
+            }
+        }
+
+        function resetBoard() {
+            if (confirm("Reset board to defaults? All custom tasks will be lost.")) {
+                localStorage.removeItem('vex_tasks');
+                localStorage.removeItem('vex_columns');
+                tasks = [...defaultTasks];
+                columns = [...defaultColumns];
+                renderBoard();
+            }
+        }
+
+        function save() {
+            localStorage.setItem('vex_tasks', JSON.stringify(tasks));
+        }
+
+        // Init
+        renderBoard();
+
+    </script>
+</body>
+</html>

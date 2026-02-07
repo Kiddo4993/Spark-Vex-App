@@ -16,9 +16,9 @@ async function main() {
       autonReliabilityPct: 85,
       notes: "Strong auton, defensive endgame",
       strategyTags: ["defensive", "fast auton"],
-      rating: 100,
-      uncertainty: 50,
-      matchesPlayed: 0,
+      performanceRating: 100,
+      ratingUncertainty: 50,
+      matchCount: 0,
     },
   });
 
@@ -33,9 +33,9 @@ async function main() {
       autonomousSide: "right",
       autonReliabilityPct: 70,
       strategyTags: ["offensive"],
-      rating: 100,
-      uncertainty: 50,
-      matchesPlayed: 0,
+      performanceRating: 120,
+      ratingUncertainty: 40,
+      matchCount: 5,
     },
   });
 
@@ -48,9 +48,9 @@ async function main() {
       country: "Canada",
       drivetrainType: "mecanum",
       autonomousSide: "skills",
-      rating: 100,
-      uncertainty: 50,
-      matchesPlayed: 0,
+      performanceRating: 80,
+      ratingUncertainty: 60,
+      matchCount: 2,
     },
   });
 
@@ -61,9 +61,9 @@ async function main() {
       teamNumber: 22222,
       provinceState: "Ontario",
       country: "Canada",
-      rating: 100,
-      uncertainty: 50,
-      matchesPlayed: 0,
+      performanceRating: 100,
+      ratingUncertainty: 50,
+      matchCount: 0,
     },
   });
 
@@ -74,9 +74,9 @@ async function main() {
       teamNumber: 33333,
       provinceState: "Ontario",
       country: "Canada",
-      rating: 100,
-      uncertainty: 50,
-      matchesPlayed: 0,
+      performanceRating: 100,
+      ratingUncertainty: 50,
+      matchCount: 0,
     },
   });
 
@@ -87,9 +87,9 @@ async function main() {
       teamNumber: 44444,
       provinceState: "Quebec",
       country: "Canada",
-      rating: 100,
-      uncertainty: 50,
-      matchesPlayed: 0,
+      performanceRating: 100,
+      ratingUncertainty: 50,
+      matchCount: 0,
     },
   });
 

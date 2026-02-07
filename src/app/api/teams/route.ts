@@ -12,6 +12,8 @@ const updateTeamSchema = z.object({
   autonReliabilityPct: z.number().min(0).max(100).optional().nullable(),
   notes: z.string().optional().nullable(),
   strategyTags: z.array(z.string()).optional(),
+  autoStrength: z.number().min(0).max(10).optional().nullable(),
+  driverStrength: z.number().min(0).max(10).optional().nullable(),
 });
 
 export async function GET(req: Request) {
@@ -25,17 +27,17 @@ export async function GET(req: Request) {
       where: { teamNumber: parseInt(teamNumber, 10) },
       include: {
         skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
-        _count: { select: { teamMatchStats: true } },
       },
     });
     if (!team) return NextResponse.json({ error: "Team not found" }, { status: 404 });
-    const { skillsRecords, _count, ...rest } = team;
+    const { skillsRecords, ...rest } = team;
     const skills = skillsRecords[0] ?? null;
     return NextResponse.json({
       ...rest,
       skills,
-      matchesPlayed: _count.teamMatchStats,
     });
+    // Note: matchCount, performanceRating, ratingUncertainty, autoStrength, driverStrength 
+    // are part of 'rest' (scalars)
   }
 
   if (search && search.length >= 1) {
@@ -55,7 +57,7 @@ export async function GET(req: Request) {
     where: { id: (session.user as { teamId: string }).teamId },
     include: {
       skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
-      ratingHistory: { orderBy: { createdAt: "desc" }, take: 50 },
+      performanceHistory: { orderBy: { createdAt: "desc" }, take: 50 },
     },
   });
   if (!myTeam) return NextResponse.json({ error: "Team not found" }, { status: 404 });

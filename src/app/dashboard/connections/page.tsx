@@ -23,8 +23,8 @@ export default async function ConnectionsPage() {
       status: "accepted",
     },
     include: {
-      fromTeam: { select: { id: true, teamNumber: true } },
-      toTeam: { select: { id: true, teamNumber: true } },
+      fromTeam: { select: { id: true, teamNumber: true, provinceState: true, country: true } },
+      toTeam: { select: { id: true, teamNumber: true, provinceState: true, country: true } },
     },
   });
 

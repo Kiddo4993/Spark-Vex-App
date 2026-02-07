@@ -2,9 +2,9 @@
 
 type Team = {
   teamNumber: number;
-  rating: number;
-  uncertainty: number;
-  matchesPlayed: number;
+  performanceRating: number;
+  ratingUncertainty: number;
+  matchCount: number;
   provinceState: string | null;
   country: string | null;
 };
@@ -15,7 +15,7 @@ type Skills = {
   combinedSkillsScore: number | null;
   provincialSkillsRank: number | null;
   worldwideSkillsRank: number | null;
-  lastUpdated: string;
+  lastUpdated: string | Date;
 } | null;
 
 export function DashboardCards({
@@ -30,9 +30,9 @@ export function DashboardCards({
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <div className="card">
-        <p className="text-sm font-medium text-gray-400">ELO Rating</p>
-        <p className="mt-1 text-3xl font-bold text-white">{Math.round(team.rating)}</p>
-        <p className="mt-1 text-xs text-gray-500">{team.matchesPlayed} matches</p>
+        <p className="text-sm font-medium text-gray-400">Performance Rating</p>
+        <p className="mt-1 text-3xl font-bold text-white">{Math.round(team.performanceRating)}</p>
+        <p className="mt-1 text-xs text-gray-500">{team.matchCount} matches</p>
       </div>
       <div className="card">
         <p className="text-sm font-medium text-gray-400">Confidence</p>
@@ -45,7 +45,7 @@ export function DashboardCards({
           </div>
           <span className="text-lg font-bold text-white">{confidence}%</span>
         </div>
-        <p className="mt-1 text-xs text-gray-500">Uncertainty: ±{team.uncertainty.toFixed(0)}</p>
+        <p className="mt-1 text-xs text-gray-500">Uncertainty: ±{team.ratingUncertainty.toFixed(0)}</p>
       </div>
       <div className="card">
         <p className="text-sm font-medium text-gray-400">Skills</p>

@@ -5,7 +5,7 @@ import Link from "next/link";
 type Match = {
   id: string;
   eventName: string;
-  date: string;
+  date: string | Date;
   redScore: number;
   blueScore: number;
   redTeam1: { teamNumber: number };
@@ -27,7 +27,7 @@ export function RecentMatches({
     return (
       <div className="card">
         <h2 className="text-lg font-semibold text-white">Recent matches</h2>
-        <p className="mt-2 text-sm text-gray-400">No matches yet. Add one to start tracking ELO.</p>
+        <p className="mt-2 text-sm text-gray-400">No matches yet. Add one to start tracking performance ratings.</p>
         <Link href="/dashboard/matches/add" className="mt-3 inline-block text-vex-accent hover:underline">
           Add match →
         </Link>

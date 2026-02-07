@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { computeAllianceEloUpdates, uncertainty as uncertaintyFn, UNCERTAINTY_BASE } from "@/lib/elo";
+import { computeBayesianMatchUpdate, K, W, U_MATCH, U_MIN } from "@/lib/bayesian";
 
 const createMatchSchema = z.object({
   eventName: z.string().min(1),
@@ -102,27 +102,21 @@ export async function POST(req: Request) {
       prisma.team.findUnique({ where: { id: blueTeam2Id } }),
       prisma.team.findUnique({ where: { id: blueTeam3Id } }),
     ]);
-    const redTeams = [red1, red2, red3].filter((t): t is NonNullable<typeof t> => t != null);
-    const blueTeams = [blue1, blue2, blue3].filter((t): t is NonNullable<typeof t> => t != null);
-    if (redTeams.length !== 3 || blueTeams.length !== 3) {
+    const redTeamsRaw = [red1, red2, red3].filter((t): t is NonNullable<typeof t> => t != null);
+    const blueTeamsRaw = [blue1, blue2, blue3].filter((t): t is NonNullable<typeof t> => t != null);
+
+    if (redTeamsRaw.length !== 3 || blueTeamsRaw.length !== 3) {
       return NextResponse.json({ error: "Invalid team IDs" }, { status: 400 });
     }
 
-    const redRatings: [number, number, number] = [
-      redTeams[0].rating,
-      redTeams[1].rating,
-      redTeams[2].rating,
-    ];
-    const blueRatings: [number, number, number] = [
-      blueTeams[0].rating,
-      blueTeams[1].rating,
-      blueTeams[2].rating,
-    ];
+    // Map to Bayesian Input
+    const redTeams = redTeamsRaw.map(t => ({ id: t.id, rating: t.performanceRating, uncertainty: t.ratingUncertainty }));
+    const blueTeams = blueTeamsRaw.map(t => ({ id: t.id, rating: t.performanceRating, uncertainty: t.ratingUncertainty }));
 
     const redWins = redScore > blueScore;
     const { winning, losing } = redWins
-      ? computeAllianceEloUpdates(redRatings, blueRatings)
-      : computeAllianceEloUpdates(blueRatings, redRatings);
+      ? computeBayesianMatchUpdate(redTeams, blueTeams, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN })
+      : computeBayesianMatchUpdate(blueTeams, redTeams, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
 
     const matchDate = new Date(date);
     const match = await prisma.match.create({
@@ -140,65 +134,45 @@ export async function POST(req: Request) {
       },
     });
 
-    const updates = redWins
-      ? [
-          ...winning.map((u, i) => ({ team: redTeams[i], ...u })),
-          ...losing.map((u, i) => ({ team: blueTeams[i], ...u })),
-        ]
-      : [
-          ...losing.map((u, i) => ({ team: redTeams[i], ...u })),
-          ...winning.map((u, i) => ({ team: blueTeams[i], ...u })),
-        ];
+    const allUpdates = [...winning, ...losing];
 
-    for (const { team, ratingAfter } of updates) {
-      const newMatchesPlayed = team.matchesPlayed + 1;
-      const newUncertainty = uncertaintyFn(newMatchesPlayed, UNCERTAINTY_BASE);
+    for (const update of allUpdates) {
       await prisma.team.update({
-        where: { id: team.id },
+        where: { id: update.teamId },
         data: {
-          rating: ratingAfter,
-          matchesPlayed: newMatchesPlayed,
-          uncertainty: newUncertainty,
+          performanceRating: update.ratingAfter,
+          ratingUncertainty: update.uncertaintyAfter,
+          matchCount: { increment: 1 },
         },
       });
-      await prisma.ratingHistory.create({
+      await prisma.performanceHistory.create({
         data: {
-          teamId: team.id,
-          rating: ratingAfter,
-          uncertainty: newUncertainty,
+          teamId: update.teamId,
+          performanceRating: update.ratingAfter,
+          uncertainty: update.uncertaintyAfter,
           matchId: match.id,
         },
       });
     }
 
-    const redStats = redWins ? winning : losing;
-    const blueStats = redWins ? losing : winning;
-    const redActual = redWins ? 1 : 0;
-    const blueActual = redWins ? 0 : 1;
-    for (let i = 0; i < 3; i++) {
+    // Create TeamMatchStats
+    // We iterate over the computed updates to easily get the calculated values
+    for (const update of allUpdates) {
+      const isRed = [redTeam1Id, redTeam2Id, redTeam3Id].includes(update.teamId);
       await prisma.teamMatchStats.create({
         data: {
           matchId: match.id,
-          teamId: redTeams[i].id,
-          alliance: "red",
-          score: redScore,
-          ratingBefore: redTeams[i].rating,
-          ratingAfter: (redWins ? winning[i] : losing[i]).ratingAfter,
-          expectedScore: (redWins ? winning[i] : losing[i]).expectedScore,
-          actualScore: redActual,
-        },
-      });
-      await prisma.teamMatchStats.create({
-        data: {
-          matchId: match.id,
-          teamId: blueTeams[i].id,
-          alliance: "blue",
-          score: blueScore,
-          ratingBefore: blueTeams[i].rating,
-          ratingAfter: (redWins ? losing[i] : winning[i]).ratingAfter,
-          expectedScore: (redWins ? losing[i] : winning[i]).expectedScore,
-          actualScore: blueActual,
-        },
+          teamId: update.teamId,
+          alliance: isRed ? "red" : "blue",
+          score: isRed ? redScore : blueScore,
+          performanceBefore: update.ratingBefore,
+          performanceAfter: update.ratingAfter,
+          uncertaintyBefore: update.uncertaintyBefore,
+          uncertaintyAfter: update.uncertaintyAfter,
+          expectedOutcome: update.expectedOutcome,
+          carryFactor: update.creditFactor,
+          surpriseFactor: update.surpriseFactor
+        }
       });
     }
 

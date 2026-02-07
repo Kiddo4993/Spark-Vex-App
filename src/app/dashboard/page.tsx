@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { confidenceFromUncertainty } from "@/lib/elo";
+import { confidenceFromUncertainty, INITIAL_UNCERTAINTY } from "@/lib/bayesian";
 import Link from "next/link";
 import { DashboardCards } from "@/components/DashboardCards";
 import { RecentMatches } from "@/components/RecentMatches";
@@ -16,13 +16,13 @@ export default async function DashboardPage() {
     where: { id: teamId },
     include: {
       skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
-      ratingHistory: { orderBy: { createdAt: "desc" }, take: 1 },
+      performanceHistory: { orderBy: { createdAt: "desc" }, take: 1 },
     },
   });
   if (!team) return <p className="text-gray-400">Team not found</p>;
 
   const skills = team.skillsRecords[0] ?? null;
-  const confidence = confidenceFromUncertainty(team.uncertainty);
+  const confidence = confidenceFromUncertainty(team.ratingUncertainty, INITIAL_UNCERTAINTY);
 
   const recentMatches = await prisma.match.findMany({
     where: {
