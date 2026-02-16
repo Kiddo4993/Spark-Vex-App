@@ -22,7 +22,8 @@ export default async function DashboardPage() {
   if (!team) return <p className="text-gray-400">Team not found</p>;
 
   const skills = team.skillsRecords[0] ?? null;
-  const confidence = confidenceFromUncertainty(team.ratingUncertainty, INITIAL_UNCERTAINTY);
+  const confidenceVal = confidenceFromUncertainty(team.ratingUncertainty, INITIAL_UNCERTAINTY);
+  const confidenceLabel = confidenceVal > 80 ? "High" : confidenceVal > 50 ? "Medium" : "Low";
 
   const recentMatches = await prisma.match.findMany({
     where: {
@@ -63,17 +64,17 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
         <Link href="/dashboard/matches/add" className="btn-primary">
-          Add match
+          Add Match
         </Link>
       </div>
 
       <DashboardCards
         team={team}
         skills={skills}
-        confidence={confidence}
+        confidence={confidenceLabel}
       />
 
       <div className="grid gap-6 lg:grid-cols-2">

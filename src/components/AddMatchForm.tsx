@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Team = { id: string; teamNumber: number };
+type Team = { id: string; teamNumber: string };
 
 export function AddMatchForm({ teams }: { teams: Team[] }) {
   const router = useRouter();
@@ -19,6 +19,7 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
   const [blueScore, setBlueScore] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const ids = [red1, red2, red3, blue1, blue2, blue3].filter(Boolean);
   const unique = new Set(ids).size === ids.length && ids.length === 6;
@@ -54,8 +55,11 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
         setLoading(false);
         return;
       }
-      router.push("/dashboard/matches");
-      router.refresh();
+      setSubmitted(true);
+      setTimeout(() => {
+        router.push("/");
+        router.refresh();
+      }, 2000);
     } catch {
       setError("Something went wrong");
       setLoading(false);
@@ -64,7 +68,7 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
 
   const select = (value: string, onChange: (id: string) => void, label: string) => (
     <div>
-      <label className="block text-sm font-medium text-gray-400">{label}</label>
+      <label className="block text-sm font-bold text-warm-800 uppercase tracking-widest">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -81,10 +85,21 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
     </div>
   );
 
+  if (submitted) {
+    return (
+      <div className="text-center py-12 space-y-4">
+        <div className="text-5xl">✅</div>
+        <h2 className="text-2xl font-graffiti text-warm-900 tracking-widest">MATCH ADDED!</h2>
+        <p className="text-warm-600 italic">Thank you for contributing to the community team rankings.</p>
+        <p className="text-xs text-warm-400">Redirecting to home...</p>
+      </div>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="card max-w-2xl space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-8">
       <div>
-        <label className="block text-sm font-medium text-gray-400">Event name</label>
+        <label className="block text-sm font-bold text-warm-800 uppercase tracking-widest mb-1">Event name</label>
         <input
           type="text"
           value={eventName}
@@ -95,7 +110,7 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-400">Date</label>
+        <label className="block text-sm font-bold text-warm-800 uppercase tracking-widest mb-1">Date</label>
         <input
           type="date"
           value={date}
@@ -111,7 +126,7 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
           {select(red2, setRed2, "Team 2")}
           {select(red3, setRed3, "Team 3")}
           <div>
-            <label className="block text-sm font-medium text-gray-400">Red score</label>
+            <label className="block text-sm font-bold text-warm-800 uppercase tracking-widest mb-1">Red score</label>
             <input
               type="number"
               min={0}
@@ -127,7 +142,7 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
           {select(blue2, setBlue2, "Team 2")}
           {select(blue3, setBlue3, "Team 3")}
           <div>
-            <label className="block text-sm font-medium text-gray-400">Blue score</label>
+            <label className="block text-sm font-bold text-warm-800 uppercase tracking-widest mb-1">Blue score</label>
             <input
               type="number"
               min={0}
@@ -139,12 +154,14 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
         </div>
       </div>
       {!unique && ids.length === 6 && (
-        <p className="text-sm text-vex-red">Please select 6 different teams.</p>
+        <p className="text-sm text-vex-red font-bold">Please select 6 different teams.</p>
       )}
-      {error && <p className="text-sm text-vex-red">{error}</p>}
-      <button type="submit" disabled={loading || !unique} className="btn-primary">
-        {loading ? "Adding…" : "Add match"}
-      </button>
+      {error && <p className="text-sm text-vex-red font-bold">{error}</p>}
+      <div className="pt-4">
+        <button type="submit" disabled={loading || !unique} className="btn-primary w-full sm:w-auto">
+          {loading ? "Adding…" : "SUBMIT MATCH"}
+        </button>
+      </div>
     </form>
   );
 }

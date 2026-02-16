@@ -1,8 +1,9 @@
 "use client";
 
 type Team = {
-  teamNumber: number;
-  provinceState: string | null;
+  id: string;
+  teamNumber: string;
+  provinceState?: string | null;
   country: string | null;
   drivetrainType: string | null;
   autonomousSide: string | null;

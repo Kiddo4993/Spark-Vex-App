@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  teamNumber: z.number().int().positive(),
+  teamNumber: z.string().min(1),
   provinceState: z.string().optional(),
   country: z.string().optional(),
 });

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 type Team = {
   id: string;
-  teamNumber: number;
+  teamNumber: string;
   provinceState: string | null;
   country: string | null;
 };
@@ -13,7 +13,7 @@ type Team = {
 type ConnectionSent = {
   id: string;
   status: string;
-  toTeam: { id: string; teamNumber: number; provinceState: string | null; country: string | null };
+  toTeam: { id: string; teamNumber: string; provinceState: string | null; country: string | null };
 };
 
 type ConnectionReceived = {

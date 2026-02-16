@@ -14,14 +14,14 @@ export default async function TeamProfilePage({
   params: Promise<{ teamNumber: string }>;
 }) {
   const { teamNumber } = await params;
-  const num = parseInt(teamNumber, 10);
-  if (Number.isNaN(num)) notFound();
+  // const num = parseInt(teamNumber, 10);
+  // if (Number.isNaN(num)) notFound();
 
   const session = await getServerSession(authOptions);
   const myTeamId = session?.user ? (session.user as { teamId: string }).teamId : null;
 
   const team = await prisma.team.findUnique({
-    where: { teamNumber: num },
+    where: { teamNumber: teamNumber },
     include: {
       skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
       performanceHistory: { orderBy: { createdAt: "desc" }, take: 20 },

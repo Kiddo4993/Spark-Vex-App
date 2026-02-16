@@ -33,16 +33,16 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.teamId = (user as unknown as { teamId: string }).teamId;
-        token.teamNumber = (user as unknown as { teamNumber: number }).teamNumber;
+        token.teamId = (user as any).teamId;
+        token.teamNumber = (user as unknown as { teamNumber: string }).teamNumber;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as { id: string }).id = token.id as string;
-        (session.user as { teamId: string }).teamId = token.teamId as string;
-        (session.user as { teamNumber: number }).teamNumber = token.teamNumber as number;
+        session.user.id = token.id;
+        session.user.teamId = token.teamId;
+        (session.user as { teamNumber: string }).teamNumber = token.teamNumber as string;
       }
       return session;
     },

@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export function SearchAndRequest({ currentTeamId }: { currentTeamId: string }) {
   const [search, setSearch] = useState("");
-  const [teams, setTeams] = useState<Array<{ id: string; teamNumber: number }>>([]);
+  const [teams, setTeams] = useState<Array<{ id: string; teamNumber: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState<string | null>(null);
   const [message, setMessage] = useState("");
