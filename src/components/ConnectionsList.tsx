@@ -13,7 +13,7 @@ type Team = {
 type ConnectionSent = {
   id: string;
   status: string;
-  toTeam: { id: string; teamNumber: string; provinceState: string | null; country: string | null };
+  toTeam: Team;
 };
 
 type ConnectionReceived = {
@@ -61,28 +61,29 @@ export function ConnectionsList({
   );
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div className="card">
-        <h2 className="text-lg font-semibold text-white">Pending (received)</h2>
+    <div className="grid gap-5 lg:grid-cols-2">
+      {/* Pending Received */}
+      <div className="card p-5">
+        <h2 className="section-title mb-3">Pending Requests</h2>
         {received.filter((r) => r.status === "pending").length === 0 ? (
-          <p className="mt-2 text-sm text-gray-400">No pending requests.</p>
+          <p className="text-sm text-txt-3">No pending requests.</p>
         ) : (
-          <ul className="mt-4 space-y-2">
+          <ul className="space-y-2">
             {received
               .filter((r) => r.status === "pending")
               .map((r) => (
                 <li
                   key={r.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-vex-dark bg-vex-darker/50 p-3"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-line bg-surface-bg p-3"
                 >
                   <div>
                     <Link
                       href={`/dashboard/teams/${r.fromTeam.teamNumber}`}
-                      className="font-medium text-vex-accent hover:underline"
+                      className="font-mono font-medium text-spark hover:underline"
                     >
                       Team {r.fromTeam.teamNumber}
                     </Link>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-[10px] text-txt-3 font-mono">
                       {[r.fromTeam.provinceState, r.fromTeam.country].filter(Boolean).join(", ") || "—"}
                     </p>
                   </div>
@@ -90,14 +91,14 @@ export function ConnectionsList({
                     <button
                       onClick={() => acceptOrDeny(r.id, "accept")}
                       disabled={processing === r.id}
-                      className="rounded bg-vex-blue px-3 py-1 text-sm text-white hover:bg-vex-blue/90 disabled:opacity-50"
+                      className="btn-primary text-xs !px-3 !py-1"
                     >
                       Accept
                     </button>
                     <button
                       onClick={() => acceptOrDeny(r.id, "deny")}
                       disabled={processing === r.id}
-                      className="rounded border border-vex-dark px-3 py-1 text-sm text-gray-400 hover:bg-vex-dark disabled:opacity-50"
+                      className="btn-ghost text-xs !px-3 !py-1"
                     >
                       Deny
                     </button>
@@ -107,47 +108,50 @@ export function ConnectionsList({
           </ul>
         )}
       </div>
-      <div className="card">
-        <h2 className="text-lg font-semibold text-white">Sent</h2>
+
+      {/* Sent */}
+      <div className="card p-5">
+        <h2 className="section-title mb-3">Sent Requests</h2>
         {sent.length === 0 ? (
-          <p className="mt-2 text-sm text-gray-400">No sent requests.</p>
+          <p className="text-sm text-txt-3">No sent requests.</p>
         ) : (
-          <ul className="mt-4 space-y-2">
+          <ul className="space-y-2">
             {sent.map((s) => (
               <li
                 key={s.id}
-                className="rounded-lg border border-vex-dark bg-vex-darker/50 p-3"
+                className="rounded-[10px] border border-line bg-surface-bg p-3"
               >
                 <Link
                   href={`/dashboard/teams/${s.toTeam.teamNumber}`}
-                  className="font-medium text-vex-accent hover:underline"
+                  className="font-mono font-medium text-spark hover:underline"
                 >
                   Team {s.toTeam.teamNumber}
                 </Link>
-                <p className="text-xs text-gray-500 capitalize">{s.status}</p>
+                <p className="text-[10px] text-txt-3 font-mono capitalize">{s.status}</p>
               </li>
             ))}
           </ul>
         )}
       </div>
-      <div className="card lg:col-span-2">
-        <h2 className="text-lg font-semibold text-white">Connected teams</h2>
-        <p className="mt-1 text-sm text-gray-400">Share strategy and scouting notes with connected teams.</p>
+
+      {/* Connected */}
+      <div className="card p-5 lg:col-span-2">
+        <h2 className="section-title mb-1">Connected Teams</h2>
+        <p className="text-xs text-txt-3 mb-3">Share strategy and scouting notes with connected teams.</p>
         {connectedTeams.length === 0 ? (
-          <p className="mt-4 text-sm text-gray-400">No connected teams yet.</p>
+          <p className="text-sm text-txt-3">No connected teams yet.</p>
         ) : (
-          <ul className="mt-4 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {connectedTeams.map((t) => (
-              <li key={t.id}>
-                <Link
-                  href={`/dashboard/teams/${t.teamNumber}`}
-                  className="inline-block rounded-lg border border-vex-dark bg-vex-darker/50 px-4 py-2 text-sm text-gray-200 hover:bg-vex-dark/60 hover:text-white"
-                >
-                  Team {t.teamNumber}
-                </Link>
-              </li>
+              <Link
+                key={t.id}
+                href={`/dashboard/teams/${t.teamNumber}`}
+                className="inline-block rounded-[10px] border border-line bg-surface-bg px-4 py-2 font-mono text-sm text-txt-2 hover:bg-surface-hover hover:border-line-hi hover:text-txt-1 transition-all"
+              >
+                Team {t.teamNumber}
+              </Link>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>

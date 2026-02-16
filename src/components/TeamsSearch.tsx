@@ -1,130 +1,113 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 type Team = {
   id: string;
   teamNumber: string;
-  provinceState: string | null;
-  country: string | null;
   performanceRating: number;
   ratingUncertainty: number;
   matchCount: number;
-  skillsRecords: Array<{
-    combinedSkillsScore: number | null;
-    driverSkillsScore: number | null;
-    autonomousSkillsScore: number | null;
-  }> | null;
+  provinceState: string | null;
+  country: string | null;
 };
 
-export function TeamsSearch({
-  initialTeams,
-  currentTeamId,
-}: {
-  initialTeams: Team[];
-  currentTeamId: string | null;
-}) {
-  const [search, setSearch] = useState("");
-  const [teams, setTeams] = useState<Team[]>(initialTeams);
-  const [loading, setLoading] = useState(false);
+export function TeamsSearch() {
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  async function doSearch() {
-    if (!search.trim()) {
-      setTeams(initialTeams);
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/teams?search=${encodeURIComponent(search)}`);
-      const data = await res.json();
-      if (Array.isArray(data)) setTeams(data);
-    } finally {
-      setLoading(false);
-    }
-  }
+  useEffect(() => {
+    fetch("/api/teams")
+      .then((r) => r.json())
+      .then((data) => {
+        setTeams(data.teams ?? []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
-  const filtered =
-    search.trim().length < 2
-      ? teams
-      : teams.filter(
-        (t) =>
-          t.teamNumber.toString().includes(search) ||
-          (t.provinceState?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
-          (t.country?.toLowerCase().includes(search.toLowerCase()) ?? false)
-      );
+  const filtered = teams.filter((t) =>
+    t.teamNumber.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && doSearch()}
-          placeholder="Team number or region"
-          className="input max-w-xs"
-        />
-        <button type="button" onClick={doSearch} className="btn-secondary" disabled={loading}>
-          {loading ? "Searching…" : "Search"}
-        </button>
-      </div>
-      <div className="card overflow-hidden p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="bg-warm-100 border-b border-warm-200">
-                <th className="px-4 py-4 font-graffiti text-warm-900 uppercase tracking-wider text-xs">Team</th>
-                <th className="px-4 py-4 font-graffiti text-warm-900 uppercase tracking-wider text-xs">Region</th>
-                <th className="px-4 py-4 font-graffiti text-warm-900 uppercase tracking-wider text-xs text-right">Rating</th>
-                <th className="px-4 py-4 font-graffiti text-warm-900 uppercase tracking-wider text-xs text-center">Matches</th>
-                <th className="px-4 py-4 font-graffiti text-warm-900 uppercase tracking-wider text-xs text-right">Skills</th>
-                <th className="px-4 py-4 font-graffiti text-warm-900 uppercase tracking-wider text-xs"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((t) => {
-                const skills = t.skillsRecords?.[0];
-                return (
-                  <tr key={t.id} className="border-b border-warm-100 hover:bg-warm-50 transition-colors">
-                    <td className="px-4 py-3 font-bold text-warm-900">{t.teamNumber}</td>
-                    <td className="px-4 py-3 text-warm-600">
-                      {[t.provinceState, t.country].filter(Boolean).join(", ") || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-vex-blue font-medium">
-                      {Math.round(t.performanceRating)}
-                    </td>
-                    <td className="px-4 py-3 text-center tabular-nums text-warm-500">
-                      {t.matchCount}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-vex-red font-medium">
-                      {skills?.combinedSkillsScore ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {t.id === currentTeamId && (
-                          <span className="text-[10px] bg-warm-200 text-warm-600 px-1.5 py-0.5 rounded font-bold uppercase tracking-tighter">You</span>
-                        )}
-                        <Link
-                          href={`/dashboard/teams/${t.teamNumber}`}
-                          className="text-vex-blue font-medium hover:underline decoration-2"
-                        >
-                          View Profile
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+    <div className="space-y-5">
+      <input
+        type="text"
+        placeholder="Search teams by number…"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="input max-w-md"
+      />
+
+      {loading ? (
+        <p className="text-sm text-txt-3">Loading teams…</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-sm text-txt-3">No teams found.</p>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filtered.map((team, i) => {
+            const confidence = Math.min(
+              100,
+              Math.round(Math.max(0, 1 - team.ratingUncertainty / 50) * 100)
+            );
+
+            return (
+              <Link
+                key={team.id}
+                href={`/dashboard/teams/${team.teamNumber}`}
+                className="team-card group block"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <span className="font-mono text-lg font-bold text-txt-1 group-hover:text-spark transition-colors">
+                    {team.teamNumber}
+                  </span>
+                  <span className="text-[10px] font-mono bg-line px-2 py-0.5 rounded-md text-txt-3">
+                    #{i + 1}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <p className="stat-label">Rating</p>
+                    <p className="font-head text-2xl font-extrabold text-txt-1 tracking-tight leading-none">
+                      {Math.round(team.performanceRating)}
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="stat-label !mb-0">Confidence</span>
+                      <span className="text-[11px] font-mono text-txt-2">{confidence}%</span>
+                    </div>
+                    <div className="rating-bar-bg !h-1">
+                      <div
+                        className={`h-full rounded-full ${confidence > 80 ? "bg-success" : confidence > 50 ? "bg-amber" : "bg-danger"
+                          }`}
+                        style={{ width: `${confidence}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-line text-[10px] font-mono text-txt-3">
+                    <span>{team.matchCount} matches</span>
+                    <span>±{team.ratingUncertainty.toFixed(1)}</span>
+                  </div>
+
+                  {(team.provinceState || team.country) && (
+                    <div className="flex gap-1.5 flex-wrap">
+                      {team.provinceState && <span className="ext-chip">{team.provinceState}</span>}
+                      {team.country && <span className="ext-chip">{team.country}</span>}
+                    </div>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </div>
-        {filtered.length === 0 && (
-          <div className="p-12 text-center bg-white">
-            <p className="text-warm-500 italic">No teams found matching "{search}"</p>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

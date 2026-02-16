@@ -1,8 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import Link from "next/link";
-import { DashboardNav } from "@/components/DashboardNav";
+import { Sidebar } from "@/components/Sidebar";
 
 export default async function DashboardLayout({
   children,
@@ -14,22 +13,24 @@ export default async function DashboardLayout({
   const teamNumber = (session.user as { teamNumber: string }).teamNumber;
 
   return (
-    <div className="min-h-screen bg-warm-50">
-      <header className="sticky top-0 z-10 border-b border-warm-200 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/dashboard" className="flex items-center gap-2 group">
-            <span className="text-2xl font-graffiti text-warm-900 transition-colors group-hover:text-vex-red">
-              SPARKS VEX
-            </span>
-            <div className="hidden sm:block h-4 w-px bg-warm-300 mx-2"></div>
-            <span className="hidden sm:block text-sm text-warm-500 italic">
-              Team {teamNumber}
-            </span>
-          </Link>
-          <DashboardNav />
+    <div className="flex min-h-screen bg-surface-bg">
+      <Sidebar teamNumber={teamNumber} />
+      <div className="flex-1 min-w-0 overflow-x-hidden">
+        {/* Top bar */}
+        <div className="h-14 bg-surface-bg/85 backdrop-blur-xl border-b border-line flex items-center px-7 sticky top-0 z-50">
+          <div className="text-[13px] text-txt-3 flex items-center gap-1.5">
+            <span>Spark VEX</span>
+            <span>›</span>
+            <strong className="text-txt-1 font-medium">Dashboard</strong>
+          </div>
+          <div className="ml-auto flex items-center gap-2.5">
+            <div className="flex items-center gap-2 bg-surface-card border border-line rounded-[10px] px-3 py-1.5 w-[220px] text-[13px] text-txt-3 cursor-text hover:border-line-hi transition-colors">
+              🔍 <span className="opacity-50 text-[11px]">Search teams, matches…</span>
+            </div>
+          </div>
         </div>
-      </header>
-      <main className="mx-auto max-w-6xl p-4 md:p-8">{children}</main>
+        <main className="p-7">{children}</main>
+      </div>
     </div>
   );
 }

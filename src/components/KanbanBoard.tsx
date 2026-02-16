@@ -39,9 +39,9 @@ type Column = {
 export function KanbanBoard() {
     const [columns, setColumns] = useState<Column[]>([]);
     const [loading, setLoading] = useState(true);
-    const [newTaskColumn, setNewTaskColumn] = useState<string | null>(null);
-    const [newTaskTitle, setNewTaskTitle] = useState("");
-    const [draggingTask, setDraggingTask] = useState<Task | null>(null);
+    const [newTitle, setNewTitle] = useState("");
+    const [activeCol, setActiveCol] = useState<string | null>(null);
+    const [dragging, setDragging] = useState<Task | null>(null);
 
     useEffect(() => {
         fetchData();
@@ -49,25 +49,21 @@ export function KanbanBoard() {
 
     async function fetchData() {
         const res = await fetch("/api/tasks");
-        if (res.ok) {
-            const data = await res.json();
-            setColumns(data);
-        }
+        const data = await res.json();
+        setColumns(data.columns ?? []);
         setLoading(false);
     }
 
     async function createTask(columnId: string) {
-        if (!newTaskTitle.trim()) return;
-        const res = await fetch("/api/tasks", {
+        if (!newTitle.trim()) return;
+        await fetch("/api/tasks", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ columnId, title: newTaskTitle }),
+            body: JSON.stringify({ title: newTitle, columnId }),
         });
-        if (res.ok) {
-            setNewTaskTitle("");
-            setNewTaskColumn(null);
-            fetchData();
-        }
+        setNewTitle("");
+        setActiveCol(null);
+        fetchData();
     }
 
     async function moveTask(taskId: string, newColumnId: string) {
@@ -85,7 +81,7 @@ export function KanbanBoard() {
     }
 
     function handleDragStart(task: Task) {
-        setDraggingTask(task);
+        setDragging(task);
     }
 
     function handleDragOver(e: React.DragEvent) {
@@ -93,135 +89,117 @@ export function KanbanBoard() {
     }
 
     function handleDrop(columnId: string) {
-        if (draggingTask && draggingTask.columnId !== columnId) {
-            moveTask(draggingTask.id, columnId);
+        if (dragging && dragging.columnId !== columnId) {
+            moveTask(dragging.id, columnId);
         }
-        setDraggingTask(null);
+        setDragging(null);
     }
 
-    const priorityColors: Record<string, string> = {
-        high: "bg-red-500/20 text-red-400 border-red-500/50",
-        medium: "bg-yellow-500/20 text-yellow-400 border-yellow-500/50",
-        low: "bg-green-500/20 text-green-400 border-green-500/50",
-    };
-
-    if (loading) {
-        return <div className="text-center text-gray-400 py-8">Loading task board...</div>;
+    function prioClass(priority: string) {
+        if (priority === "high") return "prio-high";
+        if (priority === "medium") return "prio-med";
+        return "prio-low";
     }
+
+    if (loading) return <p className="text-sm text-txt-3 py-8 text-center">Loading tasks…</p>;
 
     return (
-        <div className="flex gap-4 overflow-x-auto pb-4">
-            {columns.map((column) => (
-                <div
-                    key={column.id}
-                    className="flex-shrink-0 w-80 bg-vex-darker rounded-xl p-4 border border-vex-dark"
-                    onDragOver={handleDragOver}
-                    onDrop={() => handleDrop(column.id)}
-                >
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-white">{column.name}</h3>
-                        <span className="text-xs text-gray-500 bg-vex-dark px-2 py-1 rounded-full">
-                            {column.tasks.length}
-                        </span>
-                    </div>
-
-                    <div className="space-y-3">
-                        {column.tasks.map((task) => (
-                            <div
-                                key={task.id}
-                                draggable
-                                onDragStart={() => handleDragStart(task)}
-                                className="bg-vex-bg rounded-lg p-3 border border-vex-dark hover:border-vex-accent cursor-grab active:cursor-grabbing transition-colors group"
-                            >
-                                <div className="flex items-start justify-between gap-2">
-                                    <h4 className="font-medium text-white text-sm">{task.title}</h4>
-                                    <button
-                                        onClick={() => deleteTask(task.id)}
-                                        className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-400 text-xs transition-opacity"
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                                {task.description && (
-                                    <p className="text-xs text-gray-400 mt-1 line-clamp-2">{task.description}</p>
-                                )}
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                    <span className={`text-xs px-2 py-0.5 rounded border ${priorityColors[task.priority]}`}>
-                                        {task.priority}
-                                    </span>
-                                    {task.tags.map((tag) => (
-                                        <span key={tag} className="text-xs px-2 py-0.5 rounded bg-vex-dark text-gray-300">
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                                {task.subtasks.length > 0 && (
-                                    <div className="mt-2 text-xs text-gray-500">
-                                        ☑ {task.subtasks.filter((s) => s.completed).length}/{task.subtasks.length} subtasks
-                                    </div>
-                                )}
-                                {task.assignees.length > 0 && (
-                                    <div className="mt-2 flex -space-x-2">
-                                        {task.assignees.slice(0, 3).map((a, i) => (
-                                            <div
-                                                key={i}
-                                                className="w-6 h-6 rounded-full bg-vex-accent text-white text-xs flex items-center justify-center border-2 border-vex-bg"
-                                                title={a}
-                                            >
-                                                {a[0]?.toUpperCase()}
-                                            </div>
-                                        ))}
-                                        {task.assignees.length > 3 && (
-                                            <div className="w-6 h-6 rounded-full bg-vex-dark text-gray-400 text-xs flex items-center justify-center border-2 border-vex-bg">
-                                                +{task.assignees.length - 3}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
+        <div className="flex gap-4 overflow-x-auto pb-4" style={{ minHeight: 400 }}>
+            {columns
+                .sort((a, b) => a.order - b.order)
+                .map((col) => (
+                    <div
+                        key={col.id}
+                        className="task-col"
+                        onDragOver={handleDragOver}
+                        onDrop={() => handleDrop(col.id)}
+                    >
+                        {/* Column header */}
+                        <div className="px-3.5 py-3 border-b border-line flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <span className="font-head text-[13px] font-bold text-txt-1">{col.name}</span>
+                                <span className="text-[10px] font-mono bg-line text-txt-3 px-1.5 py-0.5 rounded-full">
+                                    {col.tasks.length}
+                                </span>
                             </div>
-                        ))}
+                            <button
+                                onClick={() => setActiveCol(activeCol === col.id ? null : col.id)}
+                                className="text-txt-3 hover:text-spark transition-colors text-lg leading-none"
+                            >
+                                +
+                            </button>
+                        </div>
 
-                        {/* Add Task */}
-                        {newTaskColumn === column.id ? (
-                            <div className="space-y-2">
+                        {/* Task add form */}
+                        {activeCol === col.id && (
+                            <div className="p-3 border-b border-line">
                                 <input
                                     type="text"
-                                    value={newTaskTitle}
-                                    onChange={(e) => setNewTaskTitle(e.target.value)}
-                                    placeholder="Task title..."
-                                    className="input w-full text-sm"
+                                    value={newTitle}
+                                    onChange={(e) => setNewTitle(e.target.value)}
+                                    onKeyDown={(e) => e.key === "Enter" && createTask(col.id)}
+                                    className="input text-xs"
+                                    placeholder="Task title…"
                                     autoFocus
-                                    onKeyDown={(e) => e.key === "Enter" && createTask(column.id)}
                                 />
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 mt-2">
                                     <button
-                                        onClick={() => createTask(column.id)}
-                                        className="btn-primary text-sm py-1"
+                                        onClick={() => createTask(col.id)}
+                                        className="btn-primary text-[11px] px-2 py-1"
                                     >
                                         Add
                                     </button>
                                     <button
-                                        onClick={() => {
-                                            setNewTaskColumn(null);
-                                            setNewTaskTitle("");
-                                        }}
-                                        className="btn-secondary text-sm py-1"
+                                        onClick={() => { setActiveCol(null); setNewTitle(""); }}
+                                        className="btn-ghost text-[11px] px-2 py-1"
                                     >
                                         Cancel
                                     </button>
                                 </div>
                             </div>
-                        ) : (
-                            <button
-                                onClick={() => setNewTaskColumn(column.id)}
-                                className="w-full text-left text-sm text-gray-500 hover:text-white py-2 px-3 rounded-lg hover:bg-vex-dark/50 transition-colors"
-                            >
-                                + Add task
-                            </button>
                         )}
+
+                        {/* Tasks */}
+                        <div className="p-2.5 space-y-2 flex-1 overflow-y-auto" style={{ maxHeight: 500 }}>
+                            {col.tasks
+                                .sort((a, b) => a.order - b.order)
+                                .map((task) => (
+                                    <div
+                                        key={task.id}
+                                        draggable
+                                        onDragStart={() => handleDragStart(task)}
+                                        className="task-item"
+                                    >
+                                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                                            <span className="text-[12.5px] text-txt-1 font-medium leading-tight">{task.title}</span>
+                                            <button
+                                                onClick={() => deleteTask(task.id)}
+                                                className="text-txt-3 hover:text-danger text-xs flex-shrink-0 transition-colors"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                        {task.description && (
+                                            <p className="text-[11px] text-txt-3 mb-2 line-clamp-2">{task.description}</p>
+                                        )}
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                            <span className={`task-priority ${prioClass(task.priority)}`}>
+                                                {task.priority.toUpperCase()}
+                                            </span>
+                                            {task.tags.map((tag) => (
+                                                <span key={tag} className="ext-chip text-[9px]">{tag}</span>
+                                            ))}
+                                        </div>
+                                        {task.subtasks.length > 0 && (
+                                            <div className="mt-2 text-[10px] font-mono text-txt-3">
+                                                {task.subtasks.filter((s) => s.completed).length}/{task.subtasks.length} done
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))}
         </div>
     );
 }

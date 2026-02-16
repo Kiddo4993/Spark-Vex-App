@@ -2,83 +2,112 @@
 
 import Link from "next/link";
 
-type SynergyResult = {
-    team: {
-        id: string;
-        teamNumber: string;
-        autonomousSide: string | null;
-        autoStrength: number | null;
-        driverStrength: number | null;
-        performanceRating: number;
-    };
-    synergyScore: number;
-    autoCompatibility: number;
-    strengthScore: number;
+type SynergyRow = {
+    teamNumber: string;
+    performanceRating: number;
     confidence: number;
+    autoStrength: number | null;
+    driverStrength: number | null;
+    synergyScore: number;
 };
 
-export function AllianceSynergyTable({ data }: { data: SynergyResult[] }) {
-    if (data.length === 0) {
-        return <div className="p-8 text-center text-gray-400">No data available. Import matches to calculate synergy.</div>;
+function gradeFor(score: number) {
+    if (score >= 150) return { label: "Excellent", cls: "pill-excellent" };
+    if (score >= 100) return { label: "Good", cls: "pill-good" };
+    return { label: "Weak", cls: "pill-weak" };
+}
+
+function barColor(score: number) {
+    if (score >= 150) return "bar-green";
+    if (score >= 100) return "bar-amber";
+    return "bar-red";
+}
+
+export function AllianceSynergyTable({ rows }: { rows: SynergyRow[] }) {
+    if (rows.length === 0) {
+        return (
+            <div className="card">
+                <div className="card-body text-center py-8 text-txt-3 text-sm">
+                    No teams available for synergy analysis. More teams need to sign up and record matches.
+                </div>
+            </div>
+        );
     }
 
+    const maxSynergy = Math.max(...rows.map((r) => r.synergyScore), 1);
+
     return (
-        <div className="card overflow-hidden p-0 border border-vex-border bg-vex-surface/20 backdrop-blur-sm">
-            <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                    <thead>
-                        <tr className="border-b border-vex-border bg-vex-darker/50">
-                            <th className="px-4 py-3 font-bold text-white uppercase tracking-wider text-xs">Team</th>
-                            <th className="px-4 py-3 font-bold text-white uppercase tracking-wider text-xs">Rating</th>
-                            <th className="px-4 py-3 font-bold text-white uppercase tracking-wider text-xs">Confidence</th>
-                            <th className="px-4 py-3 font-bold text-gray-400 uppercase tracking-wider text-xs hidden sm:table-cell">Auto Side</th>
-                            <th className="px-4 py-3 font-bold text-gray-400 uppercase tracking-wider text-xs hidden md:table-cell">Auto Str</th>
-                            <th className="px-4 py-3 font-bold text-gray-400 uppercase tracking-wider text-xs hidden md:table-cell">Driver Str</th>
-                            <th className="px-4 py-3 font-bold text-vex-accent uppercase tracking-wider text-xs">Synergy</th>
-                            <th className="px-4 py-3 font-bold text-gray-400 uppercase tracking-wider text-xs">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-vex-border/30">
-                        {data.map((row) => {
-                            const { team, synergyScore, confidence } = row;
+        <div className="card overflow-hidden p-0">
+            <table className="data-table">
+                <thead>
+                    <tr>
+                        <th>Team</th>
+                        <th>Rating</th>
+                        <th>Confidence</th>
+                        <th>Auto</th>
+                        <th>Driver</th>
+                        <th>Synergy</th>
+                        <th>Grade</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows.map((row) => {
+                        const { label, cls } = gradeFor(row.synergyScore);
+                        const barPct = Math.max(5, (row.synergyScore / maxSynergy) * 100);
 
-                            let scoreColor = "text-vex-red";
-                            if (synergyScore > 110) scoreColor = "text-green-400 shadow-green-400/20 drop-shadow-sm";
-                            else if (synergyScore >= 100) scoreColor = "text-yellow-400";
-
-                            return (
-                                <tr key={team.id} className="hover:bg-vex-surface/30 transition-colors">
-                                    <td className="px-4 py-3 font-bold text-white">{team.teamNumber}</td>
-                                    <td className="px-4 py-3 text-gray-300 font-mono">{Math.round(team.performanceRating)}</td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-1.5 w-16 overflow-hidden rounded-full bg-vex-darker border border-vex-border/50">
-                                                <div
-                                                    className={`h-full rounded-full transition-all duration-500 ${confidence > 80 ? 'bg-green-500' : confidence > 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                                                    style={{ width: `${confidence}%` }}
-                                                />
-                                            </div>
-                                            <span className="text-xs text-gray-500 font-mono">{confidence}%</span>
+                        return (
+                            <tr key={row.teamNumber}>
+                                <td>
+                                    <span className="font-mono font-bold text-txt-1">{row.teamNumber}</span>
+                                </td>
+                                <td>
+                                    <span className="font-mono text-spark">{Math.round(row.performanceRating)}</span>
+                                </td>
+                                <td>
+                                    <div className="flex items-center gap-2 min-w-[80px]">
+                                        <div className="mini-bar w-12">
+                                            <div
+                                                className={`mini-bar-fill ${row.confidence > 80 ? "bar-green" : row.confidence > 50 ? "bar-amber" : "bar-red"}`}
+                                                style={{ width: `${row.confidence}%` }}
+                                            />
                                         </div>
-                                    </td>
-                                    <td className="px-4 py-3 text-gray-400 hidden sm:table-cell text-xs">{team.autonomousSide || "—"}</td>
-                                    <td className="px-4 py-3 text-gray-500 hidden md:table-cell text-xs">{team.autoStrength != null ? `${team.autoStrength}/10` : "—"}</td>
-                                    <td className="px-4 py-3 text-gray-500 hidden md:table-cell text-xs">{team.driverStrength != null ? `${team.driverStrength}/10` : "—"}</td>
-                                    <td className={`px-4 py-3 font-bold text-lg ${scoreColor}`}>{Math.round(synergyScore)}</td>
-                                    <td className="px-4 py-3">
-                                        <Link
-                                            href={`/dashboard/teams?teamNumber=${team.teamNumber}`}
-                                            className="text-xs font-bold text-vex-accent hover:text-white transition-colors border border-vex-accent/30 hover:bg-vex-accent/20 px-3 py-1 rounded"
-                                        >
-                                            View
-                                        </Link>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
+                                        <span className="font-mono text-[11px] text-txt-2">{row.confidence}%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span className="font-mono text-amber">{row.autoStrength ?? "—"}</span>
+                                </td>
+                                <td>
+                                    <span className="font-mono text-success">{row.driverStrength ?? "—"}</span>
+                                </td>
+                                <td>
+                                    <div className="flex items-center gap-2 min-w-[100px]">
+                                        <div className="mini-bar w-16">
+                                            <div
+                                                className={`mini-bar-fill ${barColor(row.synergyScore)}`}
+                                                style={{ width: `${barPct}%` }}
+                                            />
+                                        </div>
+                                        <span className="font-mono text-[11px] text-txt-1">{Math.round(row.synergyScore)}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span className={`synergy-pill ${cls}`}>{label}</span>
+                                </td>
+                                <td>
+                                    <Link
+                                        href={`/dashboard/teams?teamNumber=${row.teamNumber}`}
+                                        className="text-[11px] font-mono text-spark hover:text-txt-1 transition-colors"
+                                    >
+                                        View →
+                                    </Link>
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
         </div>
     );
 }

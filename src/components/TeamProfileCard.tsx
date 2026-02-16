@@ -1,97 +1,113 @@
 "use client";
 
 type Team = {
-  id: string;
   teamNumber: string;
-  provinceState?: string | null;
-  country: string | null;
-  drivetrainType: string | null;
-  autonomousSide: string | null;
-  autonReliabilityPct: number | null;
-  notes: string | null;
-  strategyTags: string[];
   performanceRating: number;
   ratingUncertainty: number;
   matchCount: number;
   autoStrength: number | null;
   driverStrength: number | null;
+  provinceState: string | null;
+  country: string | null;
 };
 
-type Skills = {
-  driverSkillsScore: number | null;
-  autonomousSkillsScore: number | null;
-  combinedSkillsScore: number | null;
-  provincialSkillsRank: number | null;
-  worldwideSkillsRank: number | null;
-  lastUpdated: string | Date;
-} | null;
+export function TeamProfileCard({ team }: { team: Team }) {
+  const confidence = Math.min(
+    100,
+    Math.round(Math.max(0, 1 - team.ratingUncertainty / 50) * 100)
+  );
 
-export function TeamProfileCard({
-  team,
-  skills,
-  confidence,
-  isOwn,
-}: {
-  team: Team;
-  skills: Skills;
-  confidence: number;
-  isOwn: boolean;
-}) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div className="card">
-        <p className="text-sm font-medium text-gray-400">Performance Rating</p>
-        <p className="mt-1 text-2xl font-bold text-white">{Math.round(team.performanceRating)}</p>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-vex-dark">
-          <div
-            className="h-full rounded-full bg-vex-accent"
-            style={{ width: `${confidence}%` }}
-          />
+    <div className="space-y-5">
+      {/* Profile Hero */}
+      <div className="profile-hero">
+        <div className="team-avatar !w-16 !h-16 !text-xl">
+          {team.teamNumber.slice(0, 2)}
         </div>
-        <p className="mt-1 text-xs text-gray-500">{team.matchCount} matches · ±{team.ratingUncertainty.toFixed(0)}</p>
+        <div className="relative z-10">
+          <h2 className="font-head text-3xl font-extrabold text-txt-1 tracking-tight">
+            Team {team.teamNumber}
+          </h2>
+          <div className="flex items-center gap-3 mt-1 text-xs text-txt-3">
+            {team.provinceState && <span>{team.provinceState}</span>}
+            {team.country && <span>| {team.country}</span>}
+            <span>| {team.matchCount} matches</span>
+          </div>
+        </div>
       </div>
-      <div className="card">
-        <p className="text-sm font-medium text-gray-400">Skills</p>
-        <p className="mt-1 text-2xl font-bold text-white">{skills?.combinedSkillsScore ?? "—"}</p>
-        <p className="mt-1 text-xs text-gray-500">
-          Driver: {skills?.driverSkillsScore ?? "—"} · Auton: {skills?.autonomousSkillsScore ?? "—"}
-        </p>
-        {skills?.worldwideSkillsRank != null && (
-          <p className="mt-1 text-xs text-gray-400">World #{skills.worldwideSkillsRank}</p>
-        )}
+
+      {/* Stats Grid */}
+      <div className="profile-stats-grid">
+        <div className="p-stat">
+          <div className="p-stat-label">Rating</div>
+          <div className="p-stat-val text-spark">{Math.round(team.performanceRating)}</div>
+        </div>
+        <div className="p-stat">
+          <div className="p-stat-label">Uncertainty</div>
+          <div className="p-stat-val text-amber">±{team.ratingUncertainty.toFixed(1)}</div>
+        </div>
+        <div className="p-stat">
+          <div className="p-stat-label">Confidence</div>
+          <div className={`p-stat-val ${confidence > 80 ? "text-success" : confidence > 50 ? "text-amber" : "text-danger"}`}>
+            {confidence}%
+          </div>
+        </div>
+        <div className="p-stat">
+          <div className="p-stat-label">Auto</div>
+          <div className="p-stat-val text-amber">{team.autoStrength ?? "—"}</div>
+        </div>
+        <div className="p-stat">
+          <div className="p-stat-label">Driver</div>
+          <div className="p-stat-val text-success">{team.driverStrength ?? "—"}</div>
+        </div>
       </div>
-      <div className="card sm:col-span-2 lg:col-span-1">
-        <p className="text-sm font-medium text-gray-400">Region</p>
-        <p className="mt-1 text-white">
-          {[team.provinceState, team.country].filter(Boolean).join(", ") || "—"}
-        </p>
-        <p className="mt-2 text-sm text-gray-400">Drivetrain: {team.drivetrainType ?? "—"}</p>
-        <p className="text-sm text-gray-400">Auton side: {team.autonomousSide ?? "—"}</p>
-        {team.autonReliabilityPct != null && (
-          <p className="text-sm text-gray-400">Auton reliability: {team.autonReliabilityPct}%</p>
-        )}
-        {team.autoStrength != null && (
-          <p className="text-sm text-gray-400">Auton Strength: {team.autoStrength}/10</p>
-        )}
-        {team.driverStrength != null && (
-          <p className="text-sm text-gray-400">Driver Strength: {team.driverStrength}/10</p>
-        )}
-      </div>
-      {(team.notes || team.strategyTags?.length) ? (
-        <div className="card sm:col-span-2">
-          <p className="text-sm font-medium text-gray-400">Notes & strategy</p>
-          {team.strategyTags?.length ? (
-            <div className="mt-2 flex flex-wrap gap-2">
-              {team.strategyTags.map((tag) => (
-                <span key={tag} className="rounded bg-vex-dark px-2 py-0.5 text-xs text-vex-accent">
-                  {tag}
-                </span>
-              ))}
+
+      {/* Scouting Bars */}
+      <div className="card p-5">
+        <h3 className="section-title mb-4">Scouting Data</h3>
+        <div className="space-y-4">
+          <div>
+            <div className="flex justify-between text-[11px] font-mono text-txt-3 mb-1.5">
+              <span>AUTONOMOUS STRENGTH</span>
+              <span className="text-amber">{team.autoStrength != null ? `${team.autoStrength} / 10` : "Not scouted"}</span>
             </div>
-          ) : null}
-          {team.notes ? <p className="mt-2 text-sm text-gray-300">{team.notes}</p> : null}
+            <div className="rating-bar-bg !h-2">
+              <div
+                className="h-full rounded-full bg-amber transition-all animate-grow-bar"
+                style={{
+                  width: team.autoStrength != null ? `${team.autoStrength * 10}%` : "0%",
+                  boxShadow: "0 0 8px rgba(255,179,64,.4)"
+                }}
+              />
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between text-[11px] font-mono text-txt-3 mb-1.5">
+              <span>DRIVER STRENGTH</span>
+              <span className="text-success">{team.driverStrength != null ? `${team.driverStrength} / 10` : "Not scouted"}</span>
+            </div>
+            <div className="rating-bar-bg !h-2">
+              <div
+                className="h-full rounded-full bg-success transition-all animate-grow-bar"
+                style={{
+                  width: team.driverStrength != null ? `${team.driverStrength * 10}%` : "0%",
+                  boxShadow: "0 0 8px rgba(34,232,154,.4)"
+                }}
+              />
+            </div>
+          </div>
         </div>
-      ) : null}
+
+        {/* Re-scout warning */}
+        {confidence < 50 && (
+          <div className="alert alert-warn mt-4">
+            <span className="alert-icon">⚠️</span>
+            <div className="alert-body">
+              <strong>Re-scout recommended.</strong> Confidence is below 50% — add more match data for this team.
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -3,7 +3,6 @@
 export type ColumnMapping = {
     eventName?: string;
     date?: string;
-    // Match Fields
     redTeam1?: string;
     redTeam2?: string;
     redTeam3?: string;
@@ -12,7 +11,6 @@ export type ColumnMapping = {
     blueTeam3?: string;
     redScore?: string;
     blueScore?: string;
-    // Skills Fields
     rank?: string;
     team?: string;
     driverScore?: string;
@@ -58,27 +56,13 @@ export function ColumnMappingTable({
 
     function handleSelect(colIndex: string, field: string) {
         const newMapping = { ...mapping };
-        // Remove if previously mapped to this column
-        // Actually, one field per column? Or one column to one field?
-        // We map Field -> ColumnIndex.
-
-        // Clear any existing mapping for this field
-        // But wait, the dropdown is changing the field for THIS column.
-
-        // Check if this field is already mapped to another column?
-        // Not strictly necessary, but good UX.
 
         if (field === "") {
-            // Find if this colIndex was mapped strictly and remove it?
-            // We need to iterate entries.
-            const entry = Object.entries(newMapping).find(([k, v]) => v === colIndex);
+            const entry = Object.entries(newMapping).find(([, v]) => v === colIndex);
             if (entry) {
                 delete newMapping[entry[0] as keyof ColumnMapping];
             }
         } else {
-            // Map field -> colIndex
-            // Remove old mapping for this field to avoid duplicates
-            // (e.g. RedTeam1 was col 0, now set col 1 to RedTeam1 -> update)
             newMapping[field as keyof ColumnMapping] = colIndex;
         }
 
@@ -86,44 +70,46 @@ export function ColumnMappingTable({
     }
 
     return (
-        <div className="overflow-x-auto rounded-lg border border-vex-border bg-vex-surface/30 backdrop-blur-sm">
-            <table className="w-full text-left text-sm">
-                <thead className="bg-vex-darker/50">
-                    <tr>
-                        {columns.map((col, idx) => {
-                            const mappedField = Object.entries(mapping).find(([k, v]) => v === String(idx))?.[0] || "";
-                            return (
-                                <th key={idx} className="p-3 border-b border-vex-border min-w-[150px]">
-                                    <div className="mb-2 text-gray-300 font-medium truncate" title={col}>{col}</div>
-                                    <select
-                                        className="w-full text-xs bg-vex-dark border border-vex-border rounded px-2 py-1 text-white focus:border-vex-accent focus:ring-1 focus:ring-vex-accent outline-none"
-                                        value={mappedField}
-                                        onChange={(e) => handleSelect(String(idx), e.target.value)}
-                                    >
-                                        <option value="" className="text-gray-500">(Ignore)</option>
-                                        {fields.map((f) => (
-                                            <option key={f.key} value={f.key} className="text-white">
-                                                {f.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </th>
-                            )
-                        })}
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-vex-border/50">
-                    {preview.map((row, rIdx) => (
-                        <tr key={rIdx} className="hover:bg-vex-surface/20 transition-colors">
-                            {row.map((cell, cIdx) => (
-                                <td key={cIdx} className="p-3 text-gray-400 max-w-[150px] truncate text-xs font-mono">
-                                    {String(cell)}
-                                </td>
-                            ))}
+        <div className="card overflow-hidden p-0">
+            <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                    <thead>
+                        <tr className="border-b border-line bg-surface-hover">
+                            {columns.map((col, idx) => {
+                                const mappedField = Object.entries(mapping).find(([, v]) => v === String(idx))?.[0] || "";
+                                return (
+                                    <th key={idx} className="p-3 min-w-[150px]">
+                                        <div className="mb-2 text-txt-1 font-mono text-xs truncate" title={col}>{col}</div>
+                                        <select
+                                            className="input text-xs !py-1 !px-2"
+                                            value={mappedField}
+                                            onChange={(e) => handleSelect(String(idx), e.target.value)}
+                                        >
+                                            <option value="">(Ignore)</option>
+                                            {fields.map((f) => (
+                                                <option key={f.key} value={f.key}>
+                                                    {f.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </th>
+                                );
+                            })}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {preview.map((row, rIdx) => (
+                            <tr key={rIdx} className="border-b border-line last:border-b-0 hover:bg-surface-hover transition-colors">
+                                {row.map((cell, cIdx) => (
+                                    <td key={cIdx} className="p-3 text-txt-3 max-w-[150px] truncate text-xs font-mono">
+                                        {String(cell)}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
