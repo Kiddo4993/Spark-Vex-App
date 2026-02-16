@@ -31,9 +31,8 @@ export default function ImportPage() {
 
             setHeaders(data.headers);
             setPreview(data.preview);
-            setFileData(data.fullData); // Warning: storing in state might be heavy
+            setFileData(data.fullData);
 
-            // Auto-detect mapping
             const newMapping: ColumnMapping = {};
             const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -43,7 +42,7 @@ export default function ImportPage() {
 
                 if (importType === "match") {
                     if (h.includes("date") || h.includes("time") || h.includes("start")) newMapping.date = idxStr;
-                    else if (h.includes("match") || h.includes("round")) newMapping.eventName = idxStr; // "Match" often contains "Q1", etc.
+                    else if (h.includes("match") || h.includes("round")) newMapping.eventName = idxStr;
                     else if (h === "red1" || h === "redteam1") newMapping.redTeam1 = idxStr;
                     else if (h === "red2" || h === "redteam2") newMapping.redTeam2 = idxStr;
                     else if (h === "red3" || h === "redteam3") newMapping.redTeam3 = idxStr;
@@ -53,12 +52,11 @@ export default function ImportPage() {
                     else if (h === "redscore" || h === "redtotal") newMapping.redScore = idxStr;
                     else if (h === "bluescore" || h === "bluetotal") newMapping.blueScore = idxStr;
                 } else {
-                    // Skills Mapping
                     if (h.includes("rank")) newMapping.rank = idxStr;
-                    else if (h.includes("team")) newMapping.team = idxStr; // "Team Number"
-                    else if (h.includes("driver")) newMapping.driverScore = idxStr; // "Driver Score"
-                    else if (h.includes("prog") || h.includes("auto")) newMapping.programmingScore = idxStr; // "Programming Score"
-                    else if (h.includes("high") || h.includes("combined") || h.includes("score")) newMapping.highestScore = idxStr; // "Highest Score"
+                    else if (h.includes("team")) newMapping.team = idxStr;
+                    else if (h.includes("driver")) newMapping.driverScore = idxStr;
+                    else if (h.includes("prog") || h.includes("auto")) newMapping.programmingScore = idxStr;
+                    else if (h.includes("high") || h.includes("combined") || h.includes("score")) newMapping.highestScore = idxStr;
                 }
             });
 
@@ -73,7 +71,7 @@ export default function ImportPage() {
 
     const handleImport = async () => {
         setStep("processing");
-        setStatus("Importing matches and calculating ratings...");
+        setStatus("Importing and recalculating ratings…");
         try {
             const res = await fetch("/api/import/process", {
                 method: "POST",
@@ -83,46 +81,49 @@ export default function ImportPage() {
             const data = await res.json();
             if (data.error) throw new Error(data.error);
 
-            setStatus(`Success! Imported ${data.count} matches.`);
+            setStatus(`Success! Imported ${data.count} ${importType === "match" ? "matches" : "entries"}.`);
             setStep("done");
         } catch (e: any) {
             setStatus("Error: " + e.message);
-            setStep("map"); // allow retry
+            setStep("map");
         }
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-fade-in">
             <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Import Matches</h1>
-                <p className="text-gray-400">Upload an XLS/CSV export from RobotEvents to update ratings.</p>
+                <h1 className="page-title">Import Data</h1>
+                <p className="page-subtitle">Upload an XLS/CSV export from RobotEvents to update ratings.</p>
             </div>
 
+            {/* Step: Upload */}
             {step === "upload" && (
-                <div className="space-y-6">
-                    <div className="flex gap-4 p-1 bg-vex-surface/50 rounded-lg w-fit">
+                <div className="space-y-5">
+                    <div className="flex gap-2">
                         <button
                             onClick={() => setImportType("match")}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${importType === "match" ? "bg-vex-accent text-white shadow-lg" : "text-gray-400 hover:text-white"}`}
+                            className={`filter-chip ${importType === "match" ? "on" : ""}`}
                         >
                             Match Results
                         </button>
                         <button
                             onClick={() => setImportType("skills")}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${importType === "skills" ? "bg-vex-accent text-white shadow-lg" : "text-gray-400 hover:text-white"}`}
+                            className={`filter-chip ${importType === "skills" ? "on" : ""}`}
                         >
                             Skills List
                         </button>
                     </div>
                     <ImportFileUpload onFileSelect={handleFileSelect} />
+                    {status && <p className="text-sm text-txt-3 animate-pulse">{status}</p>}
                 </div>
             )}
 
+            {/* Step: Map Columns */}
             {step === "map" && (
-                <div className="space-y-6">
-                    <div className="glass-card p-6 border-l-[4px] border-l-vex-accent">
-                        <h3 className="text-white font-bold mb-2">Map Columns ({importType === "match" ? "Matches" : "Skills"})</h3>
-                        <p className="text-sm text-gray-400 mb-6">Select which column in your file corresponds to each field.</p>
+                <div className="space-y-5">
+                    <div className="card p-5 border-l-[3px] border-l-spark">
+                        <h3 className="section-title mb-1">Map Columns — {importType === "match" ? "Matches" : "Skills"}</h3>
+                        <p className="text-xs text-txt-3 mb-5">Select which column corresponds to each field.</p>
                         <ColumnMappingTable
                             columns={headers}
                             preview={preview}
@@ -132,12 +133,12 @@ export default function ImportPage() {
                         />
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-2">
-                        <button onClick={() => setStep("upload")} className="btn-secondary">Cancel</button>
+                    <div className="flex justify-end gap-3">
+                        <button onClick={() => setStep("upload")} className="btn-ghost">Cancel</button>
                         <button
                             onClick={async () => {
                                 setStep("processing");
-                                setStatus("Verifying data...");
+                                setStatus("Verifying data…");
                                 try {
                                     const res = await fetch("/api/import/process", {
                                         method: "POST",
@@ -166,64 +167,67 @@ export default function ImportPage() {
                 </div>
             )}
 
+            {/* Step: Review */}
             {step === "review" && reviewStats && (
-                <div className="space-y-6">
-                    <div className="glass-card p-8 text-center">
-                        <h3 className="text-2xl font-bold text-white mb-6">Ready to Import</h3>
+                <div className="space-y-5">
+                    <div className="card p-6 text-center">
+                        <h3 className="font-head text-xl font-bold text-txt-1 mb-6">Ready to Import</h3>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-left">
-                            <div className="p-4 bg-vex-surface/40 rounded-lg border border-vex-border">
-                                <span className="block text-gray-400 text-sm">{importType === "match" ? "Matches" : "Entries"} Found</span>
-                                <span className="block text-3xl font-bold text-white">{reviewStats.matchCount || reviewStats.count}</span>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-left">
+                            <div className="stat-card c-cyan">
+                                <div className="stat-label">{importType === "match" ? "Matches" : "Entries"} Found</div>
+                                <div className="stat-value">{reviewStats.matchCount || reviewStats.count}</div>
                             </div>
-                            <div className="p-4 bg-vex-surface/40 rounded-lg border border-vex-border">
-                                <span className="block text-gray-400 text-sm">Unique Teams</span>
-                                <span className="block text-3xl font-bold text-white">{reviewStats.teamCount}</span>
+                            <div className="stat-card c-amber">
+                                <div className="stat-label">Unique Teams</div>
+                                <div className="stat-value">{reviewStats.teamCount}</div>
                             </div>
-                            <div className="p-4 bg-vex-surface/40 rounded-lg border border-vex-border">
-                                <span className="block text-gray-400 text-sm">Date Range</span>
-                                <span className="block text-lg font-bold text-white">
+                            <div className="stat-card c-green">
+                                <div className="stat-label">Date Range</div>
+                                <div className="text-sm font-mono text-txt-1 mt-1">
                                     {reviewStats.dateRange ?
-                                        `${new Date(reviewStats.dateRange.start).toLocaleDateString()} - ${new Date(reviewStats.dateRange.end).toLocaleDateString()}`
+                                        `${new Date(reviewStats.dateRange.start).toLocaleDateString()} – ${new Date(reviewStats.dateRange.end).toLocaleDateString()}`
                                         : "N/A"}
-                                </span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="text-left mb-8">
-                            <h4 className="text-white font-bold mb-2">Sample Parsed Data</h4>
-                            <div className="text-xs text-gray-400 font-mono bg-black/30 p-4 rounded overflow-x-auto">
+                        <div className="text-left mb-6">
+                            <h4 className="section-title mb-2">Sample Parsed Data</h4>
+                            <pre className="text-xs text-txt-3 font-mono bg-surface-bg p-4 rounded-[10px] overflow-x-auto border border-line">
                                 {JSON.stringify(reviewStats.sample, null, 2)}
-                            </div>
+                            </pre>
                         </div>
 
-                        <div className="flex justify-center gap-4">
-                            <button onClick={() => setStep("map")} className="btn-secondary px-6">Back</button>
-                            <button onClick={handleImport} className="btn-primary px-8 bg-green-600 hover:bg-green-500 border-green-500">
-                                Confirm & Import
+                        <div className="flex justify-center gap-3">
+                            <button onClick={() => setStep("map")} className="btn-ghost">Back</button>
+                            <button onClick={handleImport} className="btn-primary bg-success hover:bg-success/90 border-success/50">
+                                Confirm &amp; Import
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
+            {/* Step: Processing */}
             {step === "processing" && (
-                <div className="text-center py-20 bg-vex-surface/20 rounded-xl border border-vex-border backdrop-blur-sm">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-vex-accent mb-6 shadow-[0_0_15px_rgba(var(--vex-accent),0.5)]"></div>
-                    <p className="text-white font-bold text-lg tracking-wide animate-pulse">{status}</p>
+                <div className="text-center py-20 card">
+                    <div className="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-spark mb-5"></div>
+                    <p className="text-txt-1 font-head font-bold tracking-wide animate-pulse">{status}</p>
                 </div>
             )}
 
+            {/* Step: Done */}
             {step === "done" && (
-                <div className="text-center py-20 bg-vex-surface/20 rounded-xl border border-vex-border backdrop-blur-sm">
-                    <div className="flex justify-center mb-6">
-                        <div className="h-16 w-16 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 text-3xl border border-green-500/50 shadow-[0_0_15px_rgba(74,222,128,0.3)]">
+                <div className="text-center py-20 card">
+                    <div className="flex justify-center mb-5">
+                        <div className="h-14 w-14 rounded-full bg-success/15 flex items-center justify-center text-success text-2xl border border-success/30">
                             ✓
                         </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Import Complete</h3>
-                    <p className="text-gray-400 mb-8 max-w-md mx-auto">{status}</p>
-                    <button onClick={() => router.push("/dashboard")} className="btn-primary px-8">Go to Dashboard</button>
+                    <h3 className="font-head text-xl font-bold text-txt-1 mb-2">Import Complete</h3>
+                    <p className="text-sm text-txt-3 mb-6 max-w-md mx-auto">{status}</p>
+                    <button onClick={() => router.push("/dashboard")} className="btn-primary">Go to Dashboard</button>
                 </div>
             )}
         </div>

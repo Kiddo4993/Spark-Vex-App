@@ -46,9 +46,9 @@ export function SearchAndRequest({ currentTeamId }: { currentTeamId: string }) {
   }
 
   return (
-    <div className="card max-w-xl">
-      <h2 className="text-lg font-semibold text-white">Find teams & send connection request</h2>
-      <div className="mt-4 flex flex-wrap gap-2">
+    <div className="card p-5 max-w-xl">
+      <h2 className="section-title mb-3">Find &amp; Connect</h2>
+      <div className="flex gap-2">
         <input
           type="text"
           value={search}
@@ -57,24 +57,24 @@ export function SearchAndRequest({ currentTeamId }: { currentTeamId: string }) {
           placeholder="Team number"
           className="input max-w-[200px]"
         />
-        <button type="button" onClick={doSearch} className="btn-secondary" disabled={loading}>
+        <button type="button" onClick={doSearch} className="btn-primary" disabled={loading}>
           {loading ? "Searching…" : "Search"}
         </button>
       </div>
-      {message && <p className="mt-2 text-sm text-vex-accent">{message}</p>}
+      {message && <p className="mt-2 text-sm text-spark">{message}</p>}
       {teams.length > 0 && (
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-3 space-y-2">
           {teams.map((t) => (
             <li
               key={t.id}
-              className="flex items-center justify-between rounded-lg border border-vex-dark bg-vex-darker/50 px-3 py-2"
+              className="flex items-center justify-between rounded-[10px] border border-line bg-surface-bg px-3 py-2"
             >
-              <span className="font-medium text-white">Team {t.teamNumber}</span>
+              <span className="font-mono font-medium text-txt-1">Team {t.teamNumber}</span>
               <button
                 type="button"
                 onClick={() => sendRequest(t.id)}
                 disabled={sending === t.id}
-                className="btn-primary text-sm disabled:opacity-50"
+                className="btn-primary text-xs"
               >
                 {sending === t.id ? "Sending…" : "Send request"}
               </button>

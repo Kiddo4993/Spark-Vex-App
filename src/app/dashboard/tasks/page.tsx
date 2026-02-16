@@ -10,14 +10,10 @@ export default async function TasksPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">Task Board</h1>
-                    <p className="text-sm text-gray-400 mt-1">
-                        Manage your team&apos;s build season tasks
-                    </p>
-                </div>
+        <div className="space-y-6 animate-fade-in">
+            <div>
+                <h1 className="page-title">Task Board</h1>
+                <p className="page-subtitle">Manage your team&apos;s build season tasks.</p>
             </div>
             <KanbanBoard />
         </div>

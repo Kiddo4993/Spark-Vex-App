@@ -29,8 +29,11 @@ export default async function ConnectionsPage() {
   });
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-white">Connections</h1>
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="page-title">Connections</h1>
+        <p className="page-subtitle">Manage team connections and share scouting data.</p>
+      </div>
       <SearchAndRequest currentTeamId={teamId} />
       <ConnectionsList
         sent={sent}

@@ -57,7 +57,7 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
       }
       setSubmitted(true);
       setTimeout(() => {
-        router.push("/");
+        router.push("/dashboard/matches");
         router.refresh();
       }, 2000);
     } catch {
@@ -68,11 +68,11 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
 
   const select = (value: string, onChange: (id: string) => void, label: string) => (
     <div>
-      <label className="block text-sm font-bold text-warm-800 uppercase tracking-widest">{label}</label>
+      <label className="label">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="input mt-1"
+        className="input mt-1 cursor-pointer"
         required
       >
         <option value="">Select team</option>
@@ -87,79 +87,87 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
 
   if (submitted) {
     return (
-      <div className="text-center py-12 space-y-4">
-        <div className="text-5xl">✅</div>
-        <h2 className="text-2xl font-graffiti text-warm-900 tracking-widest">MATCH ADDED!</h2>
-        <p className="text-warm-600 italic">Thank you for contributing to the community team rankings.</p>
-        <p className="text-xs text-warm-400">Redirecting to home...</p>
+      <div className="text-center py-12 space-y-3">
+        <div className="text-4xl">✅</div>
+        <h2 className="font-head text-xl font-bold text-txt-1">Match Added!</h2>
+        <p className="text-sm text-txt-2">Bayesian ratings updated. Redirecting…</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <div>
-        <label className="block text-sm font-bold text-warm-800 uppercase tracking-widest mb-1">Event name</label>
-        <input
-          type="text"
-          value={eventName}
-          onChange={(e) => setEventName(e.target.value)}
-          className="input mt-1"
-          placeholder="e.g. Provincial Championship"
-          required
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-bold text-warm-800 uppercase tracking-widest mb-1">Date</label>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="input mt-1"
-          required
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-4 rounded-lg border border-vex-red/30 bg-vex-red/5 p-4">
-          <h3 className="font-medium text-vex-red">Red alliance</h3>
-          {select(red1, setRed1, "Team 1")}
-          {select(red2, setRed2, "Team 2")}
-          {select(red3, setRed3, "Team 3")}
-          <div>
-            <label className="block text-sm font-bold text-warm-800 uppercase tracking-widest mb-1">Red score</label>
-            <input
-              type="number"
-              min={0}
-              value={redScore}
-              onChange={(e) => setRedScore(parseInt(e.target.value, 10) || 0)}
-              className="input mt-1"
-            />
+        <div>
+          <label className="label">Event Name</label>
+          <input
+            type="text"
+            value={eventName}
+            onChange={(e) => setEventName(e.target.value)}
+            className="input"
+            placeholder="e.g. Provincial Championship"
+            required
+          />
+        </div>
+        <div>
+          <label className="label">Date</label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="input"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div className="card p-5 border-l-[3px] border-l-danger">
+          <h3 className="font-head text-sm font-bold text-danger mb-4">Red Alliance</h3>
+          <div className="space-y-3">
+            {select(red1, setRed1, "Team 1")}
+            {select(red2, setRed2, "Team 2")}
+            {select(red3, setRed3, "Team 3")}
+            <div>
+              <label className="label">Red Score</label>
+              <input
+                type="number"
+                min={0}
+                value={redScore}
+                onChange={(e) => setRedScore(parseInt(e.target.value, 10) || 0)}
+                className="input"
+              />
+            </div>
           </div>
         </div>
-        <div className="space-y-4 rounded-lg border border-vex-blue/30 bg-vex-blue/5 p-4">
-          <h3 className="font-medium text-vex-blue">Blue alliance</h3>
-          {select(blue1, setBlue1, "Team 1")}
-          {select(blue2, setBlue2, "Team 2")}
-          {select(blue3, setBlue3, "Team 3")}
-          <div>
-            <label className="block text-sm font-bold text-warm-800 uppercase tracking-widest mb-1">Blue score</label>
-            <input
-              type="number"
-              min={0}
-              value={blueScore}
-              onChange={(e) => setBlueScore(parseInt(e.target.value, 10) || 0)}
-              className="input mt-1"
-            />
+
+        <div className="card p-5 border-l-[3px] border-l-spark">
+          <h3 className="font-head text-sm font-bold text-spark mb-4">Blue Alliance</h3>
+          <div className="space-y-3">
+            {select(blue1, setBlue1, "Team 1")}
+            {select(blue2, setBlue2, "Team 2")}
+            {select(blue3, setBlue3, "Team 3")}
+            <div>
+              <label className="label">Blue Score</label>
+              <input
+                type="number"
+                min={0}
+                value={blueScore}
+                onChange={(e) => setBlueScore(parseInt(e.target.value, 10) || 0)}
+                className="input"
+              />
+            </div>
           </div>
         </div>
       </div>
+
       {!unique && ids.length === 6 && (
-        <p className="text-sm text-vex-red font-bold">Please select 6 different teams.</p>
+        <p className="text-sm text-danger font-bold">Please select 6 different teams.</p>
       )}
-      {error && <p className="text-sm text-vex-red font-bold">{error}</p>}
-      <div className="pt-4">
-        <button type="submit" disabled={loading || !unique} className="btn-primary w-full sm:w-auto">
-          {loading ? "Adding…" : "SUBMIT MATCH"}
+      {error && <p className="text-sm text-danger font-bold">{error}</p>}
+      <div className="flex gap-3">
+        <button type="submit" disabled={loading || !unique} className="btn-primary">
+          {loading ? "Adding…" : "Submit Match"}
         </button>
       </div>
     </form>

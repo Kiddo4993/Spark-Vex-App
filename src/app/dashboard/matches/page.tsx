@@ -21,54 +21,68 @@ export default async function MatchesPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-white">Matches</h1>
-        <Link href="/dashboard/matches/add" className="btn-primary">
-          Add match
-        </Link>
-      </div>
-      <div className="card overflow-hidden p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-vex-dark bg-vex-dark/40">
-                <th className="px-4 py-3 font-medium text-gray-300">Event</th>
-                <th className="px-4 py-3 font-medium text-gray-300">Date</th>
-                <th className="px-4 py-3 font-medium text-gray-300">Red</th>
-                <th className="px-4 py-3 font-medium text-gray-300">Score</th>
-                <th className="px-4 py-3 font-medium text-gray-300">Blue</th>
-                <th className="px-4 py-3 font-medium text-gray-300">Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {matches.map((m) => {
-                const date = new Date(m.date).toLocaleDateString();
-                const redWon = m.redScore > m.blueScore;
-                return (
-                  <tr key={m.id} className="border-b border-vex-dark/60 hover:bg-vex-dark/30">
-                    <td className="px-4 py-3 text-gray-200">{m.eventName}</td>
-                    <td className="px-4 py-3 text-gray-400">{date}</td>
-                    <td className="px-4 py-3">
-                      <span className={redWon ? "font-medium text-vex-red" : "text-gray-400"}>
-                        {m.redTeam1.teamNumber}, {m.redTeam2.teamNumber}, {m.redTeam3.teamNumber}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-medium text-white">{m.redScore}</td>
-                    <td className="px-4 py-3">
-                      <span className={!redWon ? "font-medium text-vex-blue" : "text-gray-400"}>
-                        {m.blueTeam1.teamNumber}, {m.blueTeam2.teamNumber}, {m.blueTeam3.teamNumber}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-medium text-white">{m.blueScore}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="page-title">Matches</h1>
+          <p className="page-subtitle">{matches.length} matches recorded</p>
         </div>
+        <div className="flex gap-2.5">
+          <Link href="/dashboard/import" className="btn-ghost">↑ Import</Link>
+          <Link href="/dashboard/matches/add" className="btn-primary">+ Add Match</Link>
+        </div>
+      </div>
+
+      <div className="card overflow-hidden p-0">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Date</th>
+              <th>Red Alliance</th>
+              <th>Score</th>
+              <th>Blue Alliance</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {matches.map((m) => {
+              const date = new Date(m.date).toLocaleDateString();
+              const redWon = m.redScore > m.blueScore;
+              return (
+                <tr key={m.id}>
+                  <td className="font-medium">{m.eventName}</td>
+                  <td className="text-txt-2 text-xs font-mono">{date}</td>
+                  <td>
+                    <span className={redWon ? "text-danger font-medium" : "text-txt-3"}>
+                      {m.redTeam1.teamNumber} · {m.redTeam2.teamNumber} · {m.redTeam3.teamNumber}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`font-mono text-sm font-bold ${redWon ? "text-txt-1" : "text-txt-3"}`}>
+                      {m.redScore}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={!redWon ? "text-spark font-medium" : "text-txt-3"}>
+                      {m.blueTeam1.teamNumber} · {m.blueTeam2.teamNumber} · {m.blueTeam3.teamNumber}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`font-mono text-sm font-bold ${!redWon ? "text-txt-1" : "text-txt-3"}`}>
+                      {m.blueScore}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
         {matches.length === 0 && (
-          <p className="p-6 text-center text-gray-400">No matches yet. Add one to get started.</p>
+          <div className="p-8 text-center">
+            <p className="text-txt-3 text-sm mb-3">No matches yet.</p>
+            <Link href="/dashboard/matches/add" className="btn-primary text-xs">+ Add Match</Link>
+          </div>
         )}
       </div>
     </div>
