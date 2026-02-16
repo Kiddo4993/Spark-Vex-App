@@ -1,28 +1,30 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import { DashboardCards } from "@/components/DashboardCards";
-import { RecentMatches } from "@/components/RecentMatches";
-import { confidenceFromUncertainty, INITIAL_UNCERTAINTY } from "@/lib/bayesian";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { TopTeams } from "@/components/TopTeams";
+import { RecentMatches } from "@/components/RecentMatches";
 
 export default async function LandingPage() {
   const session = await getServerSession(authOptions);
-  const userTeamId = session?.user ? (session.user as { teamId: string }).teamId : null;
 
-  // Fetch top 5 teams by performance rating
+  // Fetch top teams globally
   const topTeams = await prisma.team.findMany({
     orderBy: { performanceRating: "desc" },
-    take: 5,
-    include: {
-      skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
-    },
+    take: 8,
+    select: {
+      id: true,
+      teamNumber: true,
+      performanceRating: true,
+      ratingUncertainty: true,
+      matchCount: true,
+    }
   });
 
-  // Fetch recent matches
+  // Fetch recent matches globally
   const recentMatches = await prisma.match.findMany({
     orderBy: { date: "desc" },
-    take: 10,
+    take: 5,
     include: {
       redTeam1: { select: { teamNumber: true } },
       redTeam2: { select: { teamNumber: true } },
@@ -30,90 +32,84 @@ export default async function LandingPage() {
       blueTeam1: { select: { teamNumber: true } },
       blueTeam2: { select: { teamNumber: true } },
       blueTeam3: { select: { teamNumber: true } },
-    },
+    }
   });
 
   return (
-    <main className="min-h-screen bg-vex-bg p-4 text-white sm:p-8">
-      <div className="mx-auto max-w-7xl space-y-12">
-        {/* Header */}
-        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rotate-45 rounded bg-vex-red" />
-            <h1 className="text-3xl font-bold tracking-tight">Sparks VEX</h1>
+    <main className="min-h-screen bg-vex-dark pb-32">
+      <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-12">
+
+        {/* Header / Hero Area */}
+        <header className="py-12 md:py-20 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-16 border-b border-vex-border mb-20 bg-vex-surface/30 rounded-3xl p-8 backdrop-blur-sm mt-8">
+          <div className="relative inline-block text-center md:text-left">
+            <h1 className="text-5xl sm:text-7xl font-bold text-white tracking-tighter transform -rotate-1 drop-shadow-lg">
+              SPARKS <span className="text-vex-red">VEX</span>
+            </h1>
+            <p className="mt-3 text-[10px] md:text-xs font-bold text-vex-accent uppercase tracking-[0.3em]">
+              Bayesian Performance Modeling
+            </p>
           </div>
+
           <div className="flex gap-4">
-            <Link href="/dashboard/teams" className="btn-secondary">
-              View All Teams
-            </Link>
             {session ? (
               <Link href="/dashboard" className="btn-primary">
                 Go to Dashboard
               </Link>
             ) : (
-              <Link href="/auth/signin" className="btn-primary">
-                Sign In
-              </Link>
+              <div className="flex gap-3">
+                <Link href="/auth/signin" className="btn-primary">
+                  Sign In
+                </Link>
+                <Link href="/auth/signup" className="btn-secondary">
+                  Create Account
+                </Link>
+              </div>
             )}
           </div>
+        </header>
+
+        <div className="grid gap-20 lg:grid-cols-[1fr_420px]">
+          {/* Main Content: Top Teams */}
+          <section className="space-y-20">
+            <TopTeams teams={topTeams} />
+
+            <div className="glass-card p-10 md:p-16 border-l-[4px] border-l-vex-blue">
+              <h3 className="text-2xl font-bold text-white mb-12 tracking-wide uppercase">How it works</h3>
+              <div className="grid gap-12 sm:grid-cols-2">
+                <div className="space-y-5">
+                  <p className="text-lg font-bold text-vex-blue uppercase tracking-widest border-b border-vex-blue/20 pb-2">Bayesian Strength</p>
+                  <p className="text-gray-400 leading-relaxed text-sm">
+                    Automatically calculates team strength while accounting for alliance synergies and match-to-match variance.
+                  </p>
+                </div>
+                <div className="space-y-5">
+                  <p className="text-lg font-bold text-vex-red uppercase tracking-widest border-b border-vex-red/20 pb-2">Confidence Intervals</p>
+                  <p className="text-gray-400 leading-relaxed text-sm">
+                    Identifies which rankings are solidified and which teams need more scouting data to be certain.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Sidebar Area: Recent Matches */}
+          <aside>
+            <RecentMatches matches={recentMatches as any} currentTeamId="" />
+
+            <div className="mt-8 p-6 bg-vex-blue/10 rounded-xl border border-vex-blue/20">
+              <p className="text-xs font-bold text-vex-blue uppercase tracking-widest mb-2">Pro Tip</p>
+              <p className="text-xs text-gray-300 leading-relaxed">
+                Sign in to import your own match data directly from RobotEvents and see your team's real-time ELO progression!
+              </p>
+            </div>
+          </aside>
         </div>
 
-        {/* Hero / Top Teams */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold text-vex-accent">Top Performing Teams</h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {topTeams.map((team) => {
-              const confidence = confidenceFromUncertainty(
-                team.ratingUncertainty,
-                INITIAL_UNCERTAINTY
-              );
-              const skills = team.skillsRecords[0] ?? null;
-
-              return (
-                <div key={team.id} className="card hover:border-vex-accent transition-colors">
-                  <Link href={`/dashboard/teams/${team.teamNumber}`}>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-2xl font-bold text-white">Team {team.teamNumber}</h3>
-                        <p className="text-sm text-gray-400">
-                          {[team.provinceState, team.country].filter(Boolean).join(", ")}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-xl font-bold text-vex-accent">
-                          {Math.round(team.performanceRating)}
-                        </span>
-                        <p className="text-xs text-gray-500">Rating</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex gap-4 text-sm text-gray-300">
-                      <div>
-                        <span className="block font-bold text-white">{confidence}%</span>
-                        Confidence
-                      </div>
-                      <div>
-                        <span className="block font-bold text-white">{team.matchCount}</span>
-                        Matches
-                      </div>
-                      <div>
-                        <span className="block font-bold text-white">
-                          {skills?.combinedSkillsScore ?? "-"}
-                        </span>
-                        Skills
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Recent Matches */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold text-vex-accent">Recent Matches</h2>
-          <RecentMatches matches={recentMatches} currentTeamId={userTeamId || ""} />
-        </section>
+        <footer className="mt-20 pt-12 text-center border-t border-vex-border">
+          <p className="text-[10px] text-gray-500 uppercase tracking-[0.3em]">
+            © {new Date().getFullYear()} Sparks Robotics · Spark VEX System
+          </p>
+        </footer>
       </div>
     </main>
   );

@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 
 async function main() {
   const team1 = await prisma.team.upsert({
-    where: { teamNumber: 12345 },
+    where: { teamNumber: "12345" },
     update: {},
     create: {
-      teamNumber: 12345,
+      teamNumber: "12345",
       provinceState: "Ontario",
       country: "Canada",
       drivetrainType: "mecanum",
@@ -23,10 +23,10 @@ async function main() {
   });
 
   const team2 = await prisma.team.upsert({
-    where: { teamNumber: 67890 },
+    where: { teamNumber: "67890" },
     update: {},
     create: {
-      teamNumber: 67890,
+      teamNumber: "67890",
       provinceState: "Ontario",
       country: "Canada",
       drivetrainType: "tank",
@@ -40,10 +40,10 @@ async function main() {
   });
 
   const team3 = await prisma.team.upsert({
-    where: { teamNumber: 11111 },
+    where: { teamNumber: "11111" },
     update: {},
     create: {
-      teamNumber: 11111,
+      teamNumber: "11111",
       provinceState: "Quebec",
       country: "Canada",
       drivetrainType: "mecanum",
@@ -55,10 +55,10 @@ async function main() {
   });
 
   const team4 = await prisma.team.upsert({
-    where: { teamNumber: 22222 },
+    where: { teamNumber: "22222" },
     update: {},
     create: {
-      teamNumber: 22222,
+      teamNumber: "22222",
       provinceState: "Ontario",
       country: "Canada",
       performanceRating: 100,
@@ -68,10 +68,10 @@ async function main() {
   });
 
   const team5 = await prisma.team.upsert({
-    where: { teamNumber: 33333 },
+    where: { teamNumber: "33333" },
     update: {},
     create: {
-      teamNumber: 33333,
+      teamNumber: "33333",
       provinceState: "Ontario",
       country: "Canada",
       performanceRating: 100,
@@ -81,10 +81,10 @@ async function main() {
   });
 
   const team6 = await prisma.team.upsert({
-    where: { teamNumber: 44444 },
+    where: { teamNumber: "44444" },
     update: {},
     create: {
-      teamNumber: 44444,
+      teamNumber: "44444",
       provinceState: "Quebec",
       country: "Canada",
       performanceRating: 100,

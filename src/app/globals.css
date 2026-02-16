@@ -3,28 +3,83 @@
 @tailwind utilities;
 
 :root {
-  --vex-red: #e63946;
-  --vex-blue: #457b9d;
-  --vex-dark: #1d3557;
-  --vex-darker: #0d1b2a;
-  --vex-accent: #a8dadc;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 10, 10, 10;
+  --background-end-rgb: 17, 17, 17;
 }
 
 body {
-  @apply bg-vex-darker text-gray-100;
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  min-height: 100vh;
+  @apply font-sans antialiased text-vex-text;
 }
 
 @layer components {
+
+  /* Modern Card */
   .card {
-    @apply rounded-xl border border-vex-dark bg-vex-dark/60 p-4 shadow-lg backdrop-blur;
+    @apply relative overflow-hidden rounded-xl border border-vex-border bg-vex-surface/50 p-6 backdrop-blur-sm transition-all duration-300 hover:border-vex-accent/50 hover:bg-vex-surface/80 hover:shadow-lg hover:shadow-vex-accent/5;
   }
+
+  /* Glass Card variation */
+  .glass-card {
+    @apply rounded-xl border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300;
+  }
+
+  /* Landing Feature Card */
+  .landing-card {
+    @apply card flex flex-col items-center text-center p-8 border-vex-border/50 bg-gradient-to-br from-vex-surface to-vex-darker;
+  }
+
+  /* Buttons */
   .btn-primary {
-    @apply rounded-lg bg-vex-blue px-4 py-2 font-medium text-white transition hover:bg-vex-blue/90 focus:outline-none focus:ring-2 focus:ring-vex-accent;
+    @apply inline-flex items-center justify-center rounded-lg bg-vex-red px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vex-red/20 transition-all hover:bg-red-600 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
   }
+
   .btn-secondary {
-    @apply rounded-lg border border-vex-dark bg-vex-dark/80 px-4 py-2 font-medium text-gray-200 transition hover:bg-vex-dark focus:outline-none focus:ring-2 focus:ring-vex-accent;
+    @apply inline-flex items-center justify-center rounded-lg border border-vex-border bg-vex-surface px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-vex-border hover:text-white hover:border-gray-500 active:bg-vex-border/80;
   }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center rounded-lg bg-red-900/50 text-red-200 border border-red-800 px-4 py-2 text-sm font-medium transition-colors hover:bg-red-900/80 hover:text-white;
+  }
+
+  /* Form Elements */
   .input {
-    @apply w-full rounded-lg border border-vex-dark bg-vex-dark/80 px-3 py-2 text-gray-100 placeholder-gray-500 focus:border-vex-blue focus:outline-none focus:ring-1 focus:ring-vex-blue;
+    @apply w-full rounded-lg border border-vex-border bg-vex-darker px-4 py-2.5 text-white placeholder-gray-500 transition-all focus:border-vex-accent focus:outline-none focus:ring-1 focus:ring-vex-accent/50;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-400 mb-1.5;
+  }
+
+  /* Typography */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply tracking-tight font-bold text-white;
+  }
+
+  /* Data Table */
+  .data-table {
+    @apply w-full border-collapse text-sm;
+  }
+
+  .data-table th {
+    @apply border-b border-vex-border bg-vex-surface/50 px-4 py-3 text-left font-medium text-gray-400;
+  }
+
+  .data-table td {
+    @apply border-b border-vex-border px-4 py-3 text-gray-200;
+  }
+
+  .data-table tr:hover td {
+    @apply bg-vex-surface/30;
   }
 }

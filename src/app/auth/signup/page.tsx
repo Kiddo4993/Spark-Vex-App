@@ -17,11 +17,15 @@ export default function SignUpPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const num = parseInt(teamNumber, 10);
-    if (Number.isNaN(num) || num < 1) {
-      setError("Enter a valid team number");
+    if (!teamNumber) {
+      alert("Please enter a team number (e.g. 1234A)");
       return;
     }
+    // const num = parseInt(teamNumber, 10);
+    // if (isNaN(num)) {
+    //   alert("Invalid team number");
+    //   return;
+    // }
     setLoading(true);
     try {
       const res = await fetch("/api/auth/signup", {
@@ -30,7 +34,7 @@ export default function SignUpPage() {
         body: JSON.stringify({
           email,
           password,
-          teamNumber: num,
+          teamNumber: teamNumber.toUpperCase(), // Ensure uppercase
           provinceState: provinceState || undefined,
           country: country || undefined,
         }),
@@ -52,11 +56,11 @@ export default function SignUpPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4">
       <div className="card w-full max-w-md">
-        <h1 className="text-2xl font-bold text-white">Create account</h1>
-        <p className="mt-1 text-sm text-gray-400">One account per team number</p>
+        <h1 className="text-2xl font-bold text-warm-900">Create account</h1>
+        <p className="mt-1 text-sm text-warm-500 uppercase tracking-wider">One account per team number</p>
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="email" className="block text-sm font-medium text-warm-800">
               Email
             </label>
             <input
@@ -71,7 +75,7 @@ export default function SignUpPage() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="password" className="block text-sm font-medium text-warm-800">
               Password
             </label>
             <input
@@ -84,10 +88,10 @@ export default function SignUpPage() {
               required
               autoComplete="new-password"
             />
-            <p className="mt-0.5 text-xs text-gray-500">At least 8 characters</p>
+            <p className="mt-0.5 text-xs text-warm-500/70">At least 8 characters</p>
           </div>
           <div>
-            <label htmlFor="teamNumber" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="teamNumber" className="block text-sm font-medium text-warm-800">
               Team number <span className="text-vex-red">*</span>
             </label>
             <input
@@ -102,7 +106,7 @@ export default function SignUpPage() {
             />
           </div>
           <div>
-            <label htmlFor="provinceState" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="provinceState" className="block text-sm font-medium text-warm-800">
               Province / State
             </label>
             <input
@@ -115,7 +119,7 @@ export default function SignUpPage() {
             />
           </div>
           <div>
-            <label htmlFor="country" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="country" className="block text-sm font-medium text-warm-800">
               Country
             </label>
             <input
@@ -132,9 +136,9 @@ export default function SignUpPage() {
             {loading ? "Creating account…" : "Sign up"}
           </button>
         </form>
-        <p className="mt-4 text-center text-sm text-gray-400">
+        <p className="mt-4 text-center text-sm text-warm-500">
           Already have an account?{" "}
-          <Link href="/auth/signin" className="text-vex-accent hover:underline">
+          <Link href="/auth/signin" className="text-vex-blue hover:underline">
             Sign in
           </Link>
         </p>

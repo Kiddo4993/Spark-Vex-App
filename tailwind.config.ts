@@ -9,14 +9,25 @@ const config: Config = {
   darkMode: "class",
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-inter)', 'sans-serif'],
+      },
       colors: {
         vex: {
-          red: "#E63946",
-          blue: "#457B9D",
-          dark: "#1D3557",
-          darker: "#0D1B2A",
-          accent: "#A8DADC",
+          red: "#DA291C", // Official VEX Red
+          blue: "#0066B3", // Official VEX Blue (pantone 300)
+          dark: "#111111", // Deep background
+          darker: "#0A0A0A", // Card background
+          surface: "#1A1A1A", // Surface/Card
+          border: "#333333",
+          accent: "#A8DADC", // Keep potential accent or switch to cyan
+          text: "#FFFFFF",
+          muted: "#A1A1AA",
         },
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'vex-gradient': 'linear-gradient(135deg, #111111 0%, #1A1A1A 100%)',
       },
     },
   },

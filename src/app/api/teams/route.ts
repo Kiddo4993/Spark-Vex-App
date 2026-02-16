@@ -24,7 +24,7 @@ export async function GET(req: Request) {
 
   if (teamNumber) {
     const team = await prisma.team.findUnique({
-      where: { teamNumber: parseInt(teamNumber, 10) },
+      where: { teamNumber: teamNumber },
       include: {
         skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
       },
@@ -36,14 +36,16 @@ export async function GET(req: Request) {
       ...rest,
       skills,
     });
-    // Note: matchCount, performanceRating, ratingUncertainty, autoStrength, driverStrength 
-    // are part of 'rest' (scalars)
   }
 
   if (search && search.length >= 1) {
-    const num = parseInt(search, 10);
     const searchTeams = await prisma.team.findMany({
-      where: Number.isNaN(num) ? {} : { teamNumber: num },
+      where: {
+        OR: [
+          { teamNumber: { contains: search, mode: "insensitive" } },
+          // { teamName: { contains: search, mode: "insensitive" } } // if we had a name field
+        ]
+      },
       take: 30,
       include: { skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 } },
     });

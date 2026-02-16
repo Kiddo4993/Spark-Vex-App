@@ -67,9 +67,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.teamId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+  // Allow public match submission for community data contribution
   try {
     const body = await req.json();
     const parsed = createMatchSchema.safeParse({
