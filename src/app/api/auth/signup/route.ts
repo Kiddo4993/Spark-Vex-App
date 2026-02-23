@@ -26,13 +26,13 @@ export async function POST(req: Request) {
     if (existingTeam) {
       const hasUser = await prisma.user.findUnique({ where: { teamId: existingTeam.id } });
       if (hasUser) {
-        return NextResponse.json({ error: "Team number already has an account" }, { status: 409 });
+        return NextResponse.json({ error: "This team number has already been claimed by another account. Only one account per team is allowed." }, { status: 409 });
       }
     }
 
     const existingEmail = await prisma.user.findUnique({ where: { email } });
     if (existingEmail) {
-      return NextResponse.json({ error: "Email already registered" }, { status: 409 });
+      return NextResponse.json({ error: "This email address is already registered to an account." }, { status: 409 });
     }
 
     const hashed = await hash(password, 12);
