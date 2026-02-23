@@ -3,13 +3,12 @@
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
-import Link from "next/link";
 
 function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
-  const [email, setEmail] = useState("");
+  const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,12 +19,12 @@ function SignInForm() {
     setLoading(true);
     try {
       const res = await signIn("credentials", {
-        email,
+        login,
         password,
         redirect: false,
       });
       if (res?.error) {
-        setError("Invalid email or password");
+        setError("Invalid team number or password");
         setLoading(false);
         return;
       }
@@ -38,22 +37,22 @@ function SignInForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+    <form onSubmit={handleSubmit} className="mt-8 space-y-5">
       <div>
-        <label htmlFor="email" className="label">Email</label>
+        <label htmlFor="login" className="label">TEAM NUMBER</label>
         <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          id="login"
+          type="text"
+          value={login}
+          onChange={(e) => setLogin(e.target.value)}
           className="input"
-          placeholder="you@example.com"
+          placeholder="e.g. 1234A"
           required
-          autoComplete="email"
+          autoComplete="username"
         />
       </div>
       <div>
-        <label htmlFor="password" className="label">Password</label>
+        <label htmlFor="password" className="label">PASSWORD</label>
         <input
           id="password"
           type="password"
@@ -64,9 +63,13 @@ function SignInForm() {
           autoComplete="current-password"
         />
       </div>
-      {error && <p className="text-sm text-danger">{error}</p>}
-      <button type="submit" disabled={loading} className="btn-primary w-full justify-center mt-2">
-        {loading ? "Signing in…" : "Sign in"}
+      {error && (
+        <div className="bg-danger/10 border border-danger/30 p-3 text-[11px] font-mono text-danger uppercase tracking-widest text-center">
+          {error}
+        </div>
+      )}
+      <button type="submit" disabled={loading} className="btn-primary w-full justify-center !font-mono !tracking-widest !uppercase !text-[12px] !py-3">
+        {loading ? "AUTHENTICATING…" : "[ SIGN IN ]"}
       </button>
     </form>
   );
@@ -77,28 +80,34 @@ export default function SignInPage() {
     <div className="auth-page">
       <div className="auth-bg" />
       <div className="auth-card">
-        <div className="flex items-center gap-2.5 mb-6">
-          <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-base"
-            style={{ background: "linear-gradient(135deg, #00D4FF 0%, #0090FF 100%)", boxShadow: "0 0 18px rgba(0,212,255,.35)" }}
-          >
-            ⚡
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 bg-gold flex items-center justify-center text-surface-bg font-mono font-bold text-lg">
+            X
           </div>
-          <span className="font-head font-extrabold text-xl text-txt-1">
-            Spark<span className="text-spark">VEX</span>
-          </span>
+          <div>
+            <span className="font-head font-extrabold text-xl text-txt-1">
+              Spark<span className="text-spark">VEX</span>
+            </span>
+            <p className="text-[10px] font-mono text-txt-3 tracking-widest uppercase">ANALYST SUITE</p>
+          </div>
         </div>
-        <h1 className="font-head text-xl font-bold text-txt-1">Sign in</h1>
-        <p className="mt-0.5 text-xs font-mono text-txt-3 tracking-wider uppercase">Use your team account</p>
-        <Suspense fallback={<div className="mt-6 text-center text-txt-3 text-sm">Loading...</div>}>
+
+        <div className="border-b border-line pb-4 mb-2">
+          <h1 className="text-[14px] font-mono tracking-widest uppercase font-bold text-txt-1">AUTHENTICATION</h1>
+          <p className="mt-1 text-[10px] font-mono text-txt-3 tracking-widest uppercase">
+            Enter your team credentials to access the dashboard
+          </p>
+        </div>
+
+        <Suspense fallback={<div className="mt-6 text-center text-txt-3 text-[11px] font-mono uppercase tracking-widest">Loading...</div>}>
           <SignInForm />
         </Suspense>
-        <p className="mt-5 text-center text-xs text-txt-3">
-          No account?{" "}
-          <Link href="/auth/signup" className="text-spark hover:underline">
-            Sign up
-          </Link>
-        </p>
+
+        <div className="mt-6 pt-4 border-t border-line">
+          <p className="text-[10px] font-mono text-txt-3 tracking-widest uppercase text-center">
+            Contact your admin for team credentials
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -12,10 +12,11 @@ export default async function DashboardLayout({
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/signin");
   const teamNumber = (session.user as { teamNumber: string }).teamNumber;
+  const isAdmin = (session.user as any).isAdmin === true;
 
   return (
     <div className="flex min-h-screen bg-surface-bg">
-      <Sidebar teamNumber={teamNumber} />
+      <Sidebar teamNumber={teamNumber} isAdmin={isAdmin} />
       <div className="flex-1 min-w-0 overflow-x-hidden">
         {/* Top bar */}
         <div className="h-14 bg-surface-bg/85 backdrop-blur-xl border-b border-line flex items-center px-7 sticky top-0 z-50">
