@@ -44,6 +44,7 @@ model Team {
   performanceHistory    PerformanceHistory[]
   teamMatchStats        TeamMatchStats[]
   skillsRecords         SkillsRecord[]
+  awards                Award[]
   connectionsFrom       Connection[] @relation("ConnectionFrom")
   connectionsTo         Connection[] @relation("ConnectionTo")
   sharedNotesFrom       Note[]       @relation("NoteFrom")
@@ -128,6 +129,19 @@ model SkillsRecord {
   provincialSkillsRank Int?
   worldwideSkillsRank Int?
   lastUpdated         DateTime @default(now())
+  @@index([teamId])
+}
+
+model Award {
+  id        String   @id @default(cuid())
+  teamId    String
+  name      String   // e.g., "Excellence Award (VRC)"
+  event     String   // e.g., "2024 Ontario Provincial Championship"
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  // Ensure we don't duplicate the same award from the same event
+  @@unique([teamId, name, event])
   @@index([teamId])
 }
 

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { TeamProfileCard } from "@/components/TeamProfileCard";
 import { TeamProfileForm } from "@/components/TeamProfileForm";
 import { SkillsForm } from "@/components/SkillsForm";
+import { TeamAwards } from "@/components/TeamAwards";
 
 export default async function TeamProfilePage({
   params,
@@ -27,6 +28,7 @@ export default async function TeamProfilePage({
     include: {
       skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
       performanceHistory: { orderBy: { createdAt: "desc" }, take: 20 },
+      awards: { orderBy: { createdAt: "asc" } },
     },
   });
   if (!team) notFound();
@@ -42,6 +44,7 @@ export default async function TeamProfilePage({
         </Link>
       </div>
       <TeamProfileCard team={team} />
+      <TeamAwards teamNumber={team.teamNumber} awards={team.awards} />
       {isOwn && (
         <>
           <TeamProfileForm team={team} />
