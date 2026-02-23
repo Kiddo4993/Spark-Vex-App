@@ -39,7 +39,7 @@ export default async function TeamProfilePage({
       <TeamProfileCard team={team} />
       {isOwn && (
         <>
-          <TeamProfileForm team={team} onSave={() => { }} />
+          <TeamProfileForm team={team} />
           <SkillsForm initialSkills={skills} />
         </>
       )}

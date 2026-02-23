@@ -21,7 +21,7 @@ export function TeamProfileForm({
   onSave,
 }: {
   team: Team;
-  onSave: () => void;
+  onSave?: () => void;
 }) {
   const [provinceState, setProvinceState] = useState(team.provinceState ?? "");
   const [country, setCountry] = useState(team.country ?? "");
@@ -80,7 +80,7 @@ export function TeamProfileForm({
       } else {
         setSuccess(true);
         setTimeout(() => setSuccess(false), 3000);
-        onSave();
+        if (onSave) onSave();
       }
     } catch {
       setError("Something went wrong");
