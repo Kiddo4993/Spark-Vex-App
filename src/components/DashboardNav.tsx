@@ -59,8 +59,8 @@ export function DashboardNav() {
 
   return (
     <div ref={ref} className="relative">
-      <div className="flex items-center gap-2 bg-surface-card border border-line rounded-[10px] px-3 py-1.5 w-[220px] text-[13px] text-txt-3 hover:border-line-hi transition-colors focus-within:border-spark/50 focus-within:ring-1 focus-within:ring-spark/20">
-        🔍
+      <div className="flex items-center gap-2 bg-surface-card border border-line rounded px-3 py-1.5 w-[240px] text-[13px] text-txt-3 hover:border-line-hi transition-colors focus-within:border-txt-3">
+        <span className="opacity-50 text-[12px]">◈</span>
         <input
           type="text"
           value={query}
@@ -68,25 +68,25 @@ export function DashboardNav() {
           onFocus={() => results.length > 0 && setOpen(true)}
           onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
           placeholder="Search teams, matches…"
-          className="bg-transparent border-none outline-none w-full text-[11px] text-txt-1 placeholder:text-txt-3/50"
+          className="bg-transparent border-none outline-none w-full text-[12px] font-mono text-txt-1 placeholder:text-txt-3/50"
         />
         {loading && (
-          <div className="w-3 h-3 border border-spark/40 border-t-spark rounded-full animate-spin" />
+          <div className="w-2.5 h-2.5 border border-txt-3/30 border-t-txt-1 rounded-full animate-spin" />
         )}
       </div>
 
       {open && results.length > 0 && (
-        <div className="absolute top-full left-0 mt-1.5 w-[280px] bg-surface-card border border-line rounded-[10px] shadow-xl z-[100] overflow-hidden animate-fade-in">
+        <div className="absolute top-full left-0 mt-1.5 w-full bg-surface-card border border-line rounded z-[100] overflow-hidden animate-fade-in shadow-2xl shadow-black">
           {results.map((t) => (
             <button
               key={t.id}
               onClick={() => handleSelect(t.teamNumber)}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-surface-bg/60 transition-colors text-left"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-surface-hover transition-colors text-left border-b border-line last:border-0"
             >
               <div>
-                <span className="font-mono text-sm font-bold text-txt-1">{t.teamNumber}</span>
+                <span className="font-mono text-[13px] font-bold text-txt-1">{t.teamNumber}</span>
               </div>
-              <span className="font-mono text-xs text-spark">{Math.round(t.performanceRating * 10) / 10}</span>
+              <span className="font-mono text-[11px] text-gold">{Math.round(t.performanceRating * 10) / 10}</span>
             </button>
           ))}
         </div>

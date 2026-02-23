@@ -46,50 +46,56 @@ export function SkillsForm({ initialSkills }: { initialSkills: Skills }) {
   }
 
   return (
-    <div className="card p-5 max-w-xl">
-      <h2 className="section-title mb-1">Skills Scores</h2>
-      <p className="text-xs text-txt-3 mb-4">Update your driver, autonomous, and combined skills scores.</p>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label className="label">Driver Skills</label>
-            <input
-              type="number"
-              min={0}
-              value={driver}
-              onChange={(e) => setDriver(e.target.value)}
-              className="input"
-              placeholder="—"
-            />
+    <div className="card overflow-hidden">
+      <div className="card-header bg-surface-bg border-b border-line py-2">
+        <span className="text-[10px] font-mono tracking-widest text-txt-3 uppercase">Skills Scores</span>
+      </div>
+      <div className="p-5 bg-surface-card">
+        <p className="text-xs font-mono text-txt-3 mb-6 uppercase tracking-widest">Update driver, autonomous, and combined skills.</p>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label className="label text-[10px] font-mono tracking-widest uppercase text-txt-2">Driver Skills</label>
+              <input
+                type="number"
+                min={0}
+                value={driver}
+                onChange={(e) => setDriver(e.target.value)}
+                className="input font-mono text-lg font-bold"
+                placeholder="—"
+              />
+            </div>
+            <div>
+              <label className="label text-[10px] font-mono tracking-widest uppercase text-txt-2">Auto Skills</label>
+              <input
+                type="number"
+                min={0}
+                value={auton}
+                onChange={(e) => setAuton(e.target.value)}
+                className="input font-mono text-lg font-bold text-amber-500"
+                placeholder="—"
+              />
+            </div>
+            <div>
+              <label className="label text-[10px] font-mono tracking-widest uppercase text-txt-2">Combined</label>
+              <input
+                type="number"
+                min={0}
+                value={combined}
+                onChange={(e) => setCombined(e.target.value)}
+                className="input font-mono text-lg font-bold text-cyan-400"
+                placeholder="—"
+              />
+            </div>
           </div>
-          <div>
-            <label className="label">Autonomous Skills</label>
-            <input
-              type="number"
-              min={0}
-              value={auton}
-              onChange={(e) => setAuton(e.target.value)}
-              className="input"
-              placeholder="—"
-            />
+          {error && <p className="text-sm font-mono tracking-widest uppercase text-danger mt-2">{error}</p>}
+          <div className="pt-2">
+            <button type="submit" disabled={loading} className="btn-primary w-full sm:w-auto">
+              {loading ? "SAVING…" : "SAVE SKILLS"}
+            </button>
           </div>
-          <div>
-            <label className="label">Combined Skills</label>
-            <input
-              type="number"
-              min={0}
-              value={combined}
-              onChange={(e) => setCombined(e.target.value)}
-              className="input"
-              placeholder="—"
-            />
-          </div>
-        </div>
-        {error && <p className="text-sm text-danger">{error}</p>}
-        <button type="submit" disabled={loading} className="btn-primary">
-          {loading ? "Saving…" : "Save Skills"}
-        </button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

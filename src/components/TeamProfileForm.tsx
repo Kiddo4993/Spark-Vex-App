@@ -90,264 +90,267 @@ export function TeamProfileForm({
   }
 
   return (
-    <div className="card p-5">
-      <h3 className="section-title mb-5">Edit Profile Settings</h3>
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Location */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="ps" className="label">Province / State</label>
-            <input
-              id="ps"
-              type="text"
-              value={provinceState}
-              onChange={(e) => setProvinceState(e.target.value)}
-              className="input"
-              placeholder="e.g. Ontario"
-            />
-          </div>
-          <div>
-            <label htmlFor="country" className="label">Country</label>
-            <input
-              id="country"
-              type="text"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              className="input"
-              placeholder="e.g. Canada"
-            />
-          </div>
-        </div>
-
-        {/* Robot Config */}
-        <div className="border-t border-line pt-5">
-          <h4 className="text-sm font-semibold text-txt-1 mb-4">Robot Configuration</h4>
+    <div className="card overflow-hidden">
+      <div className="card-header bg-surface-bg border-b border-line py-2">
+        <span className="text-[10px] font-mono tracking-widest text-txt-3 uppercase">Edit Profile Settings</span>
+      </div>
+      <div className="p-5 bg-surface-card">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Location */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="drivetrain" className="label">Drivetrain Type</label>
-              <select
-                id="drivetrain"
-                value={drivetrainType}
-                onChange={(e) => setDrivetrainType(e.target.value)}
+              <label htmlFor="ps" className="label text-[10px] font-mono tracking-widest uppercase">Province / State</label>
+              <input
+                id="ps"
+                type="text"
+                value={provinceState}
+                onChange={(e) => setProvinceState(e.target.value)}
                 className="input"
-              >
-                <option value="">Select…</option>
-                <option value="tank">Tank Drive</option>
-                <option value="mecanum">Mecanum</option>
-                <option value="holonomic">Holonomic / X-Drive</option>
-                <option value="swerve">Swerve</option>
-                <option value="other">Other</option>
-              </select>
+                placeholder="e.g. Ontario"
+              />
             </div>
             <div>
-              <label htmlFor="autonSide" className="label">Autonomous Side</label>
-              <select
-                id="autonSide"
-                value={autonomousSide}
-                onChange={(e) => setAutonomousSide(e.target.value)}
+              <label htmlFor="country" className="label text-[10px] font-mono tracking-widest uppercase">Country</label>
+              <input
+                id="country"
+                type="text"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
                 className="input"
-              >
-                <option value="">Select…</option>
-                <option value="left">Left</option>
-                <option value="right">Right</option>
-                <option value="skills">Skills</option>
-                <option value="both">Both</option>
-                <option value="none">None</option>
-              </select>
+                placeholder="e.g. Canada"
+              />
             </div>
           </div>
-        </div>
 
-        {/* Auton Reliability */}
-        <div className="border-t border-line pt-5">
-          <h4 className="text-sm font-semibold text-txt-1 mb-4">Autonomous Reliability</h4>
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <label className="label !mb-0">Auton Reliability %</label>
-              {autonReliabilityPct !== null && (
+          {/* Robot Config */}
+          <div className="border-t border-line pt-6">
+            <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-4">Robot Configuration</h4>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="drivetrain" className="label text-[10px] font-mono tracking-widest uppercase">Drivetrain</label>
+                <select
+                  id="drivetrain"
+                  value={drivetrainType}
+                  onChange={(e) => setDrivetrainType(e.target.value)}
+                  className="input"
+                >
+                  <option value="">Select…</option>
+                  <option value="tank">Tank Drive</option>
+                  <option value="mecanum">Mecanum</option>
+                  <option value="holonomic">Holonomic / X-Drive</option>
+                  <option value="swerve">Swerve</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="autonSide" className="label text-[10px] font-mono tracking-widest uppercase">Auton Side</label>
+                <select
+                  id="autonSide"
+                  value={autonomousSide}
+                  onChange={(e) => setAutonomousSide(e.target.value)}
+                  className="input"
+                >
+                  <option value="">Select…</option>
+                  <option value="left">Left</option>
+                  <option value="right">Right</option>
+                  <option value="skills">Skills</option>
+                  <option value="both">Both</option>
+                  <option value="none">None</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Auton Reliability */}
+          <div className="border-t border-line pt-6">
+            <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-4">Autonomous Reliability</h4>
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="label text-[10px] font-mono tracking-widest uppercase !mb-0">Reliability %</label>
+                {autonReliabilityPct !== null && (
+                  <button
+                    type="button"
+                    onClick={() => setAutonReliabilityPct(null)}
+                    className="text-[10px] text-danger font-mono tracking-widest uppercase hover:underline"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              {autonReliabilityPct === null ? (
                 <button
                   type="button"
-                  onClick={() => setAutonReliabilityPct(null)}
-                  className="text-[10px] text-danger hover:underline"
+                  onClick={() => setAutonReliabilityPct(50)}
+                  className="w-full border border-dashed border-line text-txt-3 hover:text-spark hover:border-spark py-3 text-[11px] uppercase tracking-widest font-mono transition-colors"
                 >
-                  Clear
+                  + Set Reliability
                 </button>
+              ) : (
+                <>
+                  <div className="flex justify-between items-end mb-1">
+                    <span className="text-xs font-mono tracking-widest text-txt-3">0%</span>
+                    <span className="font-mono text-xl font-bold text-spark">{autonReliabilityPct}%</span>
+                    <span className="text-xs font-mono tracking-widest text-txt-3">100%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={autonReliabilityPct}
+                    onChange={(e) => setAutonReliabilityPct(parseInt(e.target.value))}
+                    className="w-full accent-spark cursor-pointer"
+                  />
+                </>
               )}
             </div>
-            {autonReliabilityPct === null ? (
-              <button
-                type="button"
-                onClick={() => setAutonReliabilityPct(50)}
-                className="w-full btn-ghost border-dashed text-txt-3 hover:text-spark hover:border-spark py-2 text-xs"
-              >
-                + Set Reliability
-              </button>
-            ) : (
-              <>
-                <div className="flex justify-between items-end mb-1">
-                  <span className="text-xs text-txt-3">0%</span>
-                  <span className="font-mono text-xl font-bold text-spark">{autonReliabilityPct}%</span>
-                  <span className="text-xs text-txt-3">100%</span>
+          </div>
+
+          {/* Scouting Sliders */}
+          <div className="border-t border-line pt-6">
+            <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-4">Scouting Baseline</h4>
+
+            <div className="space-y-8">
+              {/* Auto Strength */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="label text-[10px] font-mono tracking-widest uppercase !mb-0">Auto Strength</label>
+                  {autoStrength !== null && (
+                    <button
+                      type="button"
+                      onClick={() => setAutoStrength(null)}
+                      className="text-[10px] text-danger font-mono tracking-widest uppercase hover:underline"
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={5}
-                  value={autonReliabilityPct}
-                  onChange={(e) => setAutonReliabilityPct(parseInt(e.target.value))}
-                  className="w-full accent-spark cursor-pointer"
-                />
-              </>
-            )}
-          </div>
-        </div>
 
-        {/* Scouting Sliders */}
-        <div className="border-t border-line pt-5">
-          <h4 className="text-sm font-semibold text-txt-1 mb-4">Scouting Strength</h4>
-
-          <div className="space-y-6">
-            {/* Auto Strength */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="label !mb-0">Autonomous Strength</label>
-                {autoStrength !== null && (
+                {autoStrength === null ? (
                   <button
                     type="button"
-                    onClick={() => setAutoStrength(null)}
-                    className="text-[10px] text-danger hover:underline"
+                    onClick={() => setAutoStrength(5)}
+                    className="w-full border border-dashed border-line text-txt-3 hover:text-amber-500 hover:border-amber-500 py-3 text-[11px] uppercase tracking-widest font-mono transition-colors"
                   >
-                    Clear
+                    + Set Rating
                   </button>
+                ) : (
+                  <>
+                    <div className="flex justify-between items-end mb-1">
+                      <span className="text-xs font-mono tracking-widest text-txt-3">0</span>
+                      <span className="font-mono text-xl font-bold text-amber-500">{autoStrength}</span>
+                      <span className="text-xs font-mono tracking-widest text-txt-3">10</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={10}
+                      step={0.5}
+                      value={autoStrength}
+                      onChange={(e) => setAutoStrength(parseFloat(e.target.value))}
+                      className="w-full accent-amber-500 cursor-pointer"
+                    />
+                  </>
                 )}
               </div>
 
-              {autoStrength === null ? (
-                <button
-                  type="button"
-                  onClick={() => setAutoStrength(5)}
-                  className="w-full btn-ghost border-dashed text-txt-3 hover:text-amber hover:border-amber py-2 text-xs"
-                >
-                  + Set Rating
-                </button>
-              ) : (
-                <>
-                  <div className="flex justify-between items-end mb-1">
-                    <span className="text-xs text-txt-3">Low (0)</span>
-                    <span className="font-mono text-xl font-bold text-amber">{autoStrength}</span>
-                    <span className="text-xs text-txt-3">High (10)</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={10}
-                    step={0.5}
-                    value={autoStrength}
-                    onChange={(e) => setAutoStrength(parseFloat(e.target.value))}
-                    className="w-full accent-amber cursor-pointer"
-                  />
-                </>
-              )}
-            </div>
+              {/* Driver Strength */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="label text-[10px] font-mono tracking-widest uppercase !mb-0">Driver Strength</label>
+                  {driverStrength !== null && (
+                    <button
+                      type="button"
+                      onClick={() => setDriverStrength(null)}
+                      className="text-[10px] text-danger font-mono tracking-widest uppercase hover:underline"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
 
-            {/* Driver Strength */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="label !mb-0">Driver Strength</label>
-                {driverStrength !== null && (
+                {driverStrength === null ? (
                   <button
                     type="button"
-                    onClick={() => setDriverStrength(null)}
-                    className="text-[10px] text-danger hover:underline"
+                    onClick={() => setDriverStrength(5)}
+                    className="w-full border border-dashed border-line text-txt-3 hover:text-green-500 hover:border-green-500 py-3 text-[11px] uppercase tracking-widest font-mono transition-colors"
                   >
-                    Clear
+                    + Set Rating
                   </button>
+                ) : (
+                  <>
+                    <div className="flex justify-between items-end mb-1">
+                      <span className="text-xs font-mono tracking-widest text-txt-3">0</span>
+                      <span className="font-mono text-xl font-bold text-green-500">{driverStrength}</span>
+                      <span className="text-xs font-mono tracking-widest text-txt-3">10</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={10}
+                      step={0.5}
+                      value={driverStrength}
+                      onChange={(e) => setDriverStrength(parseFloat(e.target.value))}
+                      className="w-full accent-green-500 cursor-pointer"
+                    />
+                  </>
                 )}
               </div>
-
-              {driverStrength === null ? (
-                <button
-                  type="button"
-                  onClick={() => setDriverStrength(5)}
-                  className="w-full btn-ghost border-dashed text-txt-3 hover:text-success hover:border-success py-2 text-xs"
-                >
-                  + Set Rating
-                </button>
-              ) : (
-                <>
-                  <div className="flex justify-between items-end mb-1">
-                    <span className="text-xs text-txt-3">Low (0)</span>
-                    <span className="font-mono text-xl font-bold text-success">{driverStrength}</span>
-                    <span className="text-xs text-txt-3">High (10)</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={10}
-                    step={0.5}
-                    value={driverStrength}
-                    onChange={(e) => setDriverStrength(parseFloat(e.target.value))}
-                    className="w-full accent-emerald-400 cursor-pointer"
-                  />
-                </>
-              )}
             </div>
           </div>
-        </div>
 
-        {/* Strategy Tags */}
-        <div className="border-t border-line pt-5">
-          <h4 className="text-sm font-semibold text-txt-1 mb-4">Strategy Tags</h4>
-          <div className="flex flex-wrap gap-2 mb-3">
-            {strategyTags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-spark/10 text-spark border border-spark/20"
-              >
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => removeTag(tag)}
-                  className="text-spark/50 hover:text-danger transition-colors"
+          {/* Strategy Tags */}
+          <div className="border-t border-line pt-6">
+            <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-4">Strategy Tags</h4>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {strategyTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider bg-txt-1 text-surface-bg"
                 >
-                  ×
-                </button>
-              </span>
-            ))}
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    className="text-surface-bg/50 hover:text-danger hover:bg-surface-bg transition-colors w-4 h-4 ml-1 flex items-center justify-center -mr-1 rounded-sm"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleAddTag}
+              className="input"
+              placeholder='Add tag + Enter (e.g. "DEFENSIVE", "RUSH")'
+            />
           </div>
-          <input
-            type="text"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleAddTag}
-            className="input"
-            placeholder='Type a tag and press Enter (e.g. "defensive", "fast auton")'
-          />
-          <p className="mt-1 text-[10px] text-txt-3 font-mono">Press Enter or comma to add a tag</p>
-        </div>
 
-        {/* Notes */}
-        <div className="border-t border-line pt-5">
-          <h4 className="text-sm font-semibold text-txt-1 mb-4">Notes</h4>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            className="input min-h-[100px] resize-y"
-            placeholder="Add any notes about your robot, strategy, or observations…"
-            rows={4}
-          />
-        </div>
+          {/* Notes */}
+          <div className="border-t border-line pt-6">
+            <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-4">Scout Notes</h4>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="input min-h-[100px] resize-y font-mono text-[13px]"
+              placeholder="Observed details, auto path breakdowns..."
+              rows={4}
+            />
+          </div>
 
-        {error && <p className="text-sm text-danger">{error}</p>}
-        {success && <p className="text-sm text-success">✓ Profile saved</p>}
+          {error && <p className="text-sm font-mono tracking-widest uppercase text-danger mt-4">{error}</p>}
+          {success && <p className="text-sm font-mono tracking-widest uppercase text-success mt-4">Profile Synced</p>}
 
-        <div className="flex gap-3">
-          <button type="submit" disabled={saving} className="btn-primary">
-            {saving ? "Saving…" : "Save Profile Changes"}
-          </button>
-        </div>
-      </form>
+          <div className="pt-2">
+            <button type="submit" disabled={saving} className="btn-primary w-full sm:w-auto">
+              {saving ? "SYNCING…" : "SAVE CHANGES"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

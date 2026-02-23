@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Syne, Space_Mono, DM_Sans } from "next/font/google";
+import { Syne, Space_Mono, Inter } from "next/font/google";
 import { SessionProvider } from "@/components/SessionProvider";
 import "./globals.css";
 
@@ -17,11 +17,11 @@ const spaceMono = Space_Mono({
   weight: ["400", "700"],
 });
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-inter",
   display: "swap",
-  weight: ["300", "400", "500"],
+  weight: ["300", "400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -35,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${syne.variable} ${spaceMono.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${syne.variable} ${spaceMono.variable} ${inter.variable}`}>
       <body className="min-h-screen antialiased bg-surface-bg text-txt-1 font-body">
         <SessionProvider>{children}</SessionProvider>
       </body>

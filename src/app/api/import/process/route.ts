@@ -130,7 +130,7 @@ async function processSkills(body: any) {
 }
 
 async function processMatches(body: any) {
-    const { fileData, mapping, dryRun } = body;
+    const { fileData, mapping, dryRun, wipeData } = body;
     if (!fileData || !mapping) return NextResponse.json({ error: "Missing data" }, { status: 400 });
 
     const rows = fileData.slice(1);
@@ -209,6 +209,22 @@ async function processMatches(body: any) {
 
     // Sort by Date
     parsedMatches.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    // --- WIPE EXISTING DATA ---
+    console.log("processMatches called with wipeData:", wipeData);
+    if (wipeData === true || wipeData === "true") {
+        console.log("Execute database wipe...");
+        // Delete all matches (cascades to TeamMatchStats and MatchComments)
+        await prisma.match.deleteMany({});
+
+        // Delete all performance history tracking
+        await prisma.performanceHistory.deleteMany({});
+
+        // Delete ALL teams (cascades to Users, Skills records, Awards, Connections, etc.)
+        await prisma.team.deleteMany({});
+
+        console.log("Wipe complete. All teams and accounts deleted.");
+    }
 
     let importedCount = 0;
     for (const match of parsedMatches) {

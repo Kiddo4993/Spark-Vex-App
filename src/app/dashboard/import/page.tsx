@@ -21,6 +21,7 @@ export default function ImportPage() {
     const [mapping, setMapping] = useState<ColumnMapping>({});
     const [status, setStatus] = useState("");
     const [reviewStats, setReviewStats] = useState<any>(null);
+    const [wipeData, setWipeData] = useState(true);
 
     // --- RobotEvents API state ---
     const [apiStep, setApiStep] = useState<ApiStep>("key");
@@ -97,7 +98,7 @@ export default function ImportPage() {
             const res = await fetch("/api/import/process", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fileData, mapping, importType }),
+                body: JSON.stringify({ fileData, mapping, importType, wipeData }),
             });
             const data = await res.json();
             if (data.error) throw new Error(data.error);
@@ -200,7 +201,7 @@ export default function ImportPage() {
             const res = await fetch("/api/import/process", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fileData: rows, mapping: apiMapping, importType: "match" }),
+                body: JSON.stringify({ fileData: rows, mapping: apiMapping, importType: "match", wipeData }),
             });
             const data = await res.json();
             if (data.error) throw new Error(data.error);
@@ -229,28 +230,30 @@ export default function ImportPage() {
 
     return (
         <div className="space-y-6 animate-fade-in">
-            <div>
-                <h1 className="page-title">Import Data</h1>
-                <p className="page-subtitle">Import match data from a file or directly from the RobotEvents API.</p>
-            </div>
-
-            {/* Import Method Selector */}
-            {step !== "done" && (
-                <div className="flex gap-2">
-                    <button
-                        onClick={() => switchMethod("file")}
-                        className={`filter-chip ${importMethod === "file" ? "on" : ""}`}
-                    >
-                        📄 Upload File
-                    </button>
-                    <button
-                        onClick={() => switchMethod("api")}
-                        className={`filter-chip ${importMethod === "api" ? "on" : ""}`}
-                    >
-                        🌐 RobotEvents API
-                    </button>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end justify-between border-b pb-4 border-line">
+                <div>
+                    <h1 className="font-head text-4xl font-extrabold text-txt-1 tracking-tight uppercase">Data Import</h1>
+                    <p className="text-xs font-mono tracking-widest uppercase text-txt-3 mt-1">Upload Match Data or Fetch from API</p>
                 </div>
-            )}
+
+                {/* Import Method Selector */}
+                {step !== "done" && (
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => switchMethod("file")}
+                            className={`px-4 py-2 text-[11px] font-mono tracking-widest uppercase font-bold transition-colors border ${importMethod === "file" ? "bg-spark text-surface-bg border-spark" : "border-line text-txt-3 hover:text-txt-1 hover:border-txt-1"}`}
+                        >
+                            [ FILE ]
+                        </button>
+                        <button
+                            onClick={() => switchMethod("api")}
+                            className={`px-4 py-2 text-[11px] font-mono tracking-widest uppercase font-bold transition-colors border ${importMethod === "api" ? "bg-spark text-surface-bg border-spark" : "border-line text-txt-3 hover:text-txt-1 hover:border-txt-1"}`}
+                        >
+                            [ ROBOTEVENTS ]
+                        </button>
+                    </div>
+                )}
+            </div>
 
             {/* ============ FILE UPLOAD PATH ============ */}
             {importMethod === "file" && (
@@ -306,33 +309,54 @@ export default function ImportPage() {
 
                     {step === "review" && reviewStats && (
                         <div className="space-y-5">
-                            <div className="card p-6 text-center">
-                                <h3 className="font-head text-xl font-bold text-txt-1 mb-6">Ready to Import</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-left">
-                                    <div className="stat-card c-cyan">
-                                        <div className="stat-label">{importType === "match" ? "Matches" : "Entries"} Found</div>
-                                        <div className="stat-value">{reviewStats.matchCount || reviewStats.count}</div>
-                                    </div>
-                                    <div className="stat-card c-amber">
-                                        <div className="stat-label">Unique Teams</div>
-                                        <div className="stat-value">{reviewStats.teamCount}</div>
-                                    </div>
-                                    <div className="stat-card c-green">
-                                        <div className="stat-label">Date Range</div>
-                                        <div className="text-sm font-mono text-txt-1 mt-1">
-                                            {reviewStats.dateRange ? `${new Date(reviewStats.dateRange.start).toLocaleDateString()} – ${new Date(reviewStats.dateRange.end).toLocaleDateString()}` : "N/A"}
+                            <div className="card overflow-hidden">
+                                <div className="card-header bg-surface-bg border-b border-line py-2 text-center">
+                                    <span className="text-[10px] font-mono tracking-widest text-txt-3 uppercase">Ready to Import</span>
+                                </div>
+                                <div className="p-5 bg-surface-card">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-y border-line mb-6 divide-y md:divide-y-0 md:divide-x divide-line bg-surface-bg">
+                                        <div className="p-4 flex flex-col items-center justify-center">
+                                            <div className="text-[10px] font-mono tracking-widest uppercase text-txt-3 mb-1">{importType === "match" ? "Matches" : "Entries"} Found</div>
+                                            <div className="font-mono text-2xl font-bold text-cyan-400">{reviewStats.matchCount || reviewStats.count}</div>
+                                        </div>
+                                        <div className="p-4 flex flex-col items-center justify-center">
+                                            <div className="text-[10px] font-mono tracking-widest uppercase text-txt-3 mb-1">Unique Teams</div>
+                                            <div className="font-mono text-2xl font-bold text-amber-500">{reviewStats.teamCount}</div>
+                                        </div>
+                                        <div className="p-4 flex flex-col items-center justify-center">
+                                            <div className="text-[10px] font-mono tracking-widest uppercase text-txt-3 mb-1">Date Range</div>
+                                            <div className="font-mono text-sm text-txt-1 mt-1 text-center">
+                                                {reviewStats.dateRange ? `${new Date(reviewStats.dateRange.start).toLocaleDateString()} – ${new Date(reviewStats.dateRange.end).toLocaleDateString()}` : "N/A"}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="text-left mb-6">
-                                    <h4 className="section-title mb-2">Sample Parsed Data</h4>
-                                    <pre className="text-xs text-txt-3 font-mono bg-surface-bg p-4 rounded-[10px] overflow-x-auto border border-line">
-                                        {JSON.stringify(reviewStats.sample, null, 2)}
-                                    </pre>
-                                </div>
-                                <div className="flex justify-center gap-3">
-                                    <button onClick={() => setStep("map")} className="btn-ghost">Back</button>
-                                    <button onClick={handleImport} className="btn-primary bg-success hover:bg-success/90 border-success/50">Confirm &amp; Import</button>
+
+                                    <div className="mb-6">
+                                        <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-2">Sample Parsed Data</h4>
+                                        <pre className="text-[10px] text-txt-3 font-mono bg-surface-bg p-4 border border-line overflow-x-auto selection:bg-spark/20">
+                                            {JSON.stringify(reviewStats.sample, null, 2)}
+                                        </pre>
+                                    </div>
+
+                                    <div className="mb-8 flex items-center justify-center gap-3 bg-danger/5 border border-danger/20 p-4">
+                                        <input
+                                            type="checkbox"
+                                            id="wipeData"
+                                            checked={wipeData}
+                                            onChange={(e) => setWipeData(e.target.checked)}
+                                            className="w-4 h-4 rounded-none border-danger/50 bg-surface-bg text-danger focus:ring-danger focus:ring-1 appearance-none checked:bg-danger checked:after:content-['✓'] checked:after:text-surface-bg checked:after:flex checked:after:justify-center checked:after:items-center checked:after:text-xs cursor-pointer"
+                                        />
+                                        <label htmlFor="wipeData" className="text-[11px] font-mono tracking-widest uppercase text-danger font-bold select-none cursor-pointer">
+                                            ⚠ Wipe all existing match data and delete ALL teams and accounts
+                                        </label>
+                                    </div>
+
+                                    <div className="flex justify-center gap-3">
+                                        <button onClick={() => setStep("map")} className="btn-ghost !text-[11px] !font-mono !tracking-widest !uppercase">Cancel</button>
+                                        <button onClick={handleImport} className="btn-primary bg-success hover:bg-success/90 border-success/50 w-full md:w-auto">
+                                            [ CONFIRM & IMPORT ]
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -344,130 +368,164 @@ export default function ImportPage() {
             {importMethod === "api" && step !== "done" && (
                 <>
                     {apiStep === "key" && (
-                        <div className="card p-6 space-y-4">
-                            <div>
-                                <h3 className="section-title mb-1">Enter API Key</h3>
-                                <p className="text-xs text-txt-3">
-                                    Get your API key from{" "}
-                                    <a href="https://www.robotevents.com/api" target="_blank" rel="noopener noreferrer" className="text-spark hover:underline">
-                                        robotevents.com/api
-                                    </a>
-                                </p>
+                        <div className="card overflow-hidden">
+                            <div className="card-header bg-surface-bg border-b border-line py-2">
+                                <span className="text-[10px] font-mono tracking-widest text-txt-3 uppercase">API Authentication</span>
                             </div>
-                            <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} className="input" placeholder="Paste your RobotEvents API key…" />
-                            {apiError && (
-                                <div className="alert alert-warn">
-                                    <span className="alert-icon">⚠️</span>
-                                    <div className="alert-body">{apiError}</div>
+                            <div className="p-6 bg-surface-card space-y-4">
+                                <div>
+                                    <p className="text-[11px] font-mono tracking-widest uppercase text-txt-3 mb-4">
+                                        GET YOUR API KEY FROM{" "}
+                                        <a href="https://www.robotevents.com/api" target="_blank" rel="noopener noreferrer" className="text-spark font-bold hover:underline">
+                                            ROBOTEVENTS.COM/API
+                                        </a>
+                                    </p>
+                                    <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} className="input font-mono tracking-widest" placeholder="PASTE YOUR ROBOTEVENTS API KEY…" />
                                 </div>
-                            )}
-                            <button onClick={validateApiKey} disabled={!apiKey || apiLoading} className="btn-primary">
-                                {apiLoading ? "Validating…" : "Validate Key"}
-                            </button>
+                                {apiError && (
+                                    <div className="bg-danger/10 border border-danger/30 p-3 text-[11px] font-mono text-danger uppercase tracking-widest text-center">
+                                        {apiError}
+                                    </div>
+                                )}
+                                <div className="pt-2">
+                                    <button onClick={validateApiKey} disabled={!apiKey || apiLoading} className="btn-primary w-full sm:w-auto">
+                                        {apiLoading ? "VALIDATING…" : "[ VALIDATE KEY ]"}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
 
                     {apiStep === "search" && (
-                        <div className="space-y-4">
-                            <div className="card p-6 space-y-4">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-success text-sm">✓ API Key Valid</span>
-                                    <button onClick={() => { setApiStep("key"); setApiKeyValid(false); }} className="text-[10px] text-txt-3 hover:text-txt-1">Change</button>
-                                </div>
-                                <div>
-                                    <h3 className="section-title mb-1">Find Event</h3>
-                                    <p className="text-xs text-txt-3">Search for an event by name to import its match data.</p>
-                                </div>
-                                <div className="flex gap-2">
-                                    <input type="text" value={eventQuery} onChange={(e) => setEventQuery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && searchEvents()} className="input flex-1" placeholder="e.g. Worlds, State Championship…" />
-                                    <button onClick={searchEvents} disabled={!eventQuery || apiLoading} className="btn-primary">
-                                        {apiLoading ? "Searching…" : "Search"}
-                                    </button>
-                                </div>
-                                {apiError && (
-                                    <div className="alert alert-warn">
-                                        <span className="alert-icon">⚠️</span>
-                                        <div className="alert-body">{apiError}</div>
+                        <div className="space-y-6">
+                            <div className="card overflow-hidden">
+                                <div className="card-header bg-surface-bg border-b border-line py-2 flex justify-between items-center">
+                                    <span className="text-[10px] font-mono tracking-widest text-txt-3 uppercase">Find Event</span>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-[10px] font-mono tracking-widest text-success uppercase font-bold">✓ KEY VALID</span>
+                                        <button onClick={() => { setApiStep("key"); setApiKeyValid(false); }} className="text-[10px] font-mono tracking-widest text-txt-3 hover:text-txt-1 uppercase transition-colors">[ CHANGE ]</button>
                                     </div>
-                                )}
+                                </div>
+                                <div className="p-6 bg-surface-card space-y-4">
+                                    <p className="text-[11px] font-mono tracking-widest uppercase text-txt-3 mb-2">SEARCH BY EVENT NAME OR SKU</p>
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        <input type="text" value={eventQuery} onChange={(e) => setEventQuery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && searchEvents()} className="input font-mono tracking-widest flex-1 uppercase" placeholder="e.g. WORLDS, STATE CHAMPIONSHIP…" />
+                                        <button onClick={searchEvents} disabled={!eventQuery || apiLoading} className="btn-primary w-full sm:w-auto">
+                                            {apiLoading ? "SEARCHING…" : "[ SEARCH ]"}
+                                        </button>
+                                    </div>
+                                    {apiError && (
+                                        <div className="bg-danger/10 border border-danger/30 p-3 text-[11px] font-mono text-danger uppercase tracking-widest text-center mt-2">
+                                            {apiError}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             {events.length > 0 && (
-                                <div className="card overflow-hidden p-0">
-                                    <table className="data-table">
-                                        <thead>
-                                            <tr><th>Event</th><th>SKU</th><th>Location</th><th></th></tr>
-                                        </thead>
-                                        <tbody>
-                                            {events.map((ev) => (
-                                                <tr key={ev.id}>
-                                                    <td className="p-3">
-                                                        <div className="font-semibold text-txt-1 text-sm">{ev.name}</div>
-                                                        <div className="text-[10px] text-txt-3 font-mono">{ev.start ? new Date(ev.start).toLocaleDateString() : ""}</div>
-                                                    </td>
-                                                    <td className="p-3 font-mono text-xs text-txt-3">{ev.sku}</td>
-                                                    <td className="p-3 text-xs text-txt-3">{ev.location}</td>
-                                                    <td className="p-3">
-                                                        <button onClick={() => fetchEventMatches(ev)} className="btn-primary text-xs py-1 px-3">Fetch Matches</button>
-                                                    </td>
+                                <div className="border border-line bg-surface-bg">
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left text-sm border-collapse">
+                                            <thead>
+                                                <tr className="border-b border-line bg-surface-card">
+                                                    <th className="p-3 text-[10px] text-txt-3 font-mono uppercase tracking-widest font-bold border-r border-line">EVENT</th>
+                                                    <th className="p-3 text-[10px] text-txt-3 font-mono uppercase tracking-widest font-bold border-r border-line w-32">SKU</th>
+                                                    <th className="p-3 text-[10px] text-txt-3 font-mono uppercase tracking-widest font-bold border-r border-line">LOCATION</th>
+                                                    <th className="p-3 w-32"></th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {events.map((ev) => (
+                                                    <tr key={ev.id} className="border-b border-line last:border-b-0 hover:bg-surface-hover transition-colors">
+                                                        <td className="p-3 border-r border-line">
+                                                            <div className="font-bold text-txt-1 text-[13px] tracking-wide uppercase">{ev.name}</div>
+                                                            <div className="text-[10px] text-txt-3 font-mono uppercase tracking-widest mt-1">{ev.start ? new Date(ev.start).toLocaleDateString() : ""}</div>
+                                                        </td>
+                                                        <td className="p-3 border-r border-line font-mono text-[11px] text-spark tracking-widest uppercase">{ev.sku}</td>
+                                                        <td className="p-3 border-r border-line text-[11px] font-mono text-txt-2 tracking-widest uppercase">{ev.location}</td>
+                                                        <td className="p-3 text-center">
+                                                            <button onClick={() => fetchEventMatches(ev)} className="bg-spark/10 text-spark border border-spark/30 hover:bg-spark hover:text-surface-bg transition-colors text-[10px] font-mono tracking-widest font-bold uppercase py-1.5 px-3">
+                                                                FETCH
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     )}
 
                     {apiStep === "fetching" && (
-                        <div className="text-center py-20 card">
-                            <div className="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-spark mb-5"></div>
-                            <p className="text-txt-1 font-head font-bold tracking-wide animate-pulse">Fetching matches from {selectedEvent?.name}…</p>
+                        <div className="text-center py-20 border border-line bg-surface-bg">
+                            <div className="inline-block animate-spin rounded-none h-10 w-10 border-t-2 border-r-2 border-spark mb-6"></div>
+                            <p className="text-[11px] text-spark font-mono uppercase tracking-widest font-bold animate-pulse">FETCHING MATCHES FROM {selectedEvent?.sku || "EVENT"}…</p>
                         </div>
                     )}
 
                     {apiStep === "review" && (
                         <div className="space-y-5">
-                            <div className="card p-6 text-center">
-                                <h3 className="font-head text-xl font-bold text-txt-1 mb-6">Ready to Import from {selectedEvent?.name}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-left">
-                                    <div className="stat-card c-cyan">
-                                        <div className="stat-label">Matches Found</div>
-                                        <div className="stat-value">{apiMatchCount}</div>
-                                    </div>
-                                    <div className="stat-card c-amber">
-                                        <div className="stat-label">Unique Teams</div>
-                                        <div className="stat-value">{apiTeamCount}</div>
-                                    </div>
-                                    <div className="stat-card c-green">
-                                        <div className="stat-label">Event</div>
-                                        <div className="text-sm font-mono text-txt-1 mt-1">{selectedEvent?.sku}</div>
-                                    </div>
+                            <div className="card overflow-hidden">
+                                <div className="card-header bg-surface-bg border-b border-line py-2 text-center">
+                                    <span className="text-[10px] font-mono tracking-widest text-txt-3 uppercase">Ready to Import from {selectedEvent?.name}</span>
                                 </div>
-                                <div className="text-left mb-6">
-                                    <h4 className="section-title mb-2">Sample Matches</h4>
-                                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                                        {apiMatches.slice(0, 5).map((m, i) => (
-                                            <div key={i} className="flex items-center gap-3 p-3 bg-surface-bg rounded-[10px] border border-line text-xs font-mono">
-                                                <span className="text-txt-3 w-20 flex-shrink-0">{m.eventName}</span>
-                                                <span className="text-danger">{m.redTeam1} {m.redTeam2} {m.redTeam3}</span>
-                                                <span className="font-bold text-txt-1">{m.redScore} – {m.blueScore}</span>
-                                                <span className="text-spark">{m.blueTeam1} {m.blueTeam2} {m.blueTeam3}</span>
-                                            </div>
-                                        ))}
+                                <div className="p-5 bg-surface-card">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-y border-line mb-6 divide-y md:divide-y-0 md:divide-x divide-line bg-surface-bg">
+                                        <div className="p-4 flex flex-col items-center justify-center">
+                                            <div className="text-[10px] font-mono tracking-widest uppercase text-txt-3 mb-1">Matches Found</div>
+                                            <div className="font-mono text-2xl font-bold text-cyan-400">{apiMatchCount}</div>
+                                        </div>
+                                        <div className="p-4 flex flex-col items-center justify-center">
+                                            <div className="text-[10px] font-mono tracking-widest uppercase text-txt-3 mb-1">Unique Teams</div>
+                                            <div className="font-mono text-2xl font-bold text-amber-500">{apiTeamCount}</div>
+                                        </div>
+                                        <div className="p-4 flex flex-col items-center justify-center">
+                                            <div className="text-[10px] font-mono tracking-widest uppercase text-txt-3 mb-1">Event SKU</div>
+                                            <div className="font-mono text-xs text-txt-1 mt-1 text-center">{selectedEvent?.sku}</div>
+                                        </div>
                                     </div>
-                                </div>
-                                {apiError && (
-                                    <div className="alert alert-warn mb-4">
-                                        <span className="alert-icon">⚠️</span>
-                                        <div className="alert-body">{apiError}</div>
+
+                                    <div className="mb-6">
+                                        <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-2">Sample Matches</h4>
+                                        <div className="space-y-0 border border-line divide-y divide-line max-h-60 overflow-y-auto">
+                                            {apiMatches.slice(0, 5).map((m, i) => (
+                                                <div key={i} className="flex items-center gap-3 p-3 bg-surface-bg text-[10px] font-mono hover:bg-surface-hover transition-colors">
+                                                    <span className="text-txt-3 w-16 truncate flex-shrink-0" title={m.eventName}>{m.eventName}</span>
+                                                    <span className="text-danger flex-1 truncate text-right">{m.redTeam1} {m.redTeam2} {m.redTeam3}</span>
+                                                    <span className="font-bold text-txt-1 text-base mx-2 tracking-widest">{m.redScore} - {m.blueScore}</span>
+                                                    <span className="text-spark flex-1 truncate">{m.blueTeam1} {m.blueTeam2} {m.blueTeam3}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                )}
-                                <div className="flex justify-center gap-3">
-                                    <button onClick={() => { setApiStep("search"); setApiError(""); }} className="btn-ghost">Back</button>
-                                    <button onClick={importApiMatches} disabled={apiLoading || apiMatches.length === 0} className="btn-primary bg-success hover:bg-success/90 border-success/50">
-                                        {apiLoading ? "Importing…" : `Confirm & Import ${apiMatchCount} Matches`}
-                                    </button>
+
+                                    {apiError && (
+                                        <div className="mb-4 bg-danger/10 border border-danger/30 p-3 text-[11px] font-mono text-danger uppercase tracking-widest text-center">
+                                            {apiError}
+                                        </div>
+                                    )}
+
+                                    <div className="mb-8 flex items-center justify-center gap-3 bg-danger/5 border border-danger/20 p-4">
+                                        <input
+                                            type="checkbox"
+                                            id="apiWipeData"
+                                            checked={wipeData}
+                                            onChange={(e) => setWipeData(e.target.checked)}
+                                            className="w-4 h-4 rounded-none border-danger/50 bg-surface-bg text-danger focus:ring-danger focus:ring-1 appearance-none checked:bg-danger checked:after:content-['✓'] checked:after:text-surface-bg checked:after:flex checked:after:justify-center checked:after:items-center checked:after:text-xs cursor-pointer"
+                                        />
+                                        <label htmlFor="apiWipeData" className="text-[11px] font-mono tracking-widest uppercase text-danger font-bold select-none cursor-pointer">
+                                            ⚠ Wipe all existing match data and delete ALL teams and accounts
+                                        </label>
+                                    </div>
+
+                                    <div className="flex justify-center gap-3">
+                                        <button onClick={() => { setApiStep("search"); setApiError(""); }} className="btn-ghost !text-[11px] !font-mono !tracking-widest !uppercase">Back</button>
+                                        <button onClick={importApiMatches} disabled={apiLoading || apiMatches.length === 0} className="btn-primary bg-success hover:bg-success/90 border-success/50 w-full md:w-auto">
+                                            {apiLoading ? "IMPORTING…" : `[ CONFIRM & IMPORT ${apiMatchCount} MATCHES ]`}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -477,20 +535,22 @@ export default function ImportPage() {
 
             {/* ============ SHARED STATES ============ */}
             {importMethod === "file" && step === "processing" && (
-                <div className="text-center py-20 card">
-                    <div className="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-spark mb-5"></div>
-                    <p className="text-txt-1 font-head font-bold tracking-wide animate-pulse">{status}</p>
+                <div className="text-center py-20 border border-line bg-surface-bg">
+                    <div className="inline-block animate-spin rounded-none h-10 w-10 border-t-2 border-r-2 border-spark mb-6"></div>
+                    <p className="text-[11px] text-spark font-mono uppercase tracking-widest font-bold animate-pulse">{status.toUpperCase()}</p>
                 </div>
             )}
 
             {step === "done" && (
-                <div className="text-center py-20 card">
-                    <div className="flex justify-center mb-5">
-                        <div className="h-14 w-14 rounded-full bg-success/15 flex items-center justify-center text-success text-2xl border border-success/30">✓</div>
+                <div className="text-center py-20 border border-line bg-success/5">
+                    <div className="flex justify-center mb-6">
+                        <div className="h-14 w-14 bg-success flex items-center justify-center text-surface-bg text-2xl font-bold font-mono border-2 border-success/30">✓</div>
                     </div>
-                    <h3 className="font-head text-xl font-bold text-txt-1 mb-2">Import Complete</h3>
-                    <p className="text-sm text-txt-3 mb-6 max-w-md mx-auto">{status || apiImportStatus}</p>
-                    <button onClick={() => router.push("/dashboard")} className="btn-primary">Go to Dashboard</button>
+                    <h3 className="text-[14px] font-mono tracking-widest uppercase font-bold text-success mb-3"> IMPORT COMPLETE </h3>
+                    <p className="text-[11px] font-mono tracking-widest uppercase text-txt-3 mb-8 max-w-md mx-auto">{status || apiImportStatus}</p>
+                    <button onClick={() => router.push("/dashboard")} className="btn-primary">
+                        [ GO TO DASHBOARD ]
+                    </button>
                 </div>
             )}
         </div>
