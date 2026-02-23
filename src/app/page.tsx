@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TopTeams } from "@/components/TopTeams";
 import { RecentMatches } from "@/components/RecentMatches";
+import { BestMatches } from "@/components/BestMatches";
 
 export default async function LandingPage() {
   const session = await getServerSession(authOptions);
@@ -22,7 +23,7 @@ export default async function LandingPage() {
 
   const recentMatches = await prisma.match.findMany({
     orderBy: { date: "desc" },
-    take: 5,
+    take: 50, // Fetch more to find the best scores
     include: {
       redTeam1: { select: { teamNumber: true } },
       redTeam2: { select: { teamNumber: true } },
@@ -32,6 +33,12 @@ export default async function LandingPage() {
       blueTeam3: { select: { teamNumber: true } },
     },
   });
+
+  const bestMatches = [...recentMatches]
+    .sort((a, b) => (b.redScore + b.blueScore) - (a.redScore + a.blueScore))
+    .slice(0, 5);
+
+  const displayRecent = recentMatches.slice(0, 5);
 
   return (
     <main className="min-h-screen bg-surface-bg pb-32">
@@ -112,11 +119,15 @@ export default async function LandingPage() {
             </div>
           </section>
 
-          {/* Sidebar: Recent Matches */}
-          <aside>
-            <RecentMatches matches={recentMatches as any} currentTeamId="" />
-            <div className="flex justify-center mt-4">
-              <Link href="/matches" className="btn-ghost text-sm">View All Matches →</Link>
+          {/* Sidebar: Recent Matches & Best Matches */}
+          <aside className="space-y-6">
+            <BestMatches matches={bestMatches as any} />
+
+            <div>
+              <RecentMatches matches={displayRecent as any} currentTeamId="" />
+              <div className="flex justify-center mt-4">
+                <Link href="/matches" className="btn-ghost text-sm">View All Matches →</Link>
+              </div>
             </div>
             <div className="mt-6 p-5 bg-spark/5 rounded-xl border border-spark/20">
               <p className="text-[10px] font-mono text-spark uppercase tracking-widest mb-1.5">Pro Tip</p>
