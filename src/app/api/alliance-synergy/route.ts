@@ -24,18 +24,18 @@ export async function GET(req: Request) {
         const s1 = myTeam.autonomousSide?.toLowerCase();
         const s2 = other.autonomousSide?.toLowerCase();
 
-        if (s1 && s2) {
-            if (s1.includes("skills") || s2.includes("skills")) {
-                autoScore = 75;
-            } else if (s1 !== s2) {
-                // opposite sides?
-                // Check simply strictly not equal?
-                // e.g. "left" vs "right" which are the common ones.
-                autoScore = 100;
-            } else {
-                // same side
+        const missingScouting = other.autoStrength === null || other.driverStrength === null;
+        let autoConflict = false;
+
+        if (s1 && s2 && s1 !== "skills" && s2 !== "skills") {
+            if (s1 === s2) {
                 autoScore = 50;
+                autoConflict = true;
+            } else {
+                autoScore = 100;
             }
+        } else if (s1 && s2 && (s1 === "skills" || s2 === "skills")) {
+            autoScore = 75;
         }
 
         // 2. Strength Score
@@ -76,6 +76,8 @@ export async function GET(req: Request) {
             autoCompatibility: autoScore,
             strengthScore,
             confidence,
+            missingScouting,
+            autoConflict,
         };
     });
 

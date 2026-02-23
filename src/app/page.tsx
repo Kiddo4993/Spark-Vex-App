@@ -85,6 +85,9 @@ export default async function LandingPage() {
           {/* Main: Top Teams */}
           <section className="space-y-12">
             <TopTeams teams={topTeams} />
+            <div className="flex justify-center">
+              <Link href="/teams" className="btn-ghost text-sm">View All Teams →</Link>
+            </div>
 
             <div className="card p-8 border-l-[3px] border-l-spark">
               <h3 className="section-title mb-6">How it works</h3>
@@ -112,6 +115,9 @@ export default async function LandingPage() {
           {/* Sidebar: Recent Matches */}
           <aside>
             <RecentMatches matches={recentMatches as any} currentTeamId="" />
+            <div className="flex justify-center mt-4">
+              <Link href="/matches" className="btn-ghost text-sm">View All Matches →</Link>
+            </div>
             <div className="mt-6 p-5 bg-spark/5 rounded-xl border border-spark/20">
               <p className="text-[10px] font-mono text-spark uppercase tracking-widest mb-1.5">Pro Tip</p>
               <p className="text-xs text-txt-2 leading-relaxed">

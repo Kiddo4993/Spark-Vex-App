@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
-const sections = [
+const getSections = (teamNumber: string) => [
     {
         label: "Overview",
         items: [
             { href: "/dashboard", icon: "◈", label: "Dashboard" },
+            { href: `/dashboard/teams/${teamNumber}`, icon: "◇", label: "Team Profile" },
             { href: "/dashboard/matches", icon: "⊡", label: "Matches", badge: true },
             { href: "/dashboard/import", icon: "↑", label: "Import Data" },
         ],
@@ -54,7 +55,7 @@ export function Sidebar({ teamNumber }: { teamNumber: string }) {
 
             {/* Navigation */}
             <nav className="flex-1 px-3 py-2">
-                {sections.map((section) => (
+                {getSections(teamNumber).map((section) => (
                     <div key={section.label} className="mb-1">
                         <div className="text-[9px] font-mono tracking-[0.12em] uppercase text-txt-3 px-2 pt-3 pb-1.5">
                             {section.label}

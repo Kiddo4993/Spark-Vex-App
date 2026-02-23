@@ -26,8 +26,7 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: "Spark VEX — Bayesian Alliance Engine",
-  description:
-    "Data-driven VEX Robotics alliance selection with Bayesian performance modeling",
+  description: "Advanced VRC scouting and alliance selection powered by Bayesian statistics.",
 };
 
 export default function RootLayout({

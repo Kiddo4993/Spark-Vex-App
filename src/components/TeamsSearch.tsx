@@ -91,12 +91,20 @@ export function TeamsSearch() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-line text-[10px] font-mono text-txt-3">
-                    <span>{team.matchCount} matches</span>
-                    <span>±{team.ratingUncertainty.toFixed(1)}</span>
-                  </div>
-
-                  {(team.provinceState || team.country) && (
+                  <div className="mt-4 pt-3 border-t border-line flex justify-between items-center">
+                    <div className="text-xs text-txt-3 font-mono">
+                      {team.matchCount} Matches
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-[10px] font-mono uppercase text-txt-3 tracking-wider">Confidence</div>
+                      <div className={`font-mono text-xs font-bold ${(1 - team.ratingUncertainty / 50) * 100 > 80 ? "text-success" :
+                          (1 - team.ratingUncertainty / 50) * 100 > 50 ? "text-amber" :
+                            "text-danger"
+                        }`}>
+                        {Math.max(0, Math.min(100, Math.round((1 - team.ratingUncertainty / 50) * 100)))}%
+                      </div>
+                    </div>
+                  </div>     {(team.provinceState || team.country) && (
                     <div className="flex gap-1.5 flex-wrap">
                       {team.provinceState && <span className="ext-chip">{team.provinceState}</span>}
                       {team.country && <span className="ext-chip">{team.country}</span>}

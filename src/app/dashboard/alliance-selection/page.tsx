@@ -62,15 +62,42 @@ export default function AllianceSelectionPage() {
                 <div className="text-center py-12 text-txt-3 text-sm">Loading synergy data…</div>
             ) : (
                 <>
+                    {filtered.some((d) => d.missingScouting) && (
+                        <div className="alert alert-warn mb-4">
+                            <span className="alert-icon">⚠️</span>
+                            <div className="alert-body">
+                                Some teams have missing scouting data. Update their driver and autonomous strengths for accurate synergy scores.
+                            </div>
+                        </div>
+                    )}
+                    {filtered.some((d) => d.autoConflict) && (
+                        <div className="alert alert-danger mb-4">
+                            <span className="alert-icon">⚔️</span>
+                            <div className="alert-body">
+                                Some potential partners have matching autonomous routines. This may cause conflicts during the match.
+                            </div>
+                        </div>
+                    )}
                     {filtered.some((d) => d.confidence < 50) && (
-                        <div className="alert alert-warn">
+                        <div className="alert alert-warn mb-4">
                             <span className="alert-icon">⚠️</span>
                             <div className="alert-body">
                                 Some teams have low confidence ratings. Consider re-scouting before finalizing your alliance picks.
                             </div>
                         </div>
                     )}
-                    <AllianceSynergyTable rows={filtered} />
+                    <AllianceSynergyTable
+                        rows={filtered.map((r) => ({
+                            teamNumber: r.team.teamNumber,
+                            performanceRating: r.team.performanceRating,
+                            confidence: r.confidence,
+                            autoStrength: r.team.autoStrength,
+                            driverStrength: r.team.driverStrength,
+                            synergyScore: r.synergyScore,
+                            missingScouting: r.missingScouting,
+                            autoConflict: r.autoConflict,
+                        }))}
+                    />
                 </>
             )}
         </div>
