@@ -21,7 +21,8 @@ export async function POST(req: Request) {
     }
     const { email, password, teamNumber, provinceState, country } = parsed.data;
 
-    const existingTeam = await prisma.team.findUnique({ where: { teamNumber } });
+    const uppercasedTeam = teamNumber.toUpperCase();
+    const existingTeam = await prisma.team.findUnique({ where: { teamNumber: uppercasedTeam } });
     if (existingTeam) {
       const hasUser = await prisma.user.findUnique({ where: { teamId: existingTeam.id } });
       if (hasUser) {
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
     const hashed = await hash(password, 12);
     const team = existingTeam ?? await prisma.team.create({
       data: {
-        teamNumber,
+        teamNumber: uppercasedTeam,
         provinceState: provinceState ?? null,
         country: country ?? null,
         performanceRating: initialRatingWithSkillsBoost(null),

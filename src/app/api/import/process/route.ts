@@ -215,11 +215,12 @@ async function processMatches(body: any) {
         // ... (Same logic as before for saving matches and ratings)
         // Ensure teams exist
         const getTeamId = async (num: string) => {
-            let t = await prisma.team.findUnique({ where: { teamNumber: num } });
+            const upNum = num.toUpperCase();
+            let t = await prisma.team.findUnique({ where: { teamNumber: upNum } });
             if (!t) {
                 t = await prisma.team.create({
                     data: {
-                        teamNumber: num,
+                        teamNumber: upNum,
                         performanceRating: 100,
                         ratingUncertainty: 50,
                         matchCount: 0
