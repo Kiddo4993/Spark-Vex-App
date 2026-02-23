@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { Sidebar } from "@/components/Sidebar";
+import { DashboardNav } from "@/components/DashboardNav";
 
 export default async function DashboardLayout({
   children,
@@ -24,9 +25,7 @@ export default async function DashboardLayout({
             <strong className="text-txt-1 font-medium">Dashboard</strong>
           </div>
           <div className="ml-auto flex items-center gap-2.5">
-            <div className="flex items-center gap-2 bg-surface-card border border-line rounded-[10px] px-3 py-1.5 w-[220px] text-[13px] text-txt-3 cursor-text hover:border-line-hi transition-colors">
-              🔍 <span className="opacity-50 text-[11px]">Search teams, matches…</span>
-            </div>
+            <DashboardNav />
           </div>
         </div>
         <main className="p-7">{children}</main>

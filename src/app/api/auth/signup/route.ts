@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { initialRatingWithSkillsBoost } from "@/lib/bayesian";
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -39,6 +40,7 @@ export async function POST(req: Request) {
         teamNumber,
         provinceState: provinceState ?? null,
         country: country ?? null,
+        performanceRating: initialRatingWithSkillsBoost(null),
       },
     });
     const user = await prisma.user.create({

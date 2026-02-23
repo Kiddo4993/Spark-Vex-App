@@ -6,6 +6,8 @@ export const U_MIN = 10; // Minimum uncertainty floor
 export const INITIAL_RATING = 100;
 export const INITIAL_UNCERTAINTY = 50;
 export const SKILLS_BONUS_DIVISOR = 5;
+export const REGIME_CHANGE_THRESHOLD = 0.7;
+export const SCOUT_NEEDED_THRESHOLD = U_MIN * 2.5; // 25
 
 // --- Helper Utilities ---
 
@@ -155,6 +157,11 @@ export function updateTeamUncertainty(
   k: number = 0.5,
   uMin: number = U_MIN
 ): number {
+  // Regime change detection: if the result is a major surprise,
+  // expand uncertainty to signal the model may need to recalibrate.
+  if (surpriseFactor > REGIME_CHANGE_THRESHOLD) {
+    return Math.min(INITIAL_UNCERTAINTY, currentUncertainty * 1.2);
+  }
   const newUncertainty = currentUncertainty * (1 - k * creditFactor * surpriseFactor);
   return Math.max(uMin, newUncertainty);
 }
@@ -274,36 +281,25 @@ export function computeBayesianMatchUpdate(
   // BUT we need to map back to original indices/IDs.
   const winningSorted = [...winningTeams].map((t, i) => ({ ...t, originalIndex: i }))
     .sort((a, b) => b.rating - a.rating);
-  // winningSorted[0] = Strongest
-  // winningSorted[1] = Middle
-  // winningSorted[2] = Weakest
-
-  // Calculate credit factors
-  // Strongest vs Middle
-  const cv_Strong_Mid = creditDistribution(winningSorted[0].rating, winningSorted[0].uncertainty, winningSorted[1].rating, winningSorted[1].uncertainty, constants.w);
-  // credit1 is for Strongest, credit2 for Middle
-
-  // Middle vs Weakest
-  const cv_Mid_Weak = creditDistribution(winningSorted[1].rating, winningSorted[1].uncertainty, winningSorted[2].rating, winningSorted[2].uncertainty, constants.w);
-  // credit1 is for Middle, credit2 for Weakest
-
-  // Wait, the logic "Strongest with middle" and "Weakest with middle".
-  // Strongest gets credit from (Strongest vs Middle).
-  // Weakest gets credit from (Middle vs Weakest) -> Wait, usually credit sums to 1?
-  // The user prompt formula for credit distribution (Da, Db) sums to 1?
-  // Da = w*DaBase + (1-w)/2. Db = w*DbBase + (1-w)/2.
-  // DaBase + DbBase = 1.
-  // Da + Db = w(DaBase+DbBase) + (1-w) = w + 1 - w = 1. Yes.
-
-  // So:
-  // Strongest Factor = cv_Strong_Mid.credit1
-  // Weakest Factor = cv_Mid_Weak.credit2
-  // Middle Factor = Average(cv_Strong_Mid.credit2, cv_Mid_Weak.credit1)
 
   const winningCredits = new Map<string, number>();
-  winningCredits.set(winningSorted[0].id, cv_Strong_Mid.credit1);
-  winningCredits.set(winningSorted[2].id, cv_Mid_Weak.credit2);
-  winningCredits.set(winningSorted[1].id, (cv_Strong_Mid.credit2 + cv_Mid_Weak.credit1) / 2);
+
+  if (winningSorted.length === 2) {
+    // 2-team alliance (VEX VRC 2v2)
+    const cv = creditDistribution(winningSorted[0].rating, winningSorted[0].uncertainty, winningSorted[1].rating, winningSorted[1].uncertainty, constants.w);
+    winningCredits.set(winningSorted[0].id, cv.credit1);
+    winningCredits.set(winningSorted[1].id, cv.credit2);
+  } else if (winningSorted.length >= 3) {
+    // 3-team alliance
+    const cv_Strong_Mid = creditDistribution(winningSorted[0].rating, winningSorted[0].uncertainty, winningSorted[1].rating, winningSorted[1].uncertainty, constants.w);
+    const cv_Mid_Weak = creditDistribution(winningSorted[1].rating, winningSorted[1].uncertainty, winningSorted[2].rating, winningSorted[2].uncertainty, constants.w);
+    winningCredits.set(winningSorted[0].id, cv_Strong_Mid.credit1);
+    winningCredits.set(winningSorted[2].id, cv_Mid_Weak.credit2);
+    winningCredits.set(winningSorted[1].id, (cv_Strong_Mid.credit2 + cv_Mid_Weak.credit1) / 2);
+  } else {
+    // 1-team alliance fallback
+    winningCredits.set(winningSorted[0].id, 1);
+  }
 
   const winningUpdates: BayesianMatchUpdate[] = winningTeams.map(team => {
     const da = winningCredits.get(team.id) || 0.33; // Fallback
@@ -326,13 +322,21 @@ export function computeBayesianMatchUpdate(
   const losingSorted = [...losingTeams].map((t, i) => ({ ...t, originalIndex: i }))
     .sort((a, b) => b.rating - a.rating);
 
-  const cl_Strong_Mid = creditDistribution(losingSorted[0].rating, losingSorted[0].uncertainty, losingSorted[1].rating, losingSorted[1].uncertainty, constants.w);
-  const cl_Mid_Weak = creditDistribution(losingSorted[1].rating, losingSorted[1].uncertainty, losingSorted[2].rating, losingSorted[2].uncertainty, constants.w);
-
   const losingCredits = new Map<string, number>();
-  losingCredits.set(losingSorted[0].id, cl_Strong_Mid.credit1);
-  losingCredits.set(losingSorted[2].id, cl_Mid_Weak.credit2);
-  losingCredits.set(losingSorted[1].id, (cl_Strong_Mid.credit2 + cl_Mid_Weak.credit1) / 2);
+
+  if (losingSorted.length === 2) {
+    const cl = creditDistribution(losingSorted[0].rating, losingSorted[0].uncertainty, losingSorted[1].rating, losingSorted[1].uncertainty, constants.w);
+    losingCredits.set(losingSorted[0].id, cl.credit1);
+    losingCredits.set(losingSorted[1].id, cl.credit2);
+  } else if (losingSorted.length >= 3) {
+    const cl_Strong_Mid = creditDistribution(losingSorted[0].rating, losingSorted[0].uncertainty, losingSorted[1].rating, losingSorted[1].uncertainty, constants.w);
+    const cl_Mid_Weak = creditDistribution(losingSorted[1].rating, losingSorted[1].uncertainty, losingSorted[2].rating, losingSorted[2].uncertainty, constants.w);
+    losingCredits.set(losingSorted[0].id, cl_Strong_Mid.credit1);
+    losingCredits.set(losingSorted[2].id, cl_Mid_Weak.credit2);
+    losingCredits.set(losingSorted[1].id, (cl_Strong_Mid.credit2 + cl_Mid_Weak.credit1) / 2);
+  } else {
+    losingCredits.set(losingSorted[0].id, 1);
+  }
 
   const losingUpdates: BayesianMatchUpdate[] = losingTeams.map(team => {
     const db = losingCredits.get(team.id) || 0.33;
@@ -352,4 +356,85 @@ export function computeBayesianMatchUpdate(
   });
 
   return { winning: winningUpdates, losing: losingUpdates };
+}
+
+/**
+ * Compute Bayesian match update for a tie (A=0.5 for both alliances).
+ * Returns a flat array of updates for all teams.
+ */
+export function computeBayesianTieUpdate(
+  redTeams: BayesianTeamInput[],
+  blueTeams: BayesianTeamInput[],
+  constants: { k: number; w: number; uMatch: number; uMin: number } = {
+    k: K, w: W, uMatch: U_MATCH, uMin: U_MIN,
+  }
+): BayesianMatchUpdate[] {
+  const redStats = allianceStats(redTeams);
+  const blueStats = allianceStats(blueTeams);
+
+  const actual = 0.5; // Tie
+
+  // Red's perspective
+  const expectedRed = expectedOutcome(
+    redStats.rating, redStats.uncertainty,
+    blueStats.rating, blueStats.uncertainty,
+    constants.uMatch
+  );
+  const deltaRed = actual - expectedRed;
+  const surpriseRed = Math.abs(deltaRed);
+
+  // Blue's perspective
+  const expectedBlue = expectedOutcome(
+    blueStats.rating, blueStats.uncertainty,
+    redStats.rating, redStats.uncertainty,
+    constants.uMatch
+  );
+  const deltaBlue = actual - expectedBlue;
+  const surpriseBlue = Math.abs(deltaBlue);
+
+  function processTeams(
+    teams: BayesianTeamInput[],
+    delta: number,
+    surprise: number,
+    expected: number
+  ): BayesianMatchUpdate[] {
+    const sorted = [...teams].map((t, i) => ({ ...t, originalIndex: i }))
+      .sort((a, b) => b.rating - a.rating);
+    const credits = new Map<string, number>();
+
+    if (sorted.length === 2) {
+      const cv = creditDistribution(sorted[0].rating, sorted[0].uncertainty, sorted[1].rating, sorted[1].uncertainty, constants.w);
+      credits.set(sorted[0].id, cv.credit1);
+      credits.set(sorted[1].id, cv.credit2);
+    } else if (sorted.length >= 3) {
+      const cv_SM = creditDistribution(sorted[0].rating, sorted[0].uncertainty, sorted[1].rating, sorted[1].uncertainty, constants.w);
+      const cv_MW = creditDistribution(sorted[1].rating, sorted[1].uncertainty, sorted[2].rating, sorted[2].uncertainty, constants.w);
+      credits.set(sorted[0].id, cv_SM.credit1);
+      credits.set(sorted[2].id, cv_MW.credit2);
+      credits.set(sorted[1].id, (cv_SM.credit2 + cv_MW.credit1) / 2);
+    } else {
+      credits.set(sorted[0].id, 1);
+    }
+
+    return teams.map(team => {
+      const d = credits.get(team.id) || 0.33;
+      const rAfter = updateTeamRating(team.rating, d, delta, constants.k);
+      const uAfter = updateTeamUncertainty(team.uncertainty, d, surprise, 0.5, constants.uMin);
+      return {
+        teamId: team.id,
+        ratingBefore: team.rating,
+        ratingAfter: rAfter,
+        uncertaintyBefore: team.uncertainty,
+        uncertaintyAfter: uAfter,
+        creditFactor: d,
+        expectedOutcome: expected,
+        surpriseFactor: surprise,
+      };
+    });
+  }
+
+  return [
+    ...processTeams(redTeams, deltaRed, surpriseRed, expectedRed),
+    ...processTeams(blueTeams, deltaBlue, surpriseBlue, expectedBlue),
+  ];
 }

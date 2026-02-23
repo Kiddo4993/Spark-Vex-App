@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { confidenceFromUncertainty, INITIAL_UNCERTAINTY } from "@/lib/bayesian";
+import { confidenceFromUncertainty, INITIAL_UNCERTAINTY, SCOUT_NEEDED_THRESHOLD } from "@/lib/bayesian";
 import Link from "next/link";
 import { DashboardCards } from "@/components/DashboardCards";
 import { RecentMatches } from "@/components/RecentMatches";
@@ -9,8 +9,7 @@ import { ConnectedTeams } from "@/components/ConnectedTeams";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user) return null;
-  const teamId = (session.user as { teamId: string }).teamId;
+  const teamId = (session!.user as { teamId: string }).teamId;
 
   const team = await prisma.team.findUnique({
     where: { id: teamId },
@@ -179,7 +178,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* High uncertainty alert */}
-      {team.ratingUncertainty > 30 && (
+      {team.ratingUncertainty > SCOUT_NEEDED_THRESHOLD && (
         <div className="alert alert-info">
           <span className="alert-icon">⚡</span>
           <div className="alert-body">

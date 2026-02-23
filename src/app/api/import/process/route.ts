@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { computeBayesianMatchUpdate, K, W, U_MATCH, U_MIN } from "@/lib/bayesian";
+import { computeBayesianMatchUpdate, computeBayesianTieUpdate, BayesianMatchUpdate, K, W, U_MATCH, U_MIN } from "@/lib/bayesian";
 
 type ColumnMapping = {
     eventName?: string;
@@ -253,10 +253,16 @@ async function processMatches(body: any) {
         const redBayesInput = rInput.map(t => ({ id: t.id, rating: t.performanceRating, uncertainty: t.ratingUncertainty }));
         const blueBayesInput = bInput.map(t => ({ id: t.id, rating: t.performanceRating, uncertainty: t.ratingUncertainty }));
 
-        const redWins = match.redScore > match.blueScore;
-        const { winning, losing } = redWins
-            ? computeBayesianMatchUpdate(redBayesInput, blueBayesInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN })
-            : computeBayesianMatchUpdate(blueBayesInput, redBayesInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
+        let allUpdates: BayesianMatchUpdate[];
+        if (match.redScore === match.blueScore) {
+            allUpdates = computeBayesianTieUpdate(redBayesInput, blueBayesInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
+        } else {
+            const redWins = match.redScore > match.blueScore;
+            const { winning, losing } = redWins
+                ? computeBayesianMatchUpdate(redBayesInput, blueBayesInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN })
+                : computeBayesianMatchUpdate(blueBayesInput, redBayesInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
+            allUpdates = [...winning, ...losing];
+        }
 
         const existing = await prisma.match.findFirst({
             where: {
@@ -284,7 +290,6 @@ async function processMatches(body: any) {
         });
 
         const startIds = new Set<string>();
-        const allUpdates = [...winning, ...losing];
 
         for (const up of allUpdates) {
             if (startIds.has(up.teamId)) continue;
