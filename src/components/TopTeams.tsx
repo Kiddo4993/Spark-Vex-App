@@ -14,78 +14,63 @@ export function TopTeams({ teams }: { teams: Team[] }) {
     if (teams.length === 0) return null;
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-line pb-3">
-                <h2 className="section-title">Top Teams</h2>
+        <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-line pb-2 mb-2">
+                <h2 className="section-title text-gold">Live Leaderboard</h2>
                 <Link
-                    href="/auth/signin"
-                    className="text-xs font-mono text-spark hover:text-txt-1 transition-colors tracking-wider"
+                    href="/dashboard/teams"
+                    className="text-[11px] font-mono text-txt-3 hover:text-txt-1 transition-colors uppercase tracking-widest"
                 >
-                    View all →
+                    View all ↗
                 </Link>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {teams.map((team, i) => {
-                    const confidence = Math.min(
-                        100,
-                        Math.round(Math.max(0, 1 - team.ratingUncertainty / 50) * 100)
-                    );
+            <table className="data-table">
+                <thead>
+                    <tr>
+                        <th className="w-12 text-center">Rank</th>
+                        <th>Team</th>
+                        <th className="text-right">Rating</th>
+                        <th className="w-32 hidden sm:table-cell">Confidence</th>
+                        <th className="text-right hidden sm:table-cell">Matches</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {teams.map((team, i) => {
+                        const confidence = Math.min(
+                            100,
+                            Math.round(Math.max(0, 1 - team.ratingUncertainty / 50) * 100)
+                        );
+                        let barColor = "bar-red";
+                        if (confidence > 80) barColor = "bar-green";
+                        else if (confidence > 50) barColor = "bar-amber";
 
-                    return (
-                        <Link
-                            key={team.id}
-                            href="/auth/signin"
-                            className="team-card group block"
-                        >
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="font-mono text-xl font-bold text-txt-1 group-hover:text-spark transition-colors tracking-tight">
-                                    {team.teamNumber}
-                                </div>
-                                <span className="text-[10px] font-mono bg-spark/15 text-spark px-2 py-0.5 rounded-md">
-                                    #{i + 1}
-                                </span>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div>
-                                    <p className="stat-label">Bayesian Rating</p>
-                                    <p className="font-head text-3xl font-extrabold text-txt-1 tracking-tight leading-none">
-                                        {Math.round(team.performanceRating)}
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <div className="flex justify-between items-center mb-1.5">
-                                        <p className="stat-label !mb-0">Confidence</p>
-                                        <span className="text-xs font-mono text-txt-2">{confidence}%</span>
+                        return (
+                            <tr key={team.id}>
+                                <td className="text-center font-mono text-txt-3">{i + 1}</td>
+                                <td>
+                                    <Link href={`/dashboard/teams/${team.teamNumber}`} className="team-num-chip hover:bg-line-hi transition-colors block w-max">
+                                        {team.teamNumber}
+                                    </Link>
+                                </td>
+                                <td className="text-right font-mono font-bold text-[15px] text-txt-1">
+                                    {Math.round(team.performanceRating * 10) / 10}
+                                </td>
+                                <td className="hidden sm:table-cell">
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1 mini-bar">
+                                            <div className={`mini-bar-fill ${barColor}`} style={{ width: `${confidence}%` }} />
+                                        </div>
                                     </div>
-                                    <div className="rating-bar-bg !h-1.5">
-                                        <div
-                                            className={`h-full rounded-full transition-all duration-700 ${confidence > 80
-                                                    ? "bg-success"
-                                                    : confidence > 50
-                                                        ? "bg-amber"
-                                                        : "bg-danger"
-                                                }`}
-                                            style={{ width: `${confidence}%` }}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-between items-center pt-3 border-t border-line">
-                                    <span className="text-[10px] font-mono text-txt-3 tracking-wider">
-                                        {team.matchCount} MATCHES
-                                    </span>
-                                    <span className="text-xs font-mono text-txt-3">
-                                        ±{team.ratingUncertainty.toFixed(1)}
-                                    </span>
-                                </div>
-                            </div>
-                        </Link>
-                    );
-                })}
-            </div>
+                                </td>
+                                <td className="text-right font-mono text-xs text-txt-3 hidden sm:table-cell">
+                                    {team.matchCount}
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
         </div>
     );
 }

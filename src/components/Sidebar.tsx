@@ -36,28 +36,27 @@ export function Sidebar({ teamNumber }: { teamNumber: string }) {
     return (
         <aside className="w-56 flex-shrink-0 bg-surface-card border-r border-line flex flex-col sticky top-0 h-screen overflow-y-auto">
             {/* Logo */}
-            <div className="px-5 py-5 border-b border-line">
+            <div className="px-5 py-6 border-b border-line">
                 <div className="flex items-center gap-2.5">
-                    <div className="w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[17px] flex-shrink-0"
-                        style={{ background: "linear-gradient(135deg, #00D4FF 0%, #0090FF 100%)", boxShadow: "0 0 18px rgba(0,212,255,.35)" }}>
-                        ⚡
+                    <div className="w-[32px] h-[32px] bg-txt-1 text-surface-bg flex items-center justify-center font-head font-bold text-lg">
+                        X
                     </div>
                     <div>
-                        <div className="font-head font-extrabold text-[17px] tracking-tight text-txt-1">
-                            Spark<span className="text-spark">VEX</span>
+                        <div className="font-head font-bold text-[18px] tracking-tight text-txt-1">
+                            SparkVEX
                         </div>
-                        <div className="text-[10px] font-mono text-txt-3 tracking-wider">
-                            Bayesian Alliance Engine
+                        <div className="text-[9px] font-mono text-txt-3 tracking-widest uppercase mt-[2px]">
+                            Analyst Suite
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-3 py-2">
+            <nav className="flex-1 py-4">
                 {getSections(teamNumber).map((section) => (
-                    <div key={section.label} className="mb-1">
-                        <div className="text-[9px] font-mono tracking-[0.12em] uppercase text-txt-3 px-2 pt-3 pb-1.5">
+                    <div key={section.label} className="mb-4">
+                        <div className="text-[10px] font-mono tracking-[0.15em] uppercase text-txt-3 px-5 pb-2">
                             {section.label}
                         </div>
                         {section.items.map(({ href, icon, label }) => {
@@ -78,22 +77,22 @@ export function Sidebar({ teamNumber }: { teamNumber: string }) {
             </nav>
 
             {/* Team Info + Sign Out */}
-            <div className="mt-auto px-5 py-3.5 border-t border-line">
-                <div className="flex items-center gap-2.5">
-                    <div className="team-avatar">
-                        {teamNumber.slice(0, 2)}
-                    </div>
-                    <div className="overflow-hidden">
-                        <div className="text-[13px] font-semibold text-txt-1 truncate">
-                            Team {teamNumber}
+            <div className="px-5 py-4 border-t border-line">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <div className="text-[10px] font-mono text-txt-3 uppercase tracking-widest mb-1">
+                            Active Team
                         </div>
-                        <button
-                            onClick={() => signOut({ callbackUrl: "/" })}
-                            className="text-[10px] font-mono text-txt-3 hover:text-danger transition-colors"
-                        >
-                            Sign out
-                        </button>
+                        <div className="font-mono font-bold text-gold text-[15px]">
+                            {teamNumber}
+                        </div>
                     </div>
+                    <button
+                        onClick={() => signOut({ callbackUrl: "/" })}
+                        className="text-[10px] font-mono text-txt-3 hover:text-danger focus:outline-none transition-colors border border-line px-2 py-1 bg-surface-bg hover:border-danger hover:bg-danger/10"
+                    >
+                        Sign out
+                    </button>
                 </div>
             </div>
         </aside>

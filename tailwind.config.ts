@@ -12,47 +12,53 @@ const config: Config = {
       fontFamily: {
         head: ['var(--font-syne)', 'sans-serif'],
         mono: ['var(--font-space-mono)', 'monospace'],
-        body: ['var(--font-dm-sans)', 'sans-serif'],
+        body: ['var(--font-inter)', 'sans-serif'],
       },
       colors: {
-        spark: {
-          DEFAULT: "#00D4FF",
-          dim: "rgba(0,212,255,.15)",
-          glow: "rgba(0,212,255,.35)",
+        alliance: {
+          red: {
+            DEFAULT: "#E83333",
+            dim: "rgba(232, 51, 51, 0.15)",
+          },
+          blue: {
+            DEFAULT: "#3366EE",
+            dim: "rgba(51, 102, 238, 0.15)",
+          }
+        },
+        gold: {
+          DEFAULT: "#F0A500",
+          dim: "rgba(240, 165, 0, 0.15)",
         },
         amber: {
-          DEFAULT: "#FFB340",
-          dim: "rgba(255,179,64,.12)",
+          DEFAULT: "#E89433",
+          dim: "rgba(232, 148, 51, 0.15)",
         },
         success: {
-          DEFAULT: "#22E89A",
-          dim: "rgba(34,232,154,.12)",
+          DEFAULT: "#19D49E",
+          dim: "rgba(25, 212, 158, 0.15)",
         },
         danger: {
-          DEFAULT: "#FF4D6A",
-          dim: "rgba(255,77,106,.12)",
+          DEFAULT: "#E83333", // matching red
+          dim: "rgba(232, 51, 51, 0.15)",
         },
         surface: {
-          bg: "#080C14",
-          card: "#0D1321",
-          hover: "#111927",
+          bg: "#09080C",
+          card: "#111018",
+          hover: "#181722",
         },
         line: {
-          DEFAULT: "#1C2A3A",
-          hi: "#2A3F57",
+          DEFAULT: "#23222F",
+          hi: "#3A3849",
         },
         txt: {
-          1: "#EFF4FA",
-          2: "#8FA4BB",
-          3: "#4D6275",
+          1: "#F4F2F0",     // Warm off-white
+          2: "#BABCC3",     // Cooler light gray
+          3: "#8A8E9A",     // Cool medium gray
         },
       },
       borderRadius: {
-        DEFAULT: "10px",
-        lg: "16px",
-      },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        DEFAULT: "6px",
+        lg: "10px",
       },
     },
   },

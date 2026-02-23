@@ -43,14 +43,13 @@ export function AllianceSynergyTable({ rows }: { rows: SynergyRow[] }) {
             <table className="data-table">
                 <thead>
                     <tr>
-                        <th>Team</th>
+                        <th className="pl-5">Team</th>
+                        <th className="text-right">Synergy</th>
                         <th>Rating</th>
-                        <th>Confidence</th>
+                        <th>Conf</th>
                         <th>Auto</th>
                         <th>Driver</th>
-                        <th>Synergy</th>
-                        <th>Grade</th>
-                        <th></th>
+                        <th className="text-right"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,60 +58,45 @@ export function AllianceSynergyTable({ rows }: { rows: SynergyRow[] }) {
                         // Scale bar relative to 200 (approx max possible) or maxSynergy if higher
                         const barPct = Math.min(100, (row.synergyScore / 200) * 100);
 
+                        let gradeBorder = "border-danger";
+                        if (row.synergyScore >= 150) gradeBorder = "border-success";
+                        else if (row.synergyScore >= 100) gradeBorder = "border-amber";
+
                         return (
-                            <tr key={row.teamNumber}>
-                                <td className="p-3">
+                            <tr key={row.teamNumber} className={`group relative transition-all duration-[180ms] ease-out hover:bg-surface-hover ${gradeBorder} border-l-[3px]`}>
+                                <td className="p-4 pl-5">
                                     <div className="flex flex-col">
-                                        <span className="font-mono font-bold text-txt-1">{row.teamNumber}</span>
-                                        {/* Re-scout Warning */}
-                                        {row.confidence < 50 && (
-                                            <div className="flex items-center gap-1 mt-0.5 text-danger" title="Re-scout recommended (Low Confidence)">
-                                                <span className="text-[10px]">⚠️ Re-scout</span>
-                                            </div>
-                                        )}
-                                        {/* Auto Conflict Warning */}
-                                        {row.autoConflict && (
-                                            <div className="flex items-center gap-1 mt-0.5 text-amber" title="Autonomous Side Conflict">
-                                                <span className="text-[10px]">⚔️ Auto Conflict</span>
-                                            </div>
-                                        )}
-                                        {/* Missing Scouting Warning */}
-                                        {row.missingScouting && (
-                                            <div className="flex items-center gap-1 mt-0.5 text-txt-3" title="Incomplete Scouting Data">
-                                                <span className="text-[10px]">⚠️ Missing Data</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </td>
-                                <td className="p-3">
-                                    <span className="font-mono text-spark">{Math.round(row.performanceRating)}</span>
-                                </td>
-                                <td className="p-3">
-                                    {/* Confidence Column */}
-                                    <div className={`font-mono text-xs font-bold ${row.confidence > 80 ? "text-success" :
-                                        row.confidence > 50 ? "text-amber" :
-                                            "text-danger"
-                                        }`}>
-                                        {Math.round(row.confidence)}%
-                                    </div>
-                                </td>
-                                <td className="p-3">
-                                    <span className="font-mono text-amber">{row.autoStrength ?? "—"}</span>
-                                </td>
-                                <td className="p-3">
-                                    <span className="font-mono text-success">{row.driverStrength ?? "—"}</span>
-                                </td>
-                                <td className="p-3 text-right">
-                                    <div className="flex items-center justify-end gap-3">
-                                        <div className="text-right">
-                                            <div className={`font-head text-lg font-extrabold leading-none ${row.synergyScore > 150 ? "text-success" :
-                                                row.synergyScore > 100 ? "text-amber" :
-                                                    "text-danger"
-                                                }`}>
-                                                {row.synergyScore.toFixed(0)}
-                                            </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-mono font-bold text-lg text-txt-1">{row.teamNumber}</span>
+                                            <span className={`synergy-pill ${cls} px-1.5 py-0 text-[9px] uppercase tracking-widest bg-transparent border border-current`}>{label}</span>
                                         </div>
-                                        <div className="w-16 h-1 rounded-full bg-surface-base overflow-hidden">
+                                        {/* Warnings */}
+                                        <div className="flex gap-2 mt-1">
+                                            {row.confidence < 50 && (
+                                                <div className="flex items-center gap-1 text-danger">
+                                                    <span className="text-[9px] tracking-widest uppercase font-mono">⚠️ Re-scout</span>
+                                                </div>
+                                            )}
+                                            {row.autoConflict && (
+                                                <div className="flex items-center gap-1 text-amber">
+                                                    <span className="text-[9px] tracking-widest uppercase font-mono">⚔️ Auto Conflict</span>
+                                                </div>
+                                            )}
+                                            {row.missingScouting && (
+                                                <div className="flex items-center gap-1 text-txt-3">
+                                                    <span className="text-[9px] tracking-widest uppercase font-mono">⚠️ Missing Data</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td className="p-4 text-right">
+                                    <div className="flex flex-col items-end justify-center">
+                                        <div className={`font-mono text-xl font-bold leading-none ${row.synergyScore >= 150 ? "text-success" : row.synergyScore >= 100 ? "text-amber" : "text-danger"}`}>
+                                            {row.synergyScore.toFixed(0)}
+                                        </div>
+                                        <div className="w-12 h-1 mt-1.5 bg-line rounded-none overflow-hidden">
                                             <div
                                                 className={`h-full ${barColor(row.synergyScore)}`}
                                                 style={{ width: `${barPct}%` }}
@@ -120,15 +104,28 @@ export function AllianceSynergyTable({ rows }: { rows: SynergyRow[] }) {
                                         </div>
                                     </div>
                                 </td>
-                                <td className="p-3">
-                                    <span className={`synergy-pill ${cls}`}>{label}</span>
+
+                                <td className="p-4">
+                                    <span className="font-mono text-txt-2">{Math.round(row.performanceRating)}</span>
                                 </td>
-                                <td className="p-3">
+                                <td className="p-4">
+                                    <div className={`font-mono text-xs ${row.confidence > 80 ? "text-success" : row.confidence > 50 ? "text-amber" : "text-danger"}`}>
+                                        {Math.round(row.confidence)}%
+                                    </div>
+                                </td>
+                                <td className="p-4">
+                                    <span className="font-mono text-amber-500">{row.autoStrength ?? "—"}</span>
+                                </td>
+                                <td className="p-4">
+                                    <span className="font-mono text-green-500">{row.driverStrength ?? "—"}</span>
+                                </td>
+
+                                <td className="p-4 text-right opacity-0 group-hover:opacity-100 transition-opacity duration-[180ms]">
                                     <Link
                                         href={`/dashboard/teams/${row.teamNumber}`}
-                                        className="text-[11px] font-mono text-spark hover:text-txt-1 transition-colors"
+                                        className="btn-ghost py-1 px-3 text-[10px]"
                                     >
-                                        View →
+                                        PROFILE ↗
                                     </Link>
                                 </td>
                             </tr>

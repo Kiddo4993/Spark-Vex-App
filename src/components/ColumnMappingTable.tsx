@@ -70,25 +70,25 @@ export function ColumnMappingTable({
     }
 
     return (
-        <div className="card overflow-hidden p-0">
+        <div className="border border-line bg-surface-bg">
             <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-left text-sm border-collapse">
                     <thead>
-                        <tr className="border-b border-line bg-surface-hover">
+                        <tr>
                             {columns.map((col, idx) => {
                                 const mappedField = Object.entries(mapping).find(([, v]) => v === String(idx))?.[0] || "";
                                 return (
-                                    <th key={idx} className="p-3 min-w-[150px]">
-                                        <div className="mb-2 text-txt-1 font-mono text-xs truncate" title={col}>{col}</div>
+                                    <th key={idx} className="p-3 min-w-[150px] border-b border-r border-line bg-surface-card last:border-r-0 align-top">
+                                        <div className="mb-3 text-[10px] text-txt-3 font-mono uppercase tracking-widest font-bold truncate" title={col}>{col}</div>
                                         <select
-                                            className="input text-xs !py-1 !px-2"
+                                            className="w-full bg-surface-bg border border-line text-txt-1 text-[11px] font-mono p-1.5 focus:border-spark focus:outline-none focus:ring-1 focus:ring-spark appearance-none rounded-none cursor-pointer"
                                             value={mappedField}
                                             onChange={(e) => handleSelect(String(idx), e.target.value)}
                                         >
-                                            <option value="">(Ignore)</option>
+                                            <option value="">( IGN )</option>
                                             {fields.map((f) => (
                                                 <option key={f.key} value={f.key}>
-                                                    {f.label}
+                                                    {f.label.toUpperCase()}
                                                 </option>
                                             ))}
                                         </select>
@@ -101,7 +101,7 @@ export function ColumnMappingTable({
                         {preview.map((row, rIdx) => (
                             <tr key={rIdx} className="border-b border-line last:border-b-0 hover:bg-surface-hover transition-colors">
                                 {row.map((cell, cIdx) => (
-                                    <td key={cIdx} className="p-3 text-txt-3 max-w-[150px] truncate text-xs font-mono">
+                                    <td key={cIdx} className="p-3 text-txt-3 max-w-[150px] truncate text-[11px] font-mono border-r border-line last:border-r-0">
                                         {String(cell)}
                                     </td>
                                 ))}
