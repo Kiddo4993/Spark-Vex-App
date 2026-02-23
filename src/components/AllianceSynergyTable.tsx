@@ -9,6 +9,8 @@ type SynergyRow = {
     autoStrength: number | null;
     driverStrength: number | null;
     synergyScore: number;
+    missingScouting: boolean;
+    autoConflict: boolean;
 };
 
 function gradeFor(score: number) {
@@ -54,50 +56,76 @@ export function AllianceSynergyTable({ rows }: { rows: SynergyRow[] }) {
                 <tbody>
                     {rows.map((row) => {
                         const { label, cls } = gradeFor(row.synergyScore);
-                        const barPct = Math.max(5, (row.synergyScore / maxSynergy) * 100);
+                        // Scale bar relative to 200 (approx max possible) or maxSynergy if higher
+                        const barPct = Math.min(100, (row.synergyScore / 200) * 100);
 
                         return (
                             <tr key={row.teamNumber}>
-                                <td>
-                                    <span className="font-mono font-bold text-txt-1">{row.teamNumber}</span>
-                                </td>
-                                <td>
-                                    <span className="font-mono text-spark">{Math.round(row.performanceRating)}</span>
-                                </td>
-                                <td>
-                                    <div className="flex items-center gap-2 min-w-[80px]">
-                                        <div className="mini-bar w-12">
-                                            <div
-                                                className={`mini-bar-fill ${row.confidence > 80 ? "bar-green" : row.confidence > 50 ? "bar-amber" : "bar-red"}`}
-                                                style={{ width: `${row.confidence}%` }}
-                                            />
-                                        </div>
-                                        <span className="font-mono text-[11px] text-txt-2">{row.confidence}%</span>
+                                <td className="p-3">
+                                    <div className="flex flex-col">
+                                        <span className="font-mono font-bold text-txt-1">{row.teamNumber}</span>
+                                        {/* Re-scout Warning */}
+                                        {row.confidence < 50 && (
+                                            <div className="flex items-center gap-1 mt-0.5 text-danger" title="Re-scout recommended (Low Confidence)">
+                                                <span className="text-[10px]">⚠️ Re-scout</span>
+                                            </div>
+                                        )}
+                                        {/* Auto Conflict Warning */}
+                                        {row.autoConflict && (
+                                            <div className="flex items-center gap-1 mt-0.5 text-amber" title="Autonomous Side Conflict">
+                                                <span className="text-[10px]">⚔️ Auto Conflict</span>
+                                            </div>
+                                        )}
+                                        {/* Missing Scouting Warning */}
+                                        {row.missingScouting && (
+                                            <div className="flex items-center gap-1 mt-0.5 text-txt-3" title="Incomplete Scouting Data">
+                                                <span className="text-[10px]">⚠️ Missing Data</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </td>
-                                <td>
+                                <td className="p-3">
+                                    <span className="font-mono text-spark">{Math.round(row.performanceRating)}</span>
+                                </td>
+                                <td className="p-3">
+                                    {/* Confidence Column */}
+                                    <div className={`font-mono text-xs font-bold ${row.confidence > 80 ? "text-success" :
+                                        row.confidence > 50 ? "text-amber" :
+                                            "text-danger"
+                                        }`}>
+                                        {Math.round(row.confidence)}%
+                                    </div>
+                                </td>
+                                <td className="p-3">
                                     <span className="font-mono text-amber">{row.autoStrength ?? "—"}</span>
                                 </td>
-                                <td>
+                                <td className="p-3">
                                     <span className="font-mono text-success">{row.driverStrength ?? "—"}</span>
                                 </td>
-                                <td>
-                                    <div className="flex items-center gap-2 min-w-[100px]">
-                                        <div className="mini-bar w-16">
+                                <td className="p-3 text-right">
+                                    <div className="flex items-center justify-end gap-3">
+                                        <div className="text-right">
+                                            <div className={`font-head text-lg font-extrabold leading-none ${row.synergyScore > 150 ? "text-success" :
+                                                row.synergyScore > 100 ? "text-amber" :
+                                                    "text-danger"
+                                                }`}>
+                                                {row.synergyScore.toFixed(0)}
+                                            </div>
+                                        </div>
+                                        <div className="w-16 h-1 rounded-full bg-surface-base overflow-hidden">
                                             <div
-                                                className={`mini-bar-fill ${barColor(row.synergyScore)}`}
+                                                className={`h-full ${barColor(row.synergyScore)}`}
                                                 style={{ width: `${barPct}%` }}
                                             />
                                         </div>
-                                        <span className="font-mono text-[11px] text-txt-1">{Math.round(row.synergyScore)}</span>
                                     </div>
                                 </td>
-                                <td>
+                                <td className="p-3">
                                     <span className={`synergy-pill ${cls}`}>{label}</span>
                                 </td>
-                                <td>
+                                <td className="p-3">
                                     <Link
-                                        href={`/dashboard/teams?teamNumber=${row.teamNumber}`}
+                                        href={`/dashboard/teams/${row.teamNumber}`}
                                         className="text-[11px] font-mono text-spark hover:text-txt-1 transition-colors"
                                     >
                                         View →

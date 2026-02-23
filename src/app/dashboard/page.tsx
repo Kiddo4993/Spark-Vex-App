@@ -78,6 +78,7 @@ export default async function DashboardPage() {
           <p className="page-subtitle">Bayesian performance overview</p>
         </div>
         <div className="flex gap-2.5">
+          <Link href={`/dashboard/teams/${team.teamNumber}`} className="btn-ghost">✎ Edit Profile</Link>
           <Link href="/dashboard/import" className="btn-ghost">↑ Import</Link>
           <Link href="/dashboard/matches/add" className="btn-primary">+ Add Match</Link>
         </div>

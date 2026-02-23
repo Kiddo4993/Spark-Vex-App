@@ -7,9 +7,36 @@ type Team = {
   matchCount: number;
   autoStrength: number | null;
   driverStrength: number | null;
+  drivetrainType: string | null;
+  autonomousSide: string | null;
+  autonReliabilityPct: number | null;
   provinceState: string | null;
   country: string | null;
+  strategyTags: string[];
+  notes: string | null;
 };
+
+function drivetrainLabel(type: string | null) {
+  const map: Record<string, string> = {
+    tank: "Tank Drive",
+    mecanum: "Mecanum",
+    holonomic: "Holonomic / X-Drive",
+    swerve: "Swerve",
+    other: "Other",
+  };
+  return type ? map[type] || type : null;
+}
+
+function autonSideLabel(side: string | null) {
+  const map: Record<string, string> = {
+    left: "Left",
+    right: "Right",
+    skills: "Skills",
+    both: "Both",
+    none: "None",
+  };
+  return side ? map[side] || side : null;
+}
 
 export function TeamProfileCard({ team }: { team: Team }) {
   const confidence = Math.min(
@@ -33,6 +60,19 @@ export function TeamProfileCard({ team }: { team: Team }) {
             {team.country && <span>| {team.country}</span>}
             <span>| {team.matchCount} matches</span>
           </div>
+          {/* Strategy Tags */}
+          {team.strategyTags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {team.strategyTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-spark/15 text-spark border border-spark/20"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -61,6 +101,35 @@ export function TeamProfileCard({ team }: { team: Team }) {
           <div className="p-stat-val text-success">{team.driverStrength ?? "—"}</div>
         </div>
       </div>
+
+      {/* Robot Config */}
+      {(team.drivetrainType || team.autonomousSide || team.autonReliabilityPct !== null) && (
+        <div className="card p-5">
+          <h3 className="section-title mb-4">Robot Configuration</h3>
+          <div className="grid grid-cols-3 gap-4">
+            {team.drivetrainType && (
+              <div>
+                <div className="text-[11px] font-mono text-txt-3 mb-1">DRIVETRAIN</div>
+                <div className="text-sm font-semibold text-txt-1">{drivetrainLabel(team.drivetrainType)}</div>
+              </div>
+            )}
+            {team.autonomousSide && (
+              <div>
+                <div className="text-[11px] font-mono text-txt-3 mb-1">AUTON SIDE</div>
+                <div className="text-sm font-semibold text-txt-1">{autonSideLabel(team.autonomousSide)}</div>
+              </div>
+            )}
+            {team.autonReliabilityPct !== null && (
+              <div>
+                <div className="text-[11px] font-mono text-txt-3 mb-1">AUTON RELIABILITY</div>
+                <div className={`text-sm font-semibold ${team.autonReliabilityPct >= 70 ? "text-success" : team.autonReliabilityPct >= 40 ? "text-amber" : "text-danger"}`}>
+                  {team.autonReliabilityPct}%
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Scouting Bars */}
       <div className="card p-5">
@@ -108,6 +177,15 @@ export function TeamProfileCard({ team }: { team: Team }) {
           </div>
         )}
       </div>
+
+      {/* Notes */}
+      {team.notes && (
+        <div className="card p-5">
+          <h3 className="section-title mb-3">Notes</h3>
+          <p className="text-sm text-txt-2 leading-relaxed whitespace-pre-wrap">{team.notes}</p>
+        </div>
+      )}
     </div>
   );
 }
+
