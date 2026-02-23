@@ -46,9 +46,13 @@ export async function GET(req: Request) {
   if (search && search.length >= 1) {
     const searchTeams = await prisma.team.findMany({
       where: {
-        OR: [
-          { teamNumber: { contains: search, mode: "insensitive" } },
-          // { teamName: { contains: search, mode: "insensitive" } } // if we had a name field
+        AND: [
+          { teamNumber: { not: "ADMIN" } },
+          {
+            OR: [
+              { teamNumber: { contains: search, mode: "insensitive" } },
+            ]
+          }
         ]
       },
       take: 30,

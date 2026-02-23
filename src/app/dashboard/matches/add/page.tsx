@@ -4,6 +4,7 @@ import Link from "next/link";
 
 export default async function AddMatchPage() {
   const teams = (await prisma.team.findMany({
+    where: { teamNumber: { not: "ADMIN" } },
     orderBy: { teamNumber: "asc" },
     select: { id: true, teamNumber: true },
   })).map((t) => ({

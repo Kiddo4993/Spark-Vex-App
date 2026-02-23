@@ -10,6 +10,7 @@ export default async function LandingPage() {
   const session = await getServerSession(authOptions);
 
   const topTeams = await prisma.team.findMany({
+    where: { teamNumber: { not: "ADMIN" } },
     orderBy: { performanceRating: "desc" },
     take: 8,
     select: {

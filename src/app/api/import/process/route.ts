@@ -236,10 +236,12 @@ async function processMatches(body: any) {
         // Delete all performance history tracking
         await prisma.performanceHistory.deleteMany({});
 
-        // Delete ALL teams (cascades to Users, Skills records, Awards, Connections, etc.)
-        await prisma.team.deleteMany({});
+        // Delete ALL teams EXCEPT admin (cascades to Users, Skills records, Awards, Connections, etc.)
+        await prisma.team.deleteMany({
+            where: { teamNumber: { not: "ADMIN" } }
+        });
 
-        console.log("Wipe complete. All teams and accounts deleted.");
+        console.log("Wipe complete. All teams and accounts deleted (admin preserved).");
     }
 
     let importedCount = 0;
@@ -367,8 +369,9 @@ async function processMatches(body: any) {
         importedCount++;
     }
 
-    // --- AUTO-CREATE TEAM ACCOUNTS ---
+    // --- AUTO-CREATE TEAM ACCOUNTS (exclude admin) ---
     const allTeams = await prisma.team.findMany({
+        where: { teamNumber: { not: "ADMIN" } },
         include: { user: true }
     });
 
