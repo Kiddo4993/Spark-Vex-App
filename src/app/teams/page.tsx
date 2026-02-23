@@ -4,6 +4,7 @@ import { TopTeams } from "@/components/TopTeams";
 
 export default async function PublicTeamsPage() {
     const teams = await prisma.team.findMany({
+        where: { teamNumber: { not: "ADMIN" } },
         orderBy: { performanceRating: "desc" },
         take: 50,
         select: {

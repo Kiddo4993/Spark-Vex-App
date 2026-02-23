@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     if (!byTeam.has(r.teamId)) byTeam.set(r.teamId, r);
   }
   const teamsWithSkills = await prisma.team.findMany({
-    where: { id: { in: Array.from(byTeam.keys()) } },
+    where: { id: { in: Array.from(byTeam.keys()) }, teamNumber: { not: "ADMIN" } },
     select: { id: true, teamNumber: true, provinceState: true },
   });
   const skillsInput = teamsWithSkills.map((t) => {

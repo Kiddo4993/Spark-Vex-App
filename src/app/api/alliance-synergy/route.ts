@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
     // Get all potential partners
     const allTeams = await prisma.team.findMany({
-        where: { id: { not: myTeam.id } },
+        where: { id: { not: myTeam.id }, teamNumber: { not: "ADMIN" } },
     });
 
     const results = allTeams.map((other) => {
