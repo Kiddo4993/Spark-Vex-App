@@ -3,7 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { computeBayesianMatchUpdate, K, W, U_MATCH, U_MIN } from "@/lib/bayesian";
+import {
+  computeBayesianMatchUpdate,
+  computeBayesianTieUpdate,
+  BayesianMatchUpdate,
+  K, W, U_MATCH, U_MIN,
+} from "@/lib/bayesian";
 
 const createMatchSchema = z.object({
   eventName: z.string().min(1),
@@ -18,6 +23,8 @@ const createMatchSchema = z.object({
   blueScore: z.number().int().min(0),
 });
 
+// Public: Match data is intentionally accessible without auth
+// for the public leaderboard and match results pages.
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
   const { searchParams } = new URL(req.url);
@@ -67,7 +74,12 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // Allow public match submission for community data contribution
+  // Auth guard — prevent unauthenticated match submission
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.teamId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await req.json();
     const parsed = createMatchSchema.safeParse({
@@ -78,16 +90,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
     const {
-      eventName,
-      date,
-      redTeam1Id,
-      redTeam2Id,
-      redTeam3Id,
-      blueTeam1Id,
-      blueTeam2Id,
-      blueTeam3Id,
-      redScore,
-      blueScore,
+      eventName, date,
+      redTeam1Id, redTeam2Id, redTeam3Id,
+      blueTeam1Id, blueTeam2Id, blueTeam3Id,
+      redScore, blueScore,
     } = parsed.data;
 
     const [red1, red2, red3] = await Promise.all([
@@ -107,32 +113,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid team IDs" }, { status: 400 });
     }
 
-    // Map to Bayesian Input
     const redTeams = redTeamsRaw.map(t => ({ id: t.id, rating: t.performanceRating, uncertainty: t.ratingUncertainty }));
     const blueTeams = blueTeamsRaw.map(t => ({ id: t.id, rating: t.performanceRating, uncertainty: t.ratingUncertainty }));
 
-    const redWins = redScore > blueScore;
-    const { winning, losing } = redWins
-      ? computeBayesianMatchUpdate(redTeams, blueTeams, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN })
-      : computeBayesianMatchUpdate(blueTeams, redTeams, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
+    // Tie handling: A=0.5 for both alliances
+    let allUpdates: BayesianMatchUpdate[];
+    if (redScore === blueScore) {
+      allUpdates = computeBayesianTieUpdate(redTeams, blueTeams, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
+    } else {
+      const redWins = redScore > blueScore;
+      const { winning, losing } = redWins
+        ? computeBayesianMatchUpdate(redTeams, blueTeams, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN })
+        : computeBayesianMatchUpdate(blueTeams, redTeams, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
+      allUpdates = [...winning, ...losing];
+    }
 
     const matchDate = new Date(date);
     const match = await prisma.match.create({
       data: {
         eventName,
         date: matchDate,
-        redTeam1Id,
-        redTeam2Id,
-        redTeam3Id,
-        blueTeam1Id,
-        blueTeam2Id,
-        blueTeam3Id,
-        redScore,
-        blueScore,
+        redTeam1Id, redTeam2Id, redTeam3Id,
+        blueTeam1Id, blueTeam2Id, blueTeam3Id,
+        redScore, blueScore,
       },
     });
-
-    const allUpdates = [...winning, ...losing];
 
     for (const update of allUpdates) {
       await prisma.team.update({
