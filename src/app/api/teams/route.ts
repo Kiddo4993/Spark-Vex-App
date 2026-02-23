@@ -23,8 +23,13 @@ export async function GET(req: Request) {
   const search = searchParams.get("search");
 
   if (teamNumber) {
-    const team = await prisma.team.findUnique({
-      where: { teamNumber: teamNumber },
+    const team = await prisma.team.findFirst({
+      where: {
+        teamNumber: {
+          equals: teamNumber,
+          mode: "insensitive"
+        }
+      },
       include: {
         skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
       },

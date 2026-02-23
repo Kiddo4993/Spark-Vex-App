@@ -17,8 +17,13 @@ export default async function TeamProfilePage({
   const session = await getServerSession(authOptions);
   const myTeamId = session?.user ? (session.user as { teamId: string }).teamId : null;
 
-  const team = await prisma.team.findUnique({
-    where: { teamNumber: teamNumber },
+  const team = await prisma.team.findFirst({
+    where: {
+      teamNumber: {
+        equals: teamNumber,
+        mode: "insensitive"
+      }
+    },
     include: {
       skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
       performanceHistory: { orderBy: { createdAt: "desc" }, take: 20 },
