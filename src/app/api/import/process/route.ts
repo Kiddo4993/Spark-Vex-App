@@ -2,7 +2,17 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { hash } from "bcryptjs";
 import { computeBayesianMatchUpdate, computeBayesianTieUpdate, BayesianMatchUpdate, K, W, U_MATCH, U_MIN } from "@/lib/bayesian";
+
+function generatePassword(length = 6): string {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // No confusing chars (0/O, 1/I/L)
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
 
 type ColumnMapping = {
     eventName?: string;
@@ -26,6 +36,12 @@ type ColumnMapping = {
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.teamId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // Check if user is admin
+    const currentUser = await prisma.user.findUnique({ where: { id: (session.user as any).id } });
+    if (!currentUser?.isAdmin) {
+        return NextResponse.json({ error: "Only administrators can import data" }, { status: 403 });
+    }
 
     try {
         const body = await req.json();
@@ -351,5 +367,42 @@ async function processMatches(body: any) {
         importedCount++;
     }
 
-    return NextResponse.json({ success: true, count: importedCount });
+    // --- AUTO-CREATE TEAM ACCOUNTS ---
+    const allTeams = await prisma.team.findMany({
+        include: { user: true }
+    });
+
+    const generatedCredentials: { teamNumber: string; password: string }[] = [];
+
+    for (const team of allTeams) {
+        if (!team.user) {
+            // Generate random password
+            const plainPassword = generatePassword(6);
+            const hashedPassword = await hash(plainPassword, 12);
+
+            // Create user account
+            await prisma.user.create({
+                data: {
+                    password: hashedPassword,
+                    teamId: team.id,
+                    isAdmin: false,
+                }
+            });
+
+            // Store the plaintext password on the team for admin viewing
+            await prisma.team.update({
+                where: { id: team.id },
+                data: { generatedPassword: plainPassword }
+            });
+
+            generatedCredentials.push({ teamNumber: team.teamNumber, password: plainPassword });
+        }
+    }
+
+    return NextResponse.json({
+        success: true,
+        count: importedCount,
+        credentialsGenerated: generatedCredentials.length,
+        credentials: generatedCredentials
+    });
 }

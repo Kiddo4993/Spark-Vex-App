@@ -4,13 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
-const getSections = (teamNumber: string) => [
+const getSections = (teamNumber: string, isAdmin: boolean) => [
     {
         label: "Overview",
         items: [
             { href: "/dashboard", icon: "◈", label: "Dashboard" },
             { href: `/dashboard/teams/${teamNumber}`, icon: "◇", label: "Team Profile" },
-            { href: "/dashboard/matches", icon: "⊡", label: "Matches", badge: true },
+            { href: "/dashboard/matches", icon: "⊡", label: "Matches" },
             { href: "/dashboard/import", icon: "↑", label: "Import Data" },
         ],
     },
@@ -26,11 +26,12 @@ const getSections = (teamNumber: string) => [
         label: "Workspace",
         items: [
             { href: "/dashboard/tasks", icon: "▣", label: "Task Board" },
+            ...(isAdmin ? [{ href: "/dashboard/admin", icon: "⚙", label: "Admin Panel" }] : []),
         ],
     },
 ];
 
-export function Sidebar({ teamNumber }: { teamNumber: string }) {
+export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; isAdmin?: boolean }) {
     const pathname = usePathname();
 
     return (
@@ -54,7 +55,7 @@ export function Sidebar({ teamNumber }: { teamNumber: string }) {
 
             {/* Navigation */}
             <nav className="flex-1 py-4">
-                {getSections(teamNumber).map((section) => (
+                {getSections(teamNumber, isAdmin).map((section) => (
                     <div key={section.label} className="mb-4">
                         <div className="text-[10px] font-mono tracking-[0.15em] uppercase text-txt-3 px-5 pb-2">
                             {section.label}
@@ -81,7 +82,7 @@ export function Sidebar({ teamNumber }: { teamNumber: string }) {
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="text-[10px] font-mono text-txt-3 uppercase tracking-widest mb-1">
-                            Active Team
+                            {isAdmin ? "Admin" : "Active Team"}
                         </div>
                         <div className="font-mono font-bold text-gold text-[15px]">
                             {teamNumber}

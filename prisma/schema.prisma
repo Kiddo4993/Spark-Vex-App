@@ -12,10 +12,11 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
+  email     String?  @unique
   password  String
   teamId    String   @unique
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  isAdmin   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -23,6 +24,7 @@ model User {
 model Team {
   id                    String    @id @default(cuid())
   teamNumber            String    @unique // Unique robot team number (e.g. "1234A")
+  generatedPassword     String?   // Plaintext password for admin display
   provinceState         String?
   country               String?
   drivetrainType        String?

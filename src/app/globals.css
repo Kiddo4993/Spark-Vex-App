@@ -354,4 +354,20 @@ body {
       transform: translateY(0);
     }
   }
+
+  /* ── AUTH PAGES ──────────────────────────────── */
+  .auth-page {
+    @apply min-h-screen flex items-center justify-center relative overflow-hidden;
+    background: #09080C;
+  }
+
+  .auth-bg {
+    @apply absolute inset-0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(240, 165, 0, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(25, 212, 158, 0.03) 0%, transparent 50%);
+  }
+
+  .auth-card {
+    @apply relative z-10 w-full max-w-md p-8 border border-line bg-surface-card;
+  }
 }

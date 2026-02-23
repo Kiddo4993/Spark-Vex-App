@@ -6,9 +6,9 @@ export default withAuth({
 
 export const config = {
   matcher: [
-    "/dashboard/import/:path*",
-    "/dashboard/connections/:path*",
+    "/dashboard/:path*",
     "/api/import/:path*",
+    "/api/admin/:path*",
     "/api/connections/:path*",
     "/api/notes/:path*",
   ],
