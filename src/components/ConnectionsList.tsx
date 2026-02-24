@@ -29,6 +29,8 @@ type ConnectionAccepted = {
   toTeam: Team;
 };
 
+import { ChatInterface } from "./ChatInterface";
+
 export function ConnectionsList({
   sent,
   received,
@@ -41,6 +43,7 @@ export function ConnectionsList({
   currentTeamId: string;
 }) {
   const [processing, setProcessing] = useState<string | null>(null);
+  const [chatToTeam, setChatToTeam] = useState<Team | null>(null);
 
   async function acceptOrDeny(connectionId: string, action: "accept" | "deny") {
     setProcessing(connectionId);
@@ -143,17 +146,34 @@ export function ConnectionsList({
         ) : (
           <div className="flex flex-wrap gap-2">
             {connectedTeams.map((t) => (
-              <Link
-                key={t.id}
-                href={`/dashboard/teams/${t.teamNumber}`}
-                className="inline-block rounded-[10px] border border-line bg-surface-bg px-4 py-2 font-mono text-sm text-txt-2 hover:bg-surface-hover hover:border-line-hi hover:text-txt-1 transition-all"
-              >
-                Team {t.teamNumber}
-              </Link>
+              <div key={t.id} className="inline-flex items-center rounded-[10px] border border-line bg-surface-bg overflow-hidden transition-all hover:border-line-hi group">
+                <Link
+                  href={`/dashboard/teams/${t.teamNumber}`}
+                  className="px-4 py-2 font-mono text-sm text-txt-2 group-hover:text-txt-1 border-r border-line"
+                  title="View Profile"
+                >
+                  Team {t.teamNumber}
+                </Link>
+                <button
+                  onClick={() => setChatToTeam(t)}
+                  className="px-3 py-2 text-txt-3 hover:text-txt-1 bg-surface-bg hover:bg-surface-hover transition-colors"
+                  title="Open Chat"
+                >
+                  💬
+                </button>
+              </div>
             ))}
           </div>
         )}
       </div>
+
+      {chatToTeam && (
+        <ChatInterface
+          currentTeamId={currentTeamId}
+          otherTeam={chatToTeam}
+          onClose={() => setChatToTeam(null)}
+        />
+      )}
     </div>
   );
 }

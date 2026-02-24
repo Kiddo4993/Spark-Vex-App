@@ -58,6 +58,8 @@ model Team {
   matchesAsBlue1        Match[]      @relation("BlueTeam1")
   matchesAsBlue2        Match[]      @relation("BlueTeam2")
   matchesAsBlue3        Match[]      @relation("BlueTeam3")
+  messagesSent          Message[]    @relation("MessageFrom")
+  messagesReceived      Message[]    @relation("MessageTo")
   taskColumns           TaskColumn[]
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
@@ -186,6 +188,19 @@ model MatchComment {
   updatedAt DateTime @updatedAt
   @@index([matchId])
   @@index([teamId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  fromTeamId String
+  toTeamId   String
+  content   String   @db.Text
+  fromTeam  Team     @relation("MessageFrom", fields: [fromTeamId], references: [id], onDelete: Cascade)
+  toTeam    Team     @relation("MessageTo", fields: [toTeamId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  @@index([fromTeamId])
+  @@index([toTeamId])
 }
 
 // ============== Task Board Models ==============
