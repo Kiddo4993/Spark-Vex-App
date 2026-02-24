@@ -3,12 +3,17 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { confidenceFromUncertainty, INITIAL_UNCERTAINTY, SCOUT_NEEDED_THRESHOLD } from "@/lib/bayesian";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { DashboardCards } from "@/components/DashboardCards";
 import { RecentMatches } from "@/components/RecentMatches";
 import { ConnectedTeams } from "@/components/ConnectedTeams";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
+  if (!session?.user) redirect("/auth/signin");
+  const isAdmin = (session.user as any).isAdmin === true;
+  if (isAdmin) redirect("/dashboard/admin");
+
   const teamId = (session!.user as { teamId: string }).teamId;
 
   const team = await prisma.team.findUnique({
@@ -78,7 +83,6 @@ export default async function DashboardPage() {
         </div>
         <div className="flex gap-2.5">
           <Link href={`/dashboard/teams/${team.teamNumber}`} className="btn-ghost">✎ Edit Profile</Link>
-          <Link href="/dashboard/import" className="btn-ghost">↑ Import</Link>
           <Link href="/dashboard/matches/add" className="btn-primary">+ Add Match</Link>
         </div>
       </div>

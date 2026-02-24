@@ -14,6 +14,13 @@ export default async function DashboardLayout({
   const teamNumber = (session.user as { teamNumber: string }).teamNumber;
   const isAdmin = (session.user as any).isAdmin === true;
 
+  // Auto-redirect admin to admin panel if they land on dashboard root
+  if (isAdmin && !teamNumber.includes("/")) {
+    // Actually, dashboard layout is a wrapper. We should check the current path if possible, 
+    // but getServerSession doesn't have the path.
+    // Better to do this in the dashboard/page.tsx or middleware for the root route.
+  }
+
   return (
     <div className="flex min-h-screen bg-surface-bg">
       <Sidebar teamNumber={teamNumber} isAdmin={isAdmin} />

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Syne, Space_Mono, Inter } from "next/font/google";
 import { SessionProvider } from "@/components/SessionProvider";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -37,7 +38,20 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${syne.variable} ${spaceMono.variable} ${inter.variable}`}>
       <body className="min-h-screen antialiased bg-surface-bg text-txt-1 font-body">
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <Toaster position="bottom-right" toastOptions={{
+            style: {
+              background: '#1A191D',
+              color: '#F4F4F4',
+              borderRadius: '0',
+              border: '1px solid #2B2A2E',
+              fontFamily: 'var(--font-space-mono)',
+              fontSize: '12px',
+              textTransform: 'uppercase'
+            }
+          }} />
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );
