@@ -4,14 +4,23 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
-const getSections = (teamNumber: string, isAdmin: boolean) => [
+const getAdminSections = () => [
+    {
+        label: "Management",
+        items: [
+            { href: "/dashboard/import", icon: "↑", label: "Import Matches" },
+            { href: "/dashboard/admin", icon: "⚙", label: "Admin Panel" },
+        ],
+    },
+];
+
+const getTeamSections = (teamNumber: string) => [
     {
         label: "Overview",
         items: [
             { href: "/dashboard", icon: "◈", label: "Dashboard" },
             { href: `/dashboard/teams/${teamNumber}`, icon: "◇", label: "Team Profile" },
             { href: "/dashboard/matches", icon: "⊡", label: "Matches" },
-            { href: "/dashboard/import", icon: "↑", label: "Import Data" },
         ],
     },
     {
@@ -25,14 +34,14 @@ const getSections = (teamNumber: string, isAdmin: boolean) => [
     {
         label: "Workspace",
         items: [
-            { href: "/dashboard/tasks", icon: "▣", label: "Task Board" },
-            ...(isAdmin ? [{ href: "/dashboard/admin", icon: "⚙", label: "Admin Panel" }] : []),
+            { href: "/dashboard/notes", icon: "✎", label: "Team Notes" },
         ],
     },
 ];
 
 export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; isAdmin?: boolean }) {
     const pathname = usePathname();
+    const sections = isAdmin ? getAdminSections() : getTeamSections(teamNumber);
 
     return (
         <aside className="w-56 flex-shrink-0 bg-surface-card border-r border-line flex flex-col sticky top-0 h-screen overflow-y-auto">
@@ -55,7 +64,7 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
 
             {/* Navigation */}
             <nav className="flex-1 py-4">
-                {getSections(teamNumber, isAdmin).map((section) => (
+                {sections.map((section) => (
                     <div key={section.label} className="mb-4">
                         <div className="text-[10px] font-mono tracking-[0.15em] uppercase text-txt-3 px-5 pb-2">
                             {section.label}
@@ -82,7 +91,7 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="text-[10px] font-mono text-txt-3 uppercase tracking-widest mb-1">
-                            {isAdmin ? "Admin" : "Active Team"}
+                            {isAdmin ? "Admin Access" : "Active Team"}
                         </div>
                         <div className="font-mono font-bold text-gold text-[15px]">
                             {teamNumber}

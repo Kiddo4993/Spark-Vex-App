@@ -1,15 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ImportFileUpload } from "@/components/ImportFileUpload";
 import { ColumnMappingTable, ColumnMapping } from "@/components/ColumnMappingTable";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 type ImportMethod = "file" | "api";
 type ApiStep = "key" | "search" | "fetching" | "review";
 
 export default function ImportPage() {
     const router = useRouter();
+    const { data: session, status: sessionStatus } = useSession();
+
+    useEffect(() => {
+        if (sessionStatus === "authenticated" && (session?.user as any).isAdmin !== true) {
+            router.push("/dashboard");
+        }
+    }, [sessionStatus, session, router]);
     const [importMethod, setImportMethod] = useState<ImportMethod>("file");
 
     // --- File upload state ---
