@@ -55,7 +55,7 @@ export default async function MatchesPage() {
                   <td className="text-txt-2 text-xs font-mono">{date}</td>
                   <td>
                     <span className={redWon ? "text-danger font-medium" : "text-txt-3"}>
-                      {m.redTeam1.teamNumber} · {m.redTeam2.teamNumber} · {m.redTeam3.teamNumber}
+                      {Array.from(new Set([m.redTeam1.teamNumber, m.redTeam2.teamNumber, m.redTeam3.teamNumber])).join(" · ")}
                     </span>
                   </td>
                   <td>
@@ -64,8 +64,8 @@ export default async function MatchesPage() {
                     </span>
                   </td>
                   <td>
-                    <span className={!redWon ? "text-spark font-medium" : "text-txt-3"}>
-                      {m.blueTeam1.teamNumber} · {m.blueTeam2.teamNumber} · {m.blueTeam3.teamNumber}
+                    <span className={!redWon ? "text-cyan-500 font-medium" : "text-txt-3"}>
+                      {Array.from(new Set([m.blueTeam1.teamNumber, m.blueTeam2.teamNumber, m.blueTeam3.teamNumber])).join(" · ")}
                     </span>
                   </td>
                   <td>

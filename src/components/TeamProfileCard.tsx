@@ -84,24 +84,24 @@ export function TeamProfileCard({ team }: { team: Team }) {
       </div>
 
       {/* Horizontal Stats Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 border-b border-line">
-        <div className="p-4 border-r border-line py-5">
-          <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-2">Model Confidence</div>
-          <div className={`text-2xl font-mono font-bold ${confidence > 80 ? "text-success" : confidence > 50 ? "text-amber-500" : "text-danger"}`}>
+      <div className="grid grid-cols-2 md:grid-cols-4 border-b border-line bg-surface-card/20">
+        <div className="p-4 border-r border-b md:border-b-0 border-line py-6 flex flex-col items-center text-center">
+          <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Model Confidence</div>
+          <div className={`text-4xl font-mono font-bold ${confidence > 80 ? "text-success" : confidence > 50 ? "text-amber-500" : "text-danger"}`}>
             {confidence}%
           </div>
         </div>
-        <div className="p-4 border-r border-line py-5">
-          <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-2">Auto Strength</div>
-          <div className="text-2xl font-mono font-bold text-amber-500">{team.autoStrength ?? "—"}</div>
+        <div className="p-4 border-r border-b md:border-b-0 border-line py-6 flex flex-col items-center text-center">
+          <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Auto Strength</div>
+          <div className="text-4xl font-mono font-bold text-amber-500">{team.autoStrength ?? "—"}</div>
         </div>
-        <div className="p-4 border-r border-line md:border-r py-5">
-          <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-2">Driver Strength</div>
-          <div className="text-2xl font-mono font-bold text-green-500">{team.driverStrength ?? "—"}</div>
+        <div className="p-4 border-r border-line md:border-r py-6 flex flex-col items-center text-center">
+          <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Driver Strength</div>
+          <div className="text-4xl font-mono font-bold text-green-500">{team.driverStrength ?? "—"}</div>
         </div>
-        <div className="p-4 py-5">
-          <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-2">Matches Played</div>
-          <div className="text-2xl font-mono font-bold text-txt-1">{team.matchCount}</div>
+        <div className="p-4 py-6 flex flex-col items-center text-center">
+          <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Matches Played</div>
+          <div className="text-4xl font-mono font-bold text-txt-1">{team.matchCount}</div>
         </div>
       </div>
 

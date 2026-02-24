@@ -81,9 +81,6 @@ export default async function LandingPage() {
                 <Link href="/auth/signin" className="btn-primary">
                   Sign In
                 </Link>
-                <Link href="/auth/signup" className="btn-ghost">
-                  Create Account
-                </Link>
               </>
             )}
           </div>
