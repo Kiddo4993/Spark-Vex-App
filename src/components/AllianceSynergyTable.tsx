@@ -40,7 +40,7 @@ export function AllianceSynergyTable({ rows }: { rows: SynergyRow[] }) {
 
     return (
         <div className="card overflow-hidden p-0">
-            <table className="data-table">
+            <table className="data-table w-full border-separate border-spacing-0">
                 <thead>
                     <tr>
                         <th className="pl-5">Team</th>
@@ -63,7 +63,7 @@ export function AllianceSynergyTable({ rows }: { rows: SynergyRow[] }) {
                         else if (row.synergyScore >= 100) gradeBorder = "border-amber";
 
                         return (
-                            <tr key={row.teamNumber} className={`group relative transition-all duration-[180ms] ease-out hover:bg-surface-hover ${gradeBorder} border-l-[3px]`}>
+                            <tr key={row.teamNumber} className={`group relative transition-all duration-[180ms] ease-out`}>
                                 <td className="p-4 pl-5">
                                     <div className="flex flex-col">
                                         <div className="flex items-center gap-2">
