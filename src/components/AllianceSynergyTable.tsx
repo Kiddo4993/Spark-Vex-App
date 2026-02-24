@@ -91,7 +91,7 @@ export function AllianceSynergyTable({ rows }: { rows: SynergyRow[] }) {
                                     </div>
                                 </td>
 
-                                <td className="p-4 text-right">
+                                <td className="p-4 text-left">
                                     <div className="flex flex-col items-end justify-center">
                                         <div className={`font-mono text-xl font-bold leading-none ${row.synergyScore >= 150 ? "text-success" : row.synergyScore >= 100 ? "text-amber" : "text-danger"}`}>
                                             {row.synergyScore.toFixed(0)}
