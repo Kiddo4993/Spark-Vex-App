@@ -104,30 +104,30 @@ export function AllianceSynergyTable({ rows }: { rows: SynergyRow[] }) {
                                         </div>
                                     </div>
                                 </td>
-{/* 
+
                                 <td className="p-4">
                                     <span className="font-mono text-txt-2">{Math.round(row.performanceRating)}</span>
-                                </td> */}
+                                </td>
                                 <td className="p-4">
                                     <div className={`font-mono text-xs ${row.confidence > 80 ? "text-success" : row.confidence > 50 ? "text-amber" : "text-danger"}`}>
                                         {Math.round(row.confidence)}%
                                     </div>
                                 </td>
-                                {/* <td className="p-4">
+                                <td className="p-4">
                                     <span className="font-mono text-amber-500">{row.autoStrength ?? "—"}</span>
                                 </td>
                                 <td className="p-4">
                                     <span className="font-mono text-green-500">{row.driverStrength ?? "—"}</span>
-                                </td> */}
+                                </td>
 
-                                <td className="p-4 text-right opacity-0 group-hover:opacity-100 transition-opacity duration-[180ms]">
+                                {/* <td className="p-4 text-right opacity-0 group-hover:opacity-100 transition-opacity duration-[180ms]">
                                     <Link
                                         href={`/dashboard/teams/${row.teamNumber}`}
                                         className="btn-ghost py-1 px-3 text-[10px]"
                                     >
                                         PROFILE ↗
                                     </Link>
-                                </td>
+                                </td> */}
                             </tr>
                         );
                     })}
