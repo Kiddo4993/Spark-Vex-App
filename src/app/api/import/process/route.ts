@@ -37,115 +37,16 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.teamId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    // Check if user is admin
-    const currentUser = await prisma.user.findUnique({ where: { id: (session.user as any).id } });
-    if (!currentUser?.isAdmin) {
-        return NextResponse.json({ error: "Only administrators can import data" }, { status: 403 });
-    }
-
     try {
         const body = await req.json();
-        const { importType = "match" } = body;
-
-        if (importType === "skills") {
-            return await processSkills(body);
-        } else {
-            return await processMatches(body);
-        }
+        return await processMatches(body, session.user.teamId);
     } catch (e: any) {
         console.error("Import Error:", e);
         return NextResponse.json({ error: "Process failed: " + e.message }, { status: 500 });
     }
 }
 
-async function processSkills(body: any) {
-    const { fileData, mapping, dryRun } = body;
-    const rows = fileData.slice(1);
-    const parsedSkills = [];
-
-    const getVal = (row: any[], colIdx?: string) => {
-        if (!colIdx) return null;
-        return row[parseInt(colIdx, 10)];
-    };
-
-    const cleanTeam = (val: any) => String(val).trim().replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-
-    for (const row of rows) {
-        if (!row || row.length === 0) continue;
-
-        const teamStr = getVal(row, mapping.team);
-        if (!teamStr) continue;
-
-        const teamNum = cleanTeam(teamStr);
-        if (!teamNum) continue;
-
-        const rank = parseInt(getVal(row, mapping.rank) || "0");
-        const driver = parseInt(getVal(row, mapping.driverScore) || "0");
-        const prog = parseInt(getVal(row, mapping.programmingScore) || "0");
-        const highest = parseInt(getVal(row, mapping.highestScore) || "0"); // often "Combined"
-
-        parsedSkills.push({ teamNum, rank, driver, prog, highest });
-    }
-
-    if (dryRun) {
-        return NextResponse.json({
-            count: parsedSkills.length,
-            teamCount: new Set(parsedSkills.map(s => s.teamNum)).size,
-            sample: parsedSkills.slice(0, 5),
-            dateRange: null
-        });
-    }
-
-    let count = 0;
-    for (const record of parsedSkills) {
-        // Find or Create Team
-        const team = await prisma.team.upsert({
-            where: { teamNumber: record.teamNum },
-            update: {},
-            create: {
-                teamNumber: record.teamNum,
-                performanceRating: 100,
-                ratingUncertainty: 50,
-                matchCount: 0
-            }
-        });
-
-        // Update Skills Record
-        // We'll update the most recent one or create new.
-        // For simplicity, let's look for an existing one and update it.
-        const existing = await prisma.skillsRecord.findFirst({
-            where: { teamId: team.id }
-        });
-
-        if (existing) {
-            await prisma.skillsRecord.update({
-                where: { id: existing.id },
-                data: {
-                    driverSkillsScore: record.driver,
-                    autonomousSkillsScore: record.prog,
-                    combinedSkillsScore: record.highest,
-                    provincialSkillsRank: record.rank,
-                    lastUpdated: new Date()
-                }
-            });
-        } else {
-            await prisma.skillsRecord.create({
-                data: {
-                    teamId: team.id,
-                    driverSkillsScore: record.driver,
-                    autonomousSkillsScore: record.prog,
-                    combinedSkillsScore: record.highest,
-                    provincialSkillsRank: record.rank,
-                }
-            });
-        }
-        count++;
-    }
-
-    return NextResponse.json({ success: true, count });
-}
-
-async function processMatches(body: any) {
+async function processMatches(body: any, uploaderId: string) {
     const { fileData, mapping, dryRun, wipeData } = body;
     if (!fileData || !mapping) return NextResponse.json({ error: "Missing data" }, { status: 400 });
 
@@ -204,7 +105,6 @@ async function processMatches(body: any) {
     }
 
     if (dryRun) {
-        // Stats for dry run
         const teamSet = new Set<string>();
         parsedMatches.forEach(m => {
             m.redNums.forEach(t => teamSet.add(t));
@@ -223,42 +123,29 @@ async function processMatches(body: any) {
         });
     }
 
-    // Sort by Date
     parsedMatches.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-    // --- WIPE EXISTING DATA ---
-    console.log("processMatches called with wipeData:", wipeData);
+    // --- WIPE EXISTING DATA SCOPED TO UPLOADER ---
     if (wipeData === true || wipeData === "true") {
-        console.log("Execute database wipe...");
-        // Delete all matches (cascades to TeamMatchStats and MatchComments)
-        await prisma.match.deleteMany({});
-
-        // Delete all performance history tracking
-        await prisma.performanceHistory.deleteMany({});
-
-        // Delete ALL teams EXCEPT admin (cascades to Users, Skills records, Awards, Connections, etc.)
-        await prisma.team.deleteMany({
-            where: { teamNumber: { not: "ADMIN" } }
+        await prisma.match.deleteMany({
+            where: { uploaderId }
         });
 
-        console.log("Wipe complete. All teams and accounts deleted (admin preserved).");
+        await prisma.calculatedRating.deleteMany({
+            where: { uploaderId }
+        });
     }
 
     let importedCount = 0;
+    const updatedTeamIds = new Set<string>();
+
     for (const match of parsedMatches) {
-        // ... (Same logic as before for saving matches and ratings)
-        // Ensure teams exist
         const getTeamId = async (num: string) => {
             const upNum = num.toUpperCase();
             let t = await prisma.team.findUnique({ where: { teamNumber: upNum } });
             if (!t) {
                 t = await prisma.team.create({
-                    data: {
-                        teamNumber: upNum,
-                        performanceRating: 100,
-                        ratingUncertainty: 50,
-                        matchCount: 0
-                    }
+                    data: { teamNumber: upNum }
                 });
             }
             return t;
@@ -280,27 +167,55 @@ async function processMatches(body: any) {
             blueTeamIds.push(t.id);
         }
 
-        const rInput = [...redTeams];
-        const bInput = [...blueTeams];
+        // Get or initialize CalculatedRatings for this uploader
+        const getRating = async (teamId: string) => {
+            let cr = await prisma.calculatedRating.findUnique({
+                where: { uploaderId_subjectTeamId: { uploaderId, subjectTeamId: teamId } }
+            });
+            if (!cr) {
+                cr = await prisma.calculatedRating.create({
+                    data: {
+                        uploaderId,
+                        subjectTeamId: teamId,
+                        performanceRating: 100,
+                        ratingUncertainty: 50,
+                        matchCount: 0
+                    }
+                });
+            }
+            return cr;
+        };
+
+        const redBayesInput = await Promise.all(redTeamIds.map(async id => {
+            const cr = await getRating(id);
+            return { id, rating: cr.performanceRating, uncertainty: cr.ratingUncertainty };
+        }));
+
+        const blueBayesInput = await Promise.all(blueTeamIds.map(async id => {
+            const cr = await getRating(id);
+            return { id, rating: cr.performanceRating, uncertainty: cr.ratingUncertainty };
+        }));
+
+        // Pad to 3 if needed for the Bayesian func (it expects length 3 inside compute logic if we didn't slice)
+        const rInput = [...redBayesInput];
+        const bInput = [...blueBayesInput];
         while (rInput.length < 3 && rInput.length > 0) rInput.push(rInput[0]);
         while (bInput.length < 3 && bInput.length > 0) bInput.push(bInput[0]);
 
-        const redBayesInput = rInput.map(t => ({ id: t.id, rating: t.performanceRating, uncertainty: t.ratingUncertainty }));
-        const blueBayesInput = bInput.map(t => ({ id: t.id, rating: t.performanceRating, uncertainty: t.ratingUncertainty }));
-
         let allUpdates: BayesianMatchUpdate[];
         if (match.redScore === match.blueScore) {
-            allUpdates = computeBayesianTieUpdate(redBayesInput, blueBayesInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
+            allUpdates = computeBayesianTieUpdate(rInput, bInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
         } else {
             const redWins = match.redScore > match.blueScore;
             const { winning, losing } = redWins
-                ? computeBayesianMatchUpdate(redBayesInput, blueBayesInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN })
-                : computeBayesianMatchUpdate(blueBayesInput, redBayesInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
+                ? computeBayesianMatchUpdate(rInput, bInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN })
+                : computeBayesianMatchUpdate(bInput, rInput, { k: K, w: W, uMatch: U_MATCH, uMin: U_MIN });
             allUpdates = [...winning, ...losing];
         }
 
         const existing = await prisma.match.findFirst({
             where: {
+                uploaderId,
                 date: match.date,
                 redScore: match.redScore,
                 blueScore: match.blueScore,
@@ -311,6 +226,7 @@ async function processMatches(body: any) {
 
         const dbMatch = await prisma.match.create({
             data: {
+                uploaderId,
                 eventName: match.eventName,
                 date: match.date,
                 redScore: match.redScore,
@@ -331,21 +247,14 @@ async function processMatches(body: any) {
             if (!redTeamIds.includes(up.teamId) && !blueTeamIds.includes(up.teamId)) continue;
 
             startIds.add(up.teamId);
+            updatedTeamIds.add(up.teamId);
 
-            await prisma.team.update({
-                where: { id: up.teamId },
+            await prisma.calculatedRating.update({
+                where: { uploaderId_subjectTeamId: { uploaderId, subjectTeamId: up.teamId } },
                 data: {
                     performanceRating: up.ratingAfter,
                     ratingUncertainty: up.uncertaintyAfter,
                     matchCount: { increment: 1 }
-                }
-            });
-            await prisma.performanceHistory.create({
-                data: {
-                    teamId: up.teamId,
-                    performanceRating: up.ratingAfter,
-                    uncertainty: up.uncertaintyAfter,
-                    matchId: dbMatch.id
                 }
             });
 
@@ -369,43 +278,22 @@ async function processMatches(body: any) {
         importedCount++;
     }
 
-    // --- AUTO-CREATE TEAM ACCOUNTS (exclude admin) ---
-    const allTeams = await prisma.team.findMany({
-        where: { teamNumber: { not: "ADMIN" } },
-        include: { user: true }
+    const updatedTeamsList = await prisma.calculatedRating.findMany({
+        where: { uploaderId, subjectTeamId: { in: Array.from(updatedTeamIds) } },
+        include: { subjectTeam: { select: { teamNumber: true } } }
     });
 
-    const generatedCredentials: { teamNumber: string; password: string }[] = [];
-
-    for (const team of allTeams) {
-        if (!team.user) {
-            // Generate random password
-            const plainPassword = generatePassword(6);
-            const hashedPassword = await hash(plainPassword, 12);
-
-            // Create user account
-            await prisma.user.create({
-                data: {
-                    password: hashedPassword,
-                    teamId: team.id,
-                    isAdmin: false,
-                }
-            });
-
-            // Store the plaintext password on the team for admin viewing
-            await prisma.team.update({
-                where: { id: team.id },
-                data: { generatedPassword: plainPassword }
-            });
-
-            generatedCredentials.push({ teamNumber: team.teamNumber, password: plainPassword });
-        }
-    }
+    const formattedUpdates = updatedTeamsList.map(cr => ({
+        teamNumber: cr.subjectTeam.teamNumber,
+        performanceRating: cr.performanceRating,
+        ratingUncertainty: cr.ratingUncertainty
+    }));
 
     return NextResponse.json({
         success: true,
         count: importedCount,
-        credentialsGenerated: generatedCredentials.length,
-        credentials: generatedCredentials
+        credentialsGenerated: 0,
+        credentials: [],
+        updatedTeams: formattedUpdates
     });
 }

@@ -44,6 +44,7 @@ export default function ImportPage() {
     const [apiMatchCount, setApiMatchCount] = useState(0);
     const [apiTeamCount, setApiTeamCount] = useState(0);
     const [apiImportStatus, setApiImportStatus] = useState("");
+    const [updatedTeams, setUpdatedTeams] = useState<any[]>([]);
 
     // --- File upload handlers ---
     const handleFileSelect = async (file: File) => {
@@ -110,6 +111,10 @@ export default function ImportPage() {
             });
             const data = await res.json();
             if (data.error) throw new Error(data.error);
+
+            if (data.updatedTeams) {
+                setUpdatedTeams(data.updatedTeams);
+            }
 
             setStatus(`Success! Imported ${data.count} ${importType === "match" ? "matches" : "entries"}.`);
             setStep("done");
@@ -214,6 +219,10 @@ export default function ImportPage() {
             const data = await res.json();
             if (data.error) throw new Error(data.error);
 
+            if (data.updatedTeams) {
+                setUpdatedTeams(data.updatedTeams);
+            }
+
             setApiImportStatus(`Success! Imported ${data.count} matches.`);
             setStep("done");
         } catch (e: any) {
@@ -234,6 +243,7 @@ export default function ImportPage() {
         setSelectedEvent(null);
         setApiMatches([]);
         setApiImportStatus("");
+        setUpdatedTeams([]);
     };
 
     return (
@@ -355,7 +365,7 @@ export default function ImportPage() {
                                             className="w-4 h-4 rounded-none border-danger/50 bg-surface-bg text-danger focus:ring-danger focus:ring-1 appearance-none checked:bg-danger checked:after:content-['✓'] checked:after:text-surface-bg checked:after:flex checked:after:justify-center checked:after:items-center checked:after:text-xs cursor-pointer"
                                         />
                                         <label htmlFor="wipeData" className="text-[11px] font-mono tracking-widest uppercase text-danger font-bold select-none cursor-pointer">
-                                            ⚠ Wipe all existing match data and delete ALL teams and accounts
+                                            ⚠ Wipe all existing match data and reset ratings (teams and accounts are preserved)
                                         </label>
                                     </div>
 
@@ -524,7 +534,7 @@ export default function ImportPage() {
                                             className="w-4 h-4 rounded-none border-danger/50 bg-surface-bg text-danger focus:ring-danger focus:ring-1 appearance-none checked:bg-danger checked:after:content-['✓'] checked:after:text-surface-bg checked:after:flex checked:after:justify-center checked:after:items-center checked:after:text-xs cursor-pointer"
                                         />
                                         <label htmlFor="apiWipeData" className="text-[11px] font-mono tracking-widest uppercase text-danger font-bold select-none cursor-pointer">
-                                            ⚠ Wipe all existing match data and delete ALL teams and accounts
+                                            ⚠ Wipe all existing match data and reset ratings (teams and accounts are preserved)
                                         </label>
                                     </div>
 
@@ -550,15 +560,56 @@ export default function ImportPage() {
             )}
 
             {step === "done" && (
-                <div className="text-center py-20 border border-line bg-success/5">
-                    <div className="flex justify-center mb-6">
-                        <div className="h-14 w-14 bg-success flex items-center justify-center text-surface-bg text-2xl font-bold font-mono border-2 border-success/30">✓</div>
+                <div className="space-y-6 animate-fade-in-up">
+                    <div className="text-center py-20 border border-line bg-success/5">
+                        <div className="flex justify-center mb-6">
+                            <div className="h-14 w-14 bg-success flex items-center justify-center text-surface-bg text-2xl font-bold font-mono border-2 border-success/30">✓</div>
+                        </div>
+                        <h3 className="text-[14px] font-mono tracking-widest uppercase font-bold text-success mb-3"> IMPORT COMPLETE </h3>
+                        <p className="text-[11px] font-mono tracking-widest uppercase text-txt-3 mb-8 max-w-md mx-auto">{status || apiImportStatus}</p>
+                        <button onClick={() => router.push("/dashboard")} className="btn-primary">
+                            [ GO TO DASHBOARD ]
+                        </button>
                     </div>
-                    <h3 className="text-[14px] font-mono tracking-widest uppercase font-bold text-success mb-3"> IMPORT COMPLETE </h3>
-                    <p className="text-[11px] font-mono tracking-widest uppercase text-txt-3 mb-8 max-w-md mx-auto">{status || apiImportStatus}</p>
-                    <button onClick={() => router.push("/dashboard")} className="btn-primary">
-                        [ GO TO DASHBOARD ]
-                    </button>
+
+                    {updatedTeams.length > 0 && (
+                        <div className="card border border-line">
+                            <div className="bg-surface-bg border-b border-line px-4 py-3 flex items-center justify-between">
+                                <span className="text-[11px] font-mono uppercase tracking-widest font-bold text-txt-1">
+                                    UPDATED TEAM RATINGS
+                                </span>
+                                <span className="text-[10px] font-mono uppercase tracking-widest text-txt-3">
+                                    {updatedTeams.length} TEAMS AFFECTED
+                                </span>
+                            </div>
+                            <div className="overflow-x-auto max-h-96">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="sticky top-0 bg-surface-card z-10">
+                                        <tr>
+                                            <th className="p-3 text-[10px] font-mono tracking-wider uppercase text-txt-2 border-b border-r border-line">TEAM NUMBER</th>
+                                            <th className="p-3 text-[10px] font-mono tracking-wider uppercase text-txt-2 border-b border-r border-line text-right">NEW RATING</th>
+                                            <th className="p-3 text-[10px] font-mono tracking-wider uppercase text-txt-2 border-b border-line text-right">UNCERTAINTY</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {[...updatedTeams].sort((a, b) => b.performanceRating - a.performanceRating).map((team: any) => (
+                                            <tr key={team.teamNumber} className="hover:bg-surface-hover transition-colors border-b border-line last:border-b-0">
+                                                <td className="p-3 border-r border-line">
+                                                    <span className="font-mono text-[13px] font-bold text-gold tracking-wider">{team.teamNumber}</span>
+                                                </td>
+                                                <td className="p-3 border-r border-line text-right">
+                                                    <span className="font-mono text-[13px] font-bold text-txt-1">{team.performanceRating.toFixed(1)}</span>
+                                                </td>
+                                                <td className="p-3 text-right">
+                                                    <span className="font-mono text-[11px] text-txt-3">±{team.ratingUncertainty.toFixed(1)}</span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

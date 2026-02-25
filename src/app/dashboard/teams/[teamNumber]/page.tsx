@@ -5,8 +5,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { TeamProfileCard } from "@/components/TeamProfileCard";
 import { TeamProfileForm } from "@/components/TeamProfileForm";
-import { SkillsForm } from "@/components/SkillsForm";
-import { TeamAwards } from "@/components/TeamAwards";
+import { ScoutingForm } from "@/components/ScoutingForm";
 
 export default async function TeamProfilePage({
   params,
@@ -26,14 +25,30 @@ export default async function TeamProfilePage({
       }
     },
     include: {
-      skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
       performanceHistory: { orderBy: { createdAt: "desc" }, take: 20 },
-      awards: { orderBy: { createdAt: "asc" } },
     },
   });
   if (!team) notFound();
 
-  const skills = team.skillsRecords[0] ?? null;
+  // Load the current uploader's perspective of this team's performance
+  const calcRating = myTeamId ? await prisma.calculatedRating.findUnique({
+    where: { uploaderId_subjectTeamId: { uploaderId: myTeamId, subjectTeamId: team.id } }
+  }) : null;
+
+  // Load the current user's private scouting records for this team
+  const scoutData = myTeamId ? await prisma.scoutingData.findUnique({
+    where: { scouterId_subjectTeamId: { scouterId: myTeamId, subjectTeamId: team.id } }
+  }) : null;
+
+  const combinedTeam = {
+    ...team,
+    performanceRating: calcRating?.performanceRating ?? 100,
+    ratingUncertainty: calcRating?.ratingUncertainty ?? 50,
+    matchCount: calcRating?.matchCount ?? 0,
+    autoStrength: scoutData?.autoStrength ?? null,
+    driverStrength: scoutData?.driverStrength ?? null,
+  };
+
   const isOwn = team.id === myTeamId;
 
   return (
@@ -43,13 +58,18 @@ export default async function TeamProfilePage({
           ← Teams
         </Link>
       </div>
-      <TeamProfileCard team={team} />
-      <TeamAwards teamNumber={team.teamNumber} awards={team.awards} />
+      <TeamProfileCard team={combinedTeam} />
+
+      {myTeamId && (
+        <ScoutingForm
+          teamNumber={team.teamNumber}
+          initialAuto={scoutData?.autoStrength ?? null}
+          initialDriver={scoutData?.driverStrength ?? null}
+        />
+      )}
+
       {isOwn && (
-        <>
-          <TeamProfileForm team={team} />
-          <SkillsForm initialSkills={skills} />
-        </>
+        <TeamProfileForm team={combinedTeam} />
       )}
     </div>
   );

@@ -32,21 +32,15 @@ model Team {
   autonReliabilityPct   Float?
   notes                 String?  @db.Text
   strategyTags          String[] // e.g. ["defensive", "fast auton"]
-  // Bayesian performance model
-  performanceRating     Float     @default(100)
-  ratingUncertainty     Float     @default(50)
-  matchCount            Int       @default(0)
-  
-  // Scouting data (user-inputted)
-  autoStrength          Float?    // 0-10 scale
-  driverStrength        Float?    // 0-10 scale
-
   // Relations
   user                  User?
   performanceHistory    PerformanceHistory[]
   teamMatchStats        TeamMatchStats[]
-  skillsRecords         SkillsRecord[]
-  awards                Award[]
+  calculatedRatingsAsUploader CalculatedRating[] @relation("RatingUploader")
+  calculatedRatingsAsSubject CalculatedRating[] @relation("RatingSubject")
+  scoutingDataAsScouter ScoutingData[] @relation("Scouter")
+  scoutingDataAsSubject ScoutingData[] @relation("ScoutingSubject")
+  uploadedMatches       Match[]      @relation("UploaderLocation")
   connectionsFrom       Connection[] @relation("ConnectionFrom")
   connectionsTo         Connection[] @relation("ConnectionTo")
   sharedNotesFrom       Note[]       @relation("NoteFrom")
@@ -71,6 +65,8 @@ model Match {
   date        DateTime
   redScore    Int
   blueScore   Int
+  uploaderId  String
+  uploader    Team     @relation("UploaderLocation", fields: [uploaderId], references: [id], onDelete: Cascade)
   // Alliance team IDs (stored as team numbers for clarity; we join via Team)
   redTeam1Id  String
   redTeam2Id  String
@@ -123,30 +119,35 @@ model PerformanceHistory {
   @@index([teamId])
 }
 
-model SkillsRecord {
-  id                  String   @id @default(cuid())
-  teamId              String
-  team                Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  driverSkillsScore   Int?
-  autonomousSkillsScore Int?
-  combinedSkillsScore Int?
-  provincialSkillsRank Int?
-  worldwideSkillsRank Int?
-  lastUpdated         DateTime @default(now())
-  @@index([teamId])
+model CalculatedRating {
+  id                String   @id @default(cuid())
+  uploaderId        String
+  subjectTeamId     String
+  uploader          Team     @relation("RatingUploader", fields: [uploaderId], references: [id], onDelete: Cascade)
+  subjectTeam       Team     @relation("RatingSubject", fields: [subjectTeamId], references: [id], onDelete: Cascade)
+  performanceRating Float    @default(100)
+  ratingUncertainty Float    @default(50)
+  matchCount        Int      @default(0)
+  lastUpdated       DateTime @default(now())
+
+  @@unique([uploaderId, subjectTeamId])
+  @@index([uploaderId])
+  @@index([subjectTeamId])
 }
 
-model Award {
-  id        String   @id @default(cuid())
-  teamId    String
-  name      String   // e.g., "Excellence Award (VRC)"
-  event     String   // e.g., "2024 Ontario Provincial Championship"
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+model ScoutingData {
+  id                String   @id @default(cuid())
+  scouterId         String
+  subjectTeamId     String
+  scouter           Team     @relation("Scouter", fields: [scouterId], references: [id], onDelete: Cascade)
+  subjectTeam       Team     @relation("ScoutingSubject", fields: [subjectTeamId], references: [id], onDelete: Cascade)
+  autoStrength      Float?    // 0-10 scale
+  driverStrength    Float?    // 0-10 scale
+  lastUpdated       DateTime @default(now())
 
-  // Ensure we don't duplicate the same award from the same event
-  @@unique([teamId, name, event])
-  @@index([teamId])
+  @@unique([scouterId, subjectTeamId])
+  @@index([scouterId])
+  @@index([subjectTeamId])
 }
 
 model Connection {
@@ -195,6 +196,7 @@ model Message {
   fromTeamId String
   toTeamId   String
   content   String   @db.Text
+  read      Boolean  @default(false)
   fromTeam  Team     @relation("MessageFrom", fields: [fromTeamId], references: [id], onDelete: Cascade)
   toTeam    Team     @relation("MessageTo", fields: [toTeamId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

@@ -27,13 +27,38 @@ export async function GET() {
         orderBy: { teamNumber: "asc" },
     });
 
-    const credentials = teams
-        .filter(t => t.user && !t.user.isAdmin)
-        .map(t => ({
+    const credentials = [];
+
+    for (const t of teams) {
+        if (t.user && t.user.isAdmin) continue; // Skip admins
+
+        let hasAccount = !!t.user;
+        let password = t.generatedPassword || "—";
+
+        // Auto-generate account if missing
+        if (!t.user) {
+            const plainPassword = generatePassword(6);
+            const hashedPassword = await hash(plainPassword, 10); // using 10 rounds for faster bulk generation
+            await prisma.user.create({
+                data: {
+                    password: hashedPassword,
+                    teamId: t.id,
+                }
+            });
+            await prisma.team.update({
+                where: { id: t.id },
+                data: { generatedPassword: plainPassword },
+            });
+            password = plainPassword;
+            hasAccount = true;
+        }
+
+        credentials.push({
             teamNumber: t.teamNumber,
-            password: t.generatedPassword || "—",
-            hasAccount: !!t.user,
-        }));
+            password: password,
+            hasAccount: hasAccount,
+        });
+    }
 
     return NextResponse.json({ credentials });
 }

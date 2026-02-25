@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 const getAdminSections = () => [
     {
         label: "Management",
         items: [
-            { href: "/dashboard/import", icon: "↑", label: "Import Matches" },
             { href: "/dashboard/admin", icon: "⚙", label: "Admin Panel" },
         ],
     },
@@ -34,7 +34,14 @@ const getTeamSections = (teamNumber: string) => [
     {
         label: "Workspace",
         items: [
+            { href: "/dashboard/import", icon: "↑", label: "Import Tournament" },
             { href: "/dashboard/notes", icon: "✎", label: "Team Notes" },
+        ],
+    },
+    {
+        label: "Help",
+        items: [
+            { href: "https://google.com", icon: "📖", label: "Walkthrough Guide", external: true },
         ],
     },
 ];
@@ -42,6 +49,32 @@ const getTeamSections = (teamNumber: string) => [
 export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; isAdmin?: boolean }) {
     const pathname = usePathname();
     const sections = isAdmin ? getAdminSections() : getTeamSections(teamNumber);
+
+    // Fetch unread messages count
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if (isAdmin) return;
+
+        const fetchUnread = async () => {
+            try {
+                const res = await fetch("/api/messages/unread");
+                if (res.ok) {
+                    const data = await res.json();
+                    setUnreadCount(data.unreadCount || 0);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        // Initial fetch
+        fetchUnread();
+
+        // Poll every 10 seconds
+        const interval = setInterval(fetchUnread, 10000);
+        return () => clearInterval(interval);
+    }, [isAdmin]);
 
     return (
         <aside className="w-56 flex-shrink-0 bg-surface-card border-r border-line flex flex-col sticky top-0 h-screen overflow-y-auto">
@@ -69,16 +102,27 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                         <div className="text-[10px] font-mono tracking-[0.15em] uppercase text-txt-3 px-5 pb-2">
                             {section.label}
                         </div>
-                        {section.items.map(({ href, icon, label }) => {
+                        {section.items.map((item) => {
+                            const { href, icon, label } = item;
+                            const isExternal = (item as any).external;
                             const isActive = pathname === href;
+                            const showUnreadDot = label === "Connections" && unreadCount > 0;
+
                             return (
                                 <Link
                                     key={href}
                                     href={href}
-                                    className={`nav-item ${isActive ? "active" : ""}`}
+                                    target={isExternal ? "_blank" : undefined}
+                                    rel={isExternal ? "noopener noreferrer" : undefined}
+                                    className={`nav-item ${isActive ? "active" : ""} flex items-center justify-between`}
                                 >
-                                    <span className="nav-icon">{icon}</span>
-                                    {label}
+                                    <div className="flex items-center">
+                                        <span className="nav-icon">{icon}</span>
+                                        {label}
+                                    </div>
+                                    {showUnreadDot && (
+                                        <div className="w-2 h-2 rounded-full bg-danger animate-pulse mr-2" />
+                                    )}
                                 </Link>
                             );
                         })}

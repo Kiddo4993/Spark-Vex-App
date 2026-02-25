@@ -14,9 +14,6 @@ async function createAdmin() {
         team = await prisma.team.create({
             data: {
                 teamNumber: adminTeamNumber,
-                performanceRating: 100,
-                ratingUncertainty: 50,
-                matchCount: 0,
             },
         });
         console.log("Created admin team:", adminTeamNumber);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 
 type Team = {
@@ -10,16 +11,40 @@ type Team = {
     matchCount: number;
 };
 
-export function TopTeams({ teams }: { teams: Team[] }) {
-    if (teams.length === 0) return null;
+type SampleDataset = {
+    label: string;
+    teams: Team[];
+};
+
+export function SampleLeaderboards({ datasets }: { datasets: SampleDataset[] }) {
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    if (!datasets || datasets.length === 0) return null;
+
+    const currentDataset = datasets[selectedIndex];
+    const teams = currentDataset.teams;
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-line pb-2 mb-2">
-                <h2 className="section-title text-gold">Live Leaderboard</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-line pb-2 mb-2 gap-3">
+                <div className="flex items-center gap-3">
+                    <h2 className="section-title text-gold m-0">Sample Rankings</h2>
+                    <select
+                        value={selectedIndex}
+                        onChange={(e) => setSelectedIndex(Number(e.target.value))}
+                        className="bg-surface-bg border border-line text-txt-1 text-xs font-mono py-1 px-2 uppercase tracking-widest focus:outline-none focus:border-spark transition-colors cursor-pointer"
+                    >
+                        {datasets.map((ds, i) => (
+                            <option key={ds.label} value={i}>
+                                • {ds.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 <Link
                     href="/dashboard/teams"
-                    className="text-[11px] font-mono text-txt-3 hover:text-txt-1 transition-colors uppercase tracking-widest"
+                    className="text-[11px] font-mono text-txt-3 hover:text-txt-1 transition-colors uppercase tracking-widest sm:self-center self-start"
                 >
                     View all ↗
                 </Link>
@@ -46,12 +71,12 @@ export function TopTeams({ teams }: { teams: Team[] }) {
                         else if (confidence > 50) barColor = "bar-amber";
 
                         return (
-                            <tr key={team.id}>
+                            <tr key={team.id || team.teamNumber}>
                                 <td className="text-center font-mono text-txt-3">{i + 1}</td>
                                 <td>
-                                    <Link href={`/dashboard/teams/${team.teamNumber}`} className="team-num-chip hover:bg-line-hi transition-colors block w-max">
+                                    <span className="team-num-chip bg-line-hi transition-colors block w-max cursor-default">
                                         {team.teamNumber}
-                                    </Link>
+                                    </span>
                                 </td>
                                 <td className="text-right font-mono font-bold text-[15px] text-txt-1">
                                     {Math.round(team.performanceRating * 10) / 10}
@@ -69,6 +94,13 @@ export function TopTeams({ teams }: { teams: Team[] }) {
                             </tr>
                         );
                     })}
+                    {teams.length === 0 && (
+                        <tr>
+                            <td colSpan={5} className="text-center py-6 text-txt-3 font-mono text-xs uppercase tracking-widest">
+                                No teams in this sample.
+                            </td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
         </div>
