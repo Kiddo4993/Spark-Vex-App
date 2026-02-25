@@ -43,7 +43,7 @@ export function SampleLeaderboards({ datasets }: { datasets: SampleDataset[] }) 
                 </div>
 
                 <Link
-                    href="/dashboard/teams"
+                    href="/skills"
                     className="text-[11px] font-mono text-txt-3 hover:text-txt-1 transition-colors uppercase tracking-widest sm:self-center self-start"
                 >
                     View all ↗

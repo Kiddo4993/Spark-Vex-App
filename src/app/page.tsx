@@ -14,14 +14,8 @@ export default async function LandingPage() {
         <header className="py-16 md:py-24 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-16 border-b border-line mb-16 mt-8">
           <div className="text-center md:text-left">
             <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                style={{
-                  background: "linear-gradient(135deg, #00D4FF 0%, #0090FF 100%)",
-                  boxShadow: "0 0 24px rgba(0,212,255,.35)",
-                }}
-              >
-                ⚡
+              <div className="w-12 h-12 bg-gold flex items-center justify-center text-surface-bg font-mono font-bold text-2xl">
+                X
               </div>
               <div>
                 <h1 className="font-head text-4xl sm:text-6xl font-extrabold text-txt-1 tracking-tighter">
