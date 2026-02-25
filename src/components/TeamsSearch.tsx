@@ -32,6 +32,8 @@ export function TeamsSearch() {
     t.teamNumber.toLowerCase().includes(query.toLowerCase())
   );
 
+  console.log("Teams length:", teams.length);
+
   return (
     <div className="space-y-5">
       <input
