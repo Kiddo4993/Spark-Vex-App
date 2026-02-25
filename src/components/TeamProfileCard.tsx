@@ -5,8 +5,6 @@ type Team = {
   performanceRating: number;
   ratingUncertainty: number;
   matchCount: number;
-  autoStrength: number | null;
-  driverStrength: number | null;
   drivetrainType: string | null;
   autonomousSide: string | null;
   autonReliabilityPct: number | null;
@@ -38,7 +36,15 @@ function autonSideLabel(side: string | null) {
   return side ? map[side] || side : null;
 }
 
-export function TeamProfileCard({ team }: { team: Team }) {
+export function TeamProfileCard({
+  team,
+  autoStrength,
+  driverStrength
+}: {
+  team: Team;
+  autoStrength: number | null;
+  driverStrength: number | null;
+}) {
   const confidence = Math.min(
     100,
     Math.round(Math.max(0, 1 - team.ratingUncertainty / 50) * 100)
@@ -93,11 +99,11 @@ export function TeamProfileCard({ team }: { team: Team }) {
         </div>
         <div className="p-4 border-r border-b md:border-b-0 border-line py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Auto Strength</div>
-          <div className="text-4xl font-mono font-bold text-amber-500">{team.autoStrength ?? "—"}</div>
+          <div className="text-4xl font-mono font-bold text-amber-500">{autoStrength ?? "—"}</div>
         </div>
         <div className="p-4 border-r border-line md:border-r py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Driver Strength</div>
-          <div className="text-4xl font-mono font-bold text-green-500">{team.driverStrength ?? "—"}</div>
+          <div className="text-4xl font-mono font-bold text-green-500">{driverStrength ?? "—"}</div>
         </div>
         <div className="p-4 py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Matches Played</div>
@@ -114,12 +120,12 @@ export function TeamProfileCard({ team }: { team: Team }) {
             <div>
               <div className="flex justify-between items-baseline mb-1.5 text-[10px] font-mono">
                 <span className="text-txt-2 uppercase tracking-wider">Autonomous Routine</span>
-                <span className="text-amber-500 font-bold">{team.autoStrength != null ? `${team.autoStrength}/10` : "—"}</span>
+                <span className="text-amber-500 font-bold">{autoStrength != null ? `${autoStrength}/10` : "—"}</span>
               </div>
               <div className="h-1.5 w-full bg-line rounded-none overflow-hidden mt-1">
                 <div
                   className="h-full bg-amber-500 transition-all"
-                  style={{ width: team.autoStrength != null ? `${team.autoStrength * 10}%` : "0%" }}
+                  style={{ width: autoStrength != null ? `${autoStrength * 10}%` : "0%" }}
                 />
               </div>
             </div>
@@ -127,12 +133,12 @@ export function TeamProfileCard({ team }: { team: Team }) {
             <div>
               <div className="flex justify-between items-baseline mb-1.5 text-[10px] font-mono">
                 <span className="text-txt-2 uppercase tracking-wider">Driver Control</span>
-                <span className="text-green-500 font-bold">{team.driverStrength != null ? `${team.driverStrength}/10` : "—"}</span>
+                <span className="text-green-500 font-bold">{driverStrength != null ? `${driverStrength}/10` : "—"}</span>
               </div>
               <div className="h-1.5 w-full bg-line rounded-none overflow-hidden mt-1">
                 <div
                   className="h-full bg-green-500 transition-all"
-                  style={{ width: team.driverStrength != null ? `${team.driverStrength * 10}%` : "0%" }}
+                  style={{ width: driverStrength != null ? `${driverStrength * 10}%` : "0%" }}
                 />
               </div>
             </div>

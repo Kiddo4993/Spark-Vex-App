@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { confidenceFromUncertainty, INITIAL_UNCERTAINTY, SCOUT_NEEDED_THRESHOLD } from "@/lib/bayesian";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { DashboardCards } from "@/components/DashboardCards";
 import { RecentMatches } from "@/components/RecentMatches";
 import { ConnectedTeams } from "@/components/ConnectedTeams";
@@ -15,29 +16,49 @@ export default async function DashboardPage() {
   if (isAdmin) redirect("/dashboard/admin");
 
   const teamId = (session!.user as { teamId: string }).teamId;
+  const cookieStore = await cookies();
+  const viewerId = cookieStore.get("viewer_team_id")?.value || teamId;
+
+  const targetId = viewerId;
+  const isViewingOther = targetId !== teamId;
 
   const team = await prisma.team.findUnique({
-    where: { id: teamId },
+    where: { id: targetId },
     include: {
-      skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
       performanceHistory: { orderBy: { createdAt: "desc" }, take: 20 },
     },
   });
   if (!team) return <p className="text-txt-3">Team not found</p>;
 
-  const skills = team.skillsRecords[0] ?? null;
-  const confidenceVal = confidenceFromUncertainty(team.ratingUncertainty, INITIAL_UNCERTAINTY);
+  // Load the selected uploader's perspective of themselves
+  const calcRating = await prisma.calculatedRating.findUnique({
+    where: { uploaderId_subjectTeamId: { uploaderId: viewerId, subjectTeamId: targetId } }
+  });
+
+  // Private scouting ALWAYS remains tied to the logged-in user
+  const scoutData = await prisma.scoutingData.findUnique({
+    where: { scouterId_subjectTeamId: { scouterId: teamId, subjectTeamId: targetId } }
+  });
+
+  const performanceRating = calcRating?.performanceRating ?? 100;
+  const ratingUncertainty = calcRating?.ratingUncertainty ?? 50;
+  const matchCount = calcRating?.matchCount ?? 0;
+  const autoStrength = scoutData?.autoStrength ?? null;
+  const driverStrength = scoutData?.driverStrength ?? null;
+
+  const confidenceVal = confidenceFromUncertainty(ratingUncertainty, INITIAL_UNCERTAINTY);
   const confidenceLabel = confidenceVal > 80 ? "High" : confidenceVal > 50 ? "Medium" : "Low";
 
   const recentMatches = await prisma.match.findMany({
     where: {
+      uploaderId: viewerId,
       OR: [
-        { redTeam1Id: teamId },
-        { redTeam2Id: teamId },
-        { redTeam3Id: teamId },
-        { blueTeam1Id: teamId },
-        { blueTeam2Id: teamId },
-        { blueTeam3Id: teamId },
+        { redTeam1Id: targetId },
+        { redTeam2Id: targetId },
+        { redTeam3Id: targetId },
+        { blueTeam1Id: targetId },
+        { blueTeam2Id: targetId },
+        { blueTeam3Id: targetId },
       ],
     },
     orderBy: { date: "desc" },
@@ -54,7 +75,7 @@ export default async function DashboardPage() {
 
   const connections = await prisma.connection.findMany({
     where: {
-      OR: [{ fromTeamId: teamId }, { toTeamId: teamId }],
+      OR: [{ fromTeamId: targetId }, { toTeamId: targetId }],
       status: "accepted",
     },
     include: {
@@ -63,11 +84,11 @@ export default async function DashboardPage() {
     },
   });
   const connectedTeams = connections.map((c) =>
-    c.fromTeamId === teamId ? c.toTeam : c.fromTeam
+    c.fromTeamId === targetId ? c.toTeam : c.fromTeam
   );
 
   // Build sparkline data from performance history
-  const sparkData = team.performanceHistory
+  const sparkData = (team.performanceHistory || [])
     .slice()
     .reverse()
     .map((h) => h.performanceRating);
@@ -78,19 +99,28 @@ export default async function DashboardPage() {
       {/* Page Header */}
       <div className="flex items-start justify-between mb-2">
         <div>
-          <h1 className="page-title">Team {team.teamNumber}</h1>
-          <p className="page-subtitle">Bayesian performance overview</p>
+          <h1 className="page-title">
+            {isViewingOther ? `Viewing Team ${team.teamNumber}` : `Team ${team.teamNumber}`}
+          </h1>
+          <p className="page-subtitle">
+            {isViewingOther ? "Their uploaded tournament statistics" : "Bayesian performance overview"}
+          </p>
         </div>
         <div className="flex gap-2.5">
-          <Link href={`/dashboard/teams/${team.teamNumber}`} className="btn-ghost">✎ Edit Profile</Link>
-          <Link href="/dashboard/matches/add" className="btn-primary">+ Add Match</Link>
+          {!isViewingOther && (
+            <>
+              <Link href={`/dashboard/teams/${team.teamNumber}`} className="btn-ghost">✎ Edit Profile</Link>
+              <Link href="/dashboard/matches/add" className="btn-primary">+ Add Match</Link>
+            </>
+          )}
         </div>
       </div>
 
       {/* Stat Cards */}
       <DashboardCards
-        team={team}
-        skills={skills}
+        team={{ ...team, performanceRating, ratingUncertainty, matchCount }}
+        autoStrength={autoStrength}
+        driverStrength={driverStrength}
         confidence={confidenceLabel}
       />
 
@@ -100,7 +130,7 @@ export default async function DashboardPage() {
           <div className="flex justify-between items-center w-full">
             <span className="text-[10px] font-mono tracking-widest text-txt-3 uppercase">Rating Interval</span>
             <span className="font-mono text-[11px] text-txt-2">
-              Current: <span className="text-txt-1">{team.performanceRating.toFixed(1)}</span> ± {team.ratingUncertainty.toFixed(1)}
+              Current: <span className="text-txt-1">{performanceRating.toFixed(1)}</span> ± {ratingUncertainty.toFixed(1)}
             </span>
           </div>
         </div>
@@ -113,24 +143,24 @@ export default async function DashboardPage() {
             <div
               className="absolute h-full bg-txt-3/30"
               style={{
-                left: `${Math.max(0, ((team.performanceRating - team.ratingUncertainty) / 200) * 100)}%`,
-                right: `${Math.max(0, 100 - ((team.performanceRating + team.ratingUncertainty) / 200) * 100)}%`
+                left: `${Math.max(0, ((performanceRating - ratingUncertainty) / 200) * 100)}%`,
+                right: `${Math.max(0, 100 - ((performanceRating + ratingUncertainty) / 200) * 100)}%`
               }}
             />
             {/* The point estimate */}
             <div
               className="absolute h-3 w-1 bg-gold -top-1"
-              style={{ left: `${Math.min(100, (team.performanceRating / 200) * 100)}%` }}
+              style={{ left: `${Math.min(100, (performanceRating / 200) * 100)}%` }}
             />
           </div>
           <div className="flex justify-between text-[11px] font-mono text-txt-2">
             <div>
               <span className="text-txt-3">Lower: </span>
-              <span className="text-amber-500">{(team.performanceRating - team.ratingUncertainty).toFixed(1)}</span>
+              <span className="text-amber-500">{(performanceRating - ratingUncertainty).toFixed(1)}</span>
             </div>
             <div>
               <span className="text-txt-3">Upper: </span>
-              <span className="text-green-500">{(team.performanceRating + team.ratingUncertainty).toFixed(1)}</span>
+              <span className="text-green-500">{(performanceRating + ratingUncertainty).toFixed(1)}</span>
             </div>
           </div>
         </div>
@@ -138,7 +168,7 @@ export default async function DashboardPage() {
 
       {/* Two-column: Recent Matches + Rating History */}
       <div className="grid gap-5 lg:grid-cols-2">
-        <RecentMatches matches={recentMatches as any} currentTeamId={teamId} />
+        <RecentMatches matches={recentMatches as any} currentTeamId={targetId} />
 
         <div className="card overflow-hidden">
           <div className="card-header bg-surface-bg border-b border-line py-2">
@@ -202,12 +232,12 @@ export default async function DashboardPage() {
               <div>
                 <div className="flex justify-between items-baseline mb-1.5 text-[10px] font-mono">
                   <span className="text-txt-3 uppercase tracking-wider">Autonomous Quality</span>
-                  <span className="text-amber-500 font-bold">{team.autoStrength != null ? `${team.autoStrength}/10` : "—"}</span>
+                  <span className="text-amber-500 font-bold">{autoStrength != null ? `${autoStrength}/10` : "—"}</span>
                 </div>
                 <div className="h-1 w-full bg-line rounded-none overflow-hidden">
                   <div
                     className="h-full bg-amber-500 transition-all"
-                    style={{ width: team.autoStrength != null ? `${team.autoStrength * 10}%` : "0%" }}
+                    style={{ width: autoStrength != null ? `${autoStrength * 10}%` : "0%" }}
                   />
                 </div>
               </div>
@@ -215,12 +245,12 @@ export default async function DashboardPage() {
               <div>
                 <div className="flex justify-between items-baseline mb-1.5 text-[10px] font-mono">
                   <span className="text-txt-3 uppercase tracking-wider">Driver Control Quality</span>
-                  <span className="text-green-500 font-bold">{team.driverStrength != null ? `${team.driverStrength}/10` : "—"}</span>
+                  <span className="text-green-500 font-bold">{driverStrength != null ? `${driverStrength}/10` : "—"}</span>
                 </div>
                 <div className="h-1 w-full bg-line rounded-none overflow-hidden">
                   <div
                     className="h-full bg-green-500 transition-all"
-                    style={{ width: team.driverStrength != null ? `${team.driverStrength * 10}%` : "0%" }}
+                    style={{ width: driverStrength != null ? `${driverStrength * 10}%` : "0%" }}
                   />
                 </div>
               </div>
@@ -230,11 +260,11 @@ export default async function DashboardPage() {
       </div>
 
       {/* High uncertainty alert */}
-      {team.ratingUncertainty > SCOUT_NEEDED_THRESHOLD && (
+      {ratingUncertainty > SCOUT_NEEDED_THRESHOLD && (
         <div className="alert alert-info">
           <span className="alert-icon">⚡</span>
           <div className="alert-body">
-            <strong>High uncertainty detected.</strong> Your rating confidence interval is wide (±{team.ratingUncertainty.toFixed(1)}). Add more match data to tighten your Bayesian estimate.
+            <strong>High uncertainty detected.</strong> Your rating confidence interval is wide (±{ratingUncertainty.toFixed(1)}). Add more match data to tighten your Bayesian estimate.
           </div>
         </div>
       )}

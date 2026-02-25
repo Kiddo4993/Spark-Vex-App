@@ -59,6 +59,7 @@ export async function GET(req: Request) {
 
   const myTeamId = session?.user ? (session.user as { teamId: string }).teamId : null;
   const matches = await prisma.match.findMany({
+    where: myTeamId ? { uploaderId: myTeamId } : {},
     orderBy: { date: "desc" },
     take: limit,
     include: {
@@ -113,8 +114,36 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid team IDs" }, { status: 400 });
     }
 
-    const redTeams = redTeamsRaw.map(t => ({ id: t.id, rating: t.performanceRating, uncertainty: t.ratingUncertainty }));
-    const blueTeams = blueTeamsRaw.map(t => ({ id: t.id, rating: t.performanceRating, uncertainty: t.ratingUncertainty }));
+    const uploaderId = session.user.teamId;
+
+    // Load existing ratings for this uploader
+    const allTeamIds = [...redTeamsRaw, ...blueTeamsRaw].map(t => t.id);
+    const existingRatings = await prisma.calculatedRating.findMany({
+      where: {
+        uploaderId,
+        subjectTeamId: { in: allTeamIds }
+      }
+    });
+
+    const ratingMap = new Map(existingRatings.map(r => [r.subjectTeamId, r]));
+
+    const redTeams = redTeamsRaw.map(t => {
+      const cr = ratingMap.get(t.id);
+      return {
+        id: t.id,
+        rating: cr?.performanceRating ?? 100,
+        uncertainty: cr?.ratingUncertainty ?? 50
+      };
+    });
+
+    const blueTeams = blueTeamsRaw.map(t => {
+      const cr = ratingMap.get(t.id);
+      return {
+        id: t.id,
+        rating: cr?.performanceRating ?? 100,
+        uncertainty: cr?.ratingUncertainty ?? 50
+      };
+    });
 
     // Tie handling: A=0.5 for both alliances
     let allUpdates: BayesianMatchUpdate[];
@@ -133,6 +162,7 @@ export async function POST(req: Request) {
       data: {
         eventName,
         date: matchDate,
+        uploaderId,
         redTeam1Id, redTeam2Id, redTeam3Id,
         blueTeam1Id, blueTeam2Id, blueTeam3Id,
         redScore, blueScore,
@@ -140,12 +170,25 @@ export async function POST(req: Request) {
     });
 
     for (const update of allUpdates) {
-      await prisma.team.update({
-        where: { id: update.teamId },
-        data: {
+      await prisma.calculatedRating.upsert({
+        where: {
+          uploaderId_subjectTeamId: {
+            uploaderId: uploaderId,
+            subjectTeamId: update.teamId,
+          },
+        },
+        update: {
           performanceRating: update.ratingAfter,
           ratingUncertainty: update.uncertaintyAfter,
           matchCount: { increment: 1 },
+          lastUpdated: new Date(),
+        },
+        create: {
+          uploaderId: uploaderId,
+          subjectTeamId: update.teamId,
+          performanceRating: update.ratingAfter,
+          ratingUncertainty: update.uncertaintyAfter,
+          matchCount: 1,
         },
       });
       await prisma.performanceHistory.create({

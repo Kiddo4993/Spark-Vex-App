@@ -13,16 +13,17 @@ export default function ImportPage() {
     const router = useRouter();
     const { data: session, status: sessionStatus } = useSession();
 
+    // Removed admin-only redirect to allow teams to import their own tournaments
     useEffect(() => {
-        if (sessionStatus === "authenticated" && (session?.user as any).isAdmin !== true) {
-            router.push("/dashboard");
+        if (sessionStatus === "unauthenticated") {
+            router.push("/auth/signin");
         }
-    }, [sessionStatus, session, router]);
+    }, [sessionStatus, router]);
     const [importMethod, setImportMethod] = useState<ImportMethod>("file");
 
     // --- File upload state ---
     const [step, setStep] = useState<"upload" | "map" | "processing" | "review" | "done">("upload");
-    const [importType, setImportType] = useState<"match" | "skills">("match");
+    const [importType, setImportType] = useState<"match">("match");
     const [fileData, setFileData] = useState<any[]>([]);
     const [headers, setHeaders] = useState<string[]>([]);
     const [preview, setPreview] = useState<any[][]>([]);
@@ -278,10 +279,6 @@ export default function ImportPage() {
                 <>
                     {step === "upload" && (
                         <div className="space-y-5">
-                            <div className="flex gap-2">
-                                <button onClick={() => setImportType("match")} className={`filter-chip ${importType === "match" ? "on" : ""}`}>Match Results</button>
-                                <button onClick={() => setImportType("skills")} className={`filter-chip ${importType === "skills" ? "on" : ""}`}>Skills List</button>
-                            </div>
                             <ImportFileUpload onFileSelect={handleFileSelect} />
                             {status && <p className="text-sm text-txt-3 animate-pulse">{status}</p>}
                         </div>
@@ -317,7 +314,7 @@ export default function ImportPage() {
                                         }
                                     }}
                                     className="btn-primary"
-                                    disabled={importType === "match" ? (!mapping.date || !mapping.redScore || !mapping.blueScore) : (!mapping.team || !mapping.highestScore)}
+                                    disabled={!mapping.date || !mapping.redScore || !mapping.blueScore}
                                 >
                                     Review Import
                                 </button>
