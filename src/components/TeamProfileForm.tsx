@@ -10,8 +10,6 @@ type Team = {
   drivetrainType: string | null;
   autonomousSide: string | null;
   autonReliabilityPct: number | null;
-  autoStrength: number | null;
-  driverStrength: number | null;
   strategyTags: string[];
   notes: string | null;
 };
@@ -28,8 +26,6 @@ export function TeamProfileForm({
   const [drivetrainType, setDrivetrainType] = useState(team.drivetrainType ?? "");
   const [autonomousSide, setAutonomousSide] = useState(team.autonomousSide ?? "");
   const [autonReliabilityPct, setAutonReliabilityPct] = useState<number | null>(team.autonReliabilityPct);
-  const [autoStrength, setAutoStrength] = useState<number | null>(team.autoStrength);
-  const [driverStrength, setDriverStrength] = useState<number | null>(team.driverStrength);
   const [strategyTags, setStrategyTags] = useState<string[]>(team.strategyTags ?? []);
   const [tagInput, setTagInput] = useState("");
   const [notes, setNotes] = useState(team.notes ?? "");
@@ -68,8 +64,6 @@ export function TeamProfileForm({
           drivetrainType: drivetrainType || null,
           autonomousSide: autonomousSide || null,
           autonReliabilityPct: autonReliabilityPct,
-          autoStrength,
-          driverStrength,
           strategyTags,
           notes: notes || null,
         }),
@@ -206,98 +200,6 @@ export function TeamProfileForm({
             </div>
           </div>
 
-          {/* Scouting Sliders */}
-          <div className="border-t border-line pt-6">
-            <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-4">Scouting Baseline</h4>
-
-            <div className="space-y-8">
-              {/* Auto Strength */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="label text-[10px] font-mono tracking-widest uppercase !mb-0">Auto Strength</label>
-                  {autoStrength !== null && (
-                    <button
-                      type="button"
-                      onClick={() => setAutoStrength(null)}
-                      className="text-[10px] text-danger font-mono tracking-widest uppercase hover:underline"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-
-                {autoStrength === null ? (
-                  <button
-                    type="button"
-                    onClick={() => setAutoStrength(5)}
-                    className="w-full border border-dashed border-line text-txt-3 hover:text-amber-500 hover:border-amber-500 py-3 text-[11px] uppercase tracking-widest font-mono transition-colors"
-                  >
-                    + Set Rating
-                  </button>
-                ) : (
-                  <>
-                    <div className="flex justify-between items-end mb-1">
-                      <span className="text-xs font-mono tracking-widest text-txt-3">0</span>
-                      <span className="font-mono text-xl font-bold text-amber-500">{autoStrength}</span>
-                      <span className="text-xs font-mono tracking-widest text-txt-3">10</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={0}
-                      max={10}
-                      step={0.5}
-                      value={autoStrength}
-                      onChange={(e) => setAutoStrength(parseFloat(e.target.value))}
-                      className="w-full accent-amber-500 cursor-pointer"
-                    />
-                  </>
-                )}
-              </div>
-
-              {/* Driver Strength */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="label text-[10px] font-mono tracking-widest uppercase !mb-0">Driver Strength</label>
-                  {driverStrength !== null && (
-                    <button
-                      type="button"
-                      onClick={() => setDriverStrength(null)}
-                      className="text-[10px] text-danger font-mono tracking-widest uppercase hover:underline"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-
-                {driverStrength === null ? (
-                  <button
-                    type="button"
-                    onClick={() => setDriverStrength(5)}
-                    className="w-full border border-dashed border-line text-txt-3 hover:text-green-500 hover:border-green-500 py-3 text-[11px] uppercase tracking-widest font-mono transition-colors"
-                  >
-                    + Set Rating
-                  </button>
-                ) : (
-                  <>
-                    <div className="flex justify-between items-end mb-1">
-                      <span className="text-xs font-mono tracking-widest text-txt-3">0</span>
-                      <span className="font-mono text-xl font-bold text-green-500">{driverStrength}</span>
-                      <span className="text-xs font-mono tracking-widest text-txt-3">10</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={0}
-                      max={10}
-                      step={0.5}
-                      value={driverStrength}
-                      onChange={(e) => setDriverStrength(parseFloat(e.target.value))}
-                      className="w-full accent-green-500 cursor-pointer"
-                    />
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
 
           {/* Strategy Tags */}
           <div className="border-t border-line pt-6">

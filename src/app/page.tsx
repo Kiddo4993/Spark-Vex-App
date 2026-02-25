@@ -1,45 +1,11 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { TopTeams } from "@/components/TopTeams";
-import { RecentMatches } from "@/components/RecentMatches";
-import { BestMatches } from "@/components/BestMatches";
+import { SampleLeaderboards } from "@/components/SampleLeaderboards";
+import { sampleTournaments } from "@/lib/sampleData";
 
 export default async function LandingPage() {
   const session = await getServerSession(authOptions);
-
-  const topTeams = await prisma.team.findMany({
-    where: { teamNumber: { not: "ADMIN" } },
-    orderBy: { performanceRating: "desc" },
-    take: 8,
-    select: {
-      id: true,
-      teamNumber: true,
-      performanceRating: true,
-      ratingUncertainty: true,
-      matchCount: true,
-    },
-  });
-
-  const recentMatches = await prisma.match.findMany({
-    orderBy: { date: "desc" },
-    take: 50, // Fetch more to find the best scores
-    include: {
-      redTeam1: { select: { teamNumber: true } },
-      redTeam2: { select: { teamNumber: true } },
-      redTeam3: { select: { teamNumber: true } },
-      blueTeam1: { select: { teamNumber: true } },
-      blueTeam2: { select: { teamNumber: true } },
-      blueTeam3: { select: { teamNumber: true } },
-    },
-  });
-
-  const bestMatches = [...recentMatches]
-    .sort((a, b) => (b.redScore + b.blueScore) - (a.redScore + a.blueScore))
-    .slice(0, 5);
-
-  const displayRecent = recentMatches.slice(0, 5);
 
   return (
     <main className="min-h-screen bg-surface-bg pb-32">
@@ -86,59 +52,79 @@ export default async function LandingPage() {
           </div>
         </header>
 
-        <div className="grid gap-16 lg:grid-cols-[1fr_380px]">
-          {/* Main: Top Teams */}
-          <section className="space-y-12">
-            <TopTeams teams={topTeams} />
-            <div className="flex justify-center">
-              <Link href="/teams" className="btn-ghost text-sm">View All Teams →</Link>
-            </div>
+        <div className="grid gap-16 lg:grid-cols-2">
+          {/* Main: Explanation */}
+          <section className="space-y-8">
+            <div>
+              <h3 className="section-title mb-8 text-3xl font-extrabold text-txt-1 tracking-tight">Why Spark?</h3>
 
-            <div className="card p-8 border-l-[3px] border-l-spark">
-              <h3 className="section-title mb-6">How it works</h3>
-              <div className="grid gap-8 sm:grid-cols-2">
+              <div className="space-y-10">
                 <div className="space-y-3">
                   <p className="text-sm font-bold text-spark uppercase tracking-widest border-b border-spark/20 pb-1.5">
-                    Bayesian Strength
+                    BAYESIAN PERFORMANCE MODEL
                   </p>
                   <p className="text-txt-2 text-sm leading-relaxed">
-                    Automatically calculates team strength while accounting for alliance synergies and match-to-match variance.
+                    Compared to traditional ranking systems such as the Elo system, the Bayesian Performance Model accounts for inconsistencies, allocates <span className="text-gold font-medium">scoring fairly</span>, and <span className="text-gold font-medium">gives each team</span> an uncertainty rating. This results in a more layered and less volatile model.
                   </p>
                 </div>
+
                 <div className="space-y-3">
-                  <p className="text-sm font-bold text-amber uppercase tracking-widest border-b border-amber/20 pb-1.5">
-                    Confidence Intervals
+                  <p className="text-sm font-bold text-cyan-400 uppercase tracking-widest border-b border-cyan-400/20 pb-1.5">
+                    RANK TEAMS FROM ANY TOURNAMENT
                   </p>
                   <p className="text-txt-2 text-sm leading-relaxed">
-                    Identifies which rankings are solidified and which teams need more scouting data to be certain.
+                    Upload the .XLS file from Robot Events and get quick results and rankings.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-sm font-bold text-amber-500 uppercase tracking-widest border-b border-amber-500/20 pb-1.5">
+                    DIRECT MESSAGE OTHER TEAMS
+                  </p>
+                  <p className="text-txt-2 text-sm leading-relaxed">
+                    Quickly get in contact with teams without the hassle of finding their contact information.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-sm font-bold text-purple-400 uppercase tracking-widest border-b border-purple-400/20 pb-1.5">
+                    TEAM PROFILES
+                  </p>
+                  <p className="text-txt-2 text-sm leading-relaxed">
+                    Make a profile for your team to make it easier for others to discover you. Add details such as pictures of your bot, your type <span className="text-gold font-medium">of match</span>, autonomous, and a description of your team.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-sm font-bold text-emerald-400 uppercase tracking-widest border-b border-emerald-400/20 pb-1.5">
+                    SCOUTING NOTES
+                  </p>
+                  <p className="text-txt-2 text-sm leading-relaxed">
+                    Quickly add notes <span className="text-gold font-medium">about teams</span> you're interested in aligning with, <span className="text-gold font-medium">such as</span> driver skill, autonomous side, autonomous type, and bot type.
                   </p>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Sidebar: Recent Matches & Best Matches */}
-          <aside className="space-y-6">
-            <BestMatches matches={bestMatches as any} />
-
-            <div>
-              <RecentMatches matches={displayRecent as any} currentTeamId="" />
-              <div className="flex justify-center mt-4">
-                <Link href="/matches" className="btn-ghost text-sm">View All Matches →</Link>
-              </div>
-            </div>
-            <div className="mt-6 p-5 bg-spark/5 rounded-xl border border-spark/20">
-              <p className="text-[10px] font-mono text-spark uppercase tracking-widest mb-1.5">Pro Tip</p>
-              <p className="text-xs text-txt-2 leading-relaxed">
-                Sign in to import your own match data from RobotEvents and see your team&apos;s Bayesian rating progression!
+          {/* Sidebar: Sample Data */}
+          <aside className="space-y-8 lg:pl-8 lg:border-l lg:border-line">
+            <SampleLeaderboards datasets={sampleTournaments as any} />
+            <div className="mt-8 p-6 bg-surface-card border-l-[3px] border-l-spark border border-line">
+              <h4 className="text-[11px] font-mono text-spark uppercase tracking-widest font-bold mb-3">Notice</h4>
+              <p className="text-sm text-txt-2 leading-relaxed">
+                The rankings above are loaded from preset sample data to demonstrate the dashboard view. Sign in with your team port to map your own tournament .XLS data.
               </p>
+              <div className="mt-5">
+                <Link href="/auth/signin" className="text-xs font-mono text-txt-1 underline tracking-widest uppercase hover:text-spark transition-colors">Log In Here →</Link>
+              </div>
             </div>
           </aside>
         </div>
 
-        <footer className="mt-20 pt-8 text-center border-t border-line">
+        <footer className="mt-24 pt-8 text-center border-t border-line">
           <p className="text-[10px] text-txt-3 uppercase tracking-[0.3em] font-mono">
-            © {new Date().getFullYear()} Sparks Robotics · Spark VEX System
+            © 2026 77174A Holy Airball! · Spark VEX
           </p>
         </footer>
       </div>

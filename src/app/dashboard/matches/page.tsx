@@ -8,6 +8,7 @@ export default async function MatchesPage() {
   const teamId = session?.user ? (session.user as { teamId: string }).teamId : null;
 
   const matches = await prisma.match.findMany({
+    where: { uploaderId: teamId as string },
     orderBy: { date: "desc" },
     take: 50,
     include: {

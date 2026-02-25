@@ -8,8 +8,10 @@ export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.teamId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const myTeamId = (session.user as any).teamId;
+
     const myTeam = await prisma.team.findUnique({
-        where: { id: (session.user as any).teamId },
+        where: { id: myTeamId },
     });
     if (!myTeam) return NextResponse.json({ error: "Team not found" }, { status: 404 });
 
@@ -18,13 +20,34 @@ export async function GET(req: Request) {
         where: { id: { not: myTeam.id }, teamNumber: { not: "ADMIN" } },
     });
 
+    // Lookup scoped data
+    const calcRatings = await prisma.calculatedRating.findMany({
+        where: { uploaderId: myTeamId }
+    });
+    const scoutingDataList = await prisma.scoutingData.findMany({
+        where: { scouterId: myTeamId }
+    });
+
+    const calcMap = new Map(calcRatings.map(c => [c.subjectTeamId, c]));
+    const scoutMap = new Map(scoutingDataList.map(s => [s.subjectTeamId, s]));
+
+    const myRating = calcMap.get(myTeam.id);
+    const myScout = scoutMap.get(myTeam.id);
+
+    const r1 = myRating?.performanceRating ?? 100;
+    const as1 = myScout?.autoStrength ?? 0;
+    const ds1 = myScout?.driverStrength ?? 0;
+
     const results = allTeams.map((other) => {
+        const otherRating = calcMap.get(other.id);
+        const otherScout = scoutMap.get(other.id);
+
         // 1. Auto Compatibility
         let autoScore = 75; // Default/Unknown/Skills
         const s1 = myTeam.autonomousSide?.toLowerCase();
         const s2 = other.autonomousSide?.toLowerCase();
 
-        const missingScouting = other.autoStrength === null || other.driverStrength === null;
+        const missingScouting = (otherScout?.autoStrength ?? null) === null || (otherScout?.driverStrength ?? null) === null;
         let autoConflict = false;
 
         if (s1 && s2 && s1 !== "skills" && s2 !== "skills") {
@@ -39,19 +62,13 @@ export async function GET(req: Request) {
         }
 
         // 2. Strength Score
-        const r1 = myTeam.performanceRating;
-        const r2 = other.performanceRating;
-        // Formula: min(50, (r1+r2)/6)
-        // If ratings are around 100, sum=200, /6 = 33.
-        // If ratings are 150 (strong), sum=300, /6 = 50 (max).
+        const r2 = otherRating?.performanceRating ?? 100;
         const baseScore = Math.min(50, (r1 + r2) / 6);
 
-        const as1 = myTeam.autoStrength || 0;
-        const as2 = other.autoStrength || 0;
+        const as2 = otherScout?.autoStrength ?? 0;
         const autoBonus = (as1 + as2) / 0.8; // Max 25
 
-        const ds1 = myTeam.driverStrength || 0;
-        const ds2 = other.driverStrength || 0;
+        const ds2 = otherScout?.driverStrength ?? 0;
         const driverBonus = (ds1 + ds2) / 0.8; // Max 25
 
         const strengthScore = baseScore + Math.min(25, autoBonus) + Math.min(25, driverBonus);
@@ -59,7 +76,7 @@ export async function GET(req: Request) {
         const synergyScore = autoScore + strengthScore;
 
         const confidence = confidenceFromUncertainty(
-            other.ratingUncertainty,
+            otherRating?.ratingUncertainty ?? 50,
             INITIAL_UNCERTAINTY
         );
 
@@ -68,9 +85,9 @@ export async function GET(req: Request) {
                 id: other.id,
                 teamNumber: other.teamNumber,
                 autonomousSide: other.autonomousSide,
-                autoStrength: other.autoStrength,
-                driverStrength: other.driverStrength,
-                performanceRating: other.performanceRating,
+                autoStrength: otherScout?.autoStrength ?? null,
+                driverStrength: otherScout?.driverStrength ?? null,
+                performanceRating: otherRating?.performanceRating ?? 100,
             },
             synergyScore,
             autoCompatibility: autoScore,
@@ -81,7 +98,6 @@ export async function GET(req: Request) {
         };
     });
 
-    // Sort by synergy descending
     results.sort((a, b) => b.synergyScore - a.synergyScore);
 
     return NextResponse.json(results);

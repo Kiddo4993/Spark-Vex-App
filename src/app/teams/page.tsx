@@ -1,21 +1,8 @@
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { TopTeams } from "@/components/TopTeams";
+import { SampleLeaderboards } from "@/components/SampleLeaderboards";
+import { sampleTournaments } from "@/lib/sampleData";
 
 export default async function PublicTeamsPage() {
-    const teams = await prisma.team.findMany({
-        where: { teamNumber: { not: "ADMIN" } },
-        orderBy: { performanceRating: "desc" },
-        take: 50,
-        select: {
-            id: true,
-            teamNumber: true,
-            performanceRating: true,
-            ratingUncertainty: true,
-            matchCount: true,
-        },
-    });
-
     return (
         <main className="min-h-screen bg-surface-bg pb-32">
             <div className="mx-auto max-w-5xl px-6 sm:px-10 lg:px-12 py-12">
@@ -25,12 +12,12 @@ export default async function PublicTeamsPage() {
                     </Link>
                 </div>
                 <h1 className="font-head text-3xl font-extrabold text-txt-1 tracking-tight mb-2">
-                    All Teams
+                    Sample Leaderboards
                 </h1>
                 <p className="text-sm text-txt-2 mb-8">
-                    Browse all registered VEX Robotics teams and their Bayesian performance ratings.
+                    Browse the preset sample leaderboards. Connect your team port to map your own tournament .XLS data.
                 </p>
-                <TopTeams teams={teams} />
+                <SampleLeaderboards datasets={sampleTournaments as any} />
             </div>
         </main>
     );

@@ -30,6 +30,16 @@ export async function GET(req: Request) {
             },
         });
 
+        // Mark unread messages from the other team as read
+        await prisma.message.updateMany({
+            where: {
+                fromTeamId: withTeamId,
+                toTeamId: session.user.teamId,
+                read: false,
+            },
+            data: { read: true },
+        });
+
         return NextResponse.json({ messages });
     } catch (error) {
         console.error("Failed to fetch messages:", error);

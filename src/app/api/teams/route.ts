@@ -12,8 +12,6 @@ const updateTeamSchema = z.object({
   autonReliabilityPct: z.number().min(0).max(100).optional().nullable(),
   notes: z.string().optional().nullable(),
   strategyTags: z.array(z.string()).optional(),
-  autoStrength: z.number().min(0).max(10).optional().nullable(),
-  driverStrength: z.number().min(0).max(10).optional().nullable(),
 });
 
 export async function GET(req: Request) {
@@ -25,11 +23,9 @@ export async function GET(req: Request) {
   if (teamNumber) {
     const team = await prisma.team.findFirst({
       where: { teamNumber: { equals: teamNumber, mode: "insensitive" } },
-      include: { skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 } },
     });
     if (!team) return NextResponse.json({ error: "Team not found" }, { status: 404 });
-    const { skillsRecords, ...rest } = team;
-    return NextResponse.json({ ...rest, skills: skillsRecords[0] ?? null });
+    return NextResponse.json(team);
   }
 
   if (search && search.length >= 1) {
@@ -47,7 +43,6 @@ export async function GET(req: Request) {
         ],
       },
       take: 50,
-      include: { skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 } },
     });
     return NextResponse.json(searchTeams);
   }
@@ -55,7 +50,6 @@ export async function GET(req: Request) {
   const allTeams = await prisma.team.findMany({
     where: { teamNumber: { not: "ADMIN" } },
     take: 50, // optional: limit to first 50 for performance
-    include: { skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 } },
   });
 
   return NextResponse.json(allTeams);
