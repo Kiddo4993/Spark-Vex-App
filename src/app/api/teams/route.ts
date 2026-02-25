@@ -24,23 +24,12 @@ export async function GET(req: Request) {
 
   if (teamNumber) {
     const team = await prisma.team.findFirst({
-      where: {
-        teamNumber: {
-          equals: teamNumber,
-          mode: "insensitive"
-        }
-      },
-      include: {
-        skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
-      },
+      where: { teamNumber: { equals: teamNumber, mode: "insensitive" } },
+      include: { skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 } },
     });
     if (!team) return NextResponse.json({ error: "Team not found" }, { status: 404 });
     const { skillsRecords, ...rest } = team;
-    const skills = skillsRecords[0] ?? null;
-    return NextResponse.json({
-      ...rest,
-      skills,
-    });
+    return NextResponse.json({ ...rest, skills: skillsRecords[0] ?? null });
   }
 
   if (search && search.length >= 1) {
@@ -51,28 +40,25 @@ export async function GET(req: Request) {
           {
             OR: [
               { teamNumber: { contains: search, mode: "insensitive" } },
-            ]
-          }
-        ]
+              { provinceState: { contains: search, mode: "insensitive" } },
+              { country: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        ],
       },
-      take: 30,
+      take: 50,
       include: { skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 } },
     });
     return NextResponse.json(searchTeams);
   }
 
-  if (!session?.user?.teamId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const myTeam = await prisma.team.findUnique({
-    where: { id: (session.user as { teamId: string }).teamId },
-    include: {
-      skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 },
-      performanceHistory: { orderBy: { createdAt: "desc" }, take: 50 },
-    },
+  const allTeams = await prisma.team.findMany({
+    where: { teamNumber: { not: "ADMIN" } },
+    take: 50, // optional: limit to first 50 for performance
+    include: { skillsRecords: { orderBy: { lastUpdated: "desc" }, take: 1 } },
   });
-  if (!myTeam) return NextResponse.json({ error: "Team not found" }, { status: 404 });
-  return NextResponse.json(myTeam);
+
+  return NextResponse.json(allTeams);
 }
 
 export async function PATCH(req: Request) {
