@@ -19,20 +19,27 @@ export function TeamsSearch() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/teams")
-      .then((r) => r.json())
-      .then((data) => {
+    fetch("/api/teams", {
+      credentials: "include",
+    })
+      .then(async (r) => {
+        if (!r.ok) {
+          console.error("Failed:", r.status);
+          return;
+        }
+        const data = await r.json();
         setTeams(data.teams ?? []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
   const filtered = teams.filter((t) =>
     t.teamNumber.toLowerCase().includes(query.toLowerCase())
   );
-
-  console.log("Teams length:", teams.length);
 
   return (
     <div className="space-y-5">
