@@ -41,7 +41,6 @@ export async function POST(req: Request) {
         teamNumber: uppercasedTeam,
         provinceState: provinceState ?? null,
         country: country ?? null,
-        performanceRating: initialRatingWithSkillsBoost(null),
       },
     });
     const user = await prisma.user.create({

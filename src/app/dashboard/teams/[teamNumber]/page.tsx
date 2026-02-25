@@ -7,6 +7,8 @@ import { TeamProfileCard } from "@/components/TeamProfileCard";
 import { TeamProfileForm } from "@/components/TeamProfileForm";
 import { ScoutingForm } from "@/components/ScoutingForm";
 
+import { cookies } from "next/headers";
+
 export default async function TeamProfilePage({
   params,
 }: {
@@ -16,6 +18,9 @@ export default async function TeamProfilePage({
 
   const session = await getServerSession(authOptions);
   const myTeamId = session?.user ? (session.user as { teamId: string }).teamId : null;
+
+  const cookieStore = await cookies();
+  const viewerId = cookieStore.get("viewer_team_id")?.value || myTeamId;
 
   const team = await prisma.team.findFirst({
     where: {
@@ -30,12 +35,12 @@ export default async function TeamProfilePage({
   });
   if (!team) notFound();
 
-  // Load the current uploader's perspective of this team's performance
-  const calcRating = myTeamId ? await prisma.calculatedRating.findUnique({
-    where: { uploaderId_subjectTeamId: { uploaderId: myTeamId, subjectTeamId: team.id } }
+  // Load the current viewer's public perspective of this team's performance
+  const calcRating = viewerId ? await prisma.calculatedRating.findUnique({
+    where: { uploaderId_subjectTeamId: { uploaderId: viewerId, subjectTeamId: team.id } }
   }) : null;
 
-  // Load the current user's private scouting records for this team
+  // Load the current user's *private* scouting records for this team
   const scoutData = myTeamId ? await prisma.scoutingData.findUnique({
     where: { scouterId_subjectTeamId: { scouterId: myTeamId, subjectTeamId: team.id } }
   }) : null;
@@ -45,8 +50,6 @@ export default async function TeamProfilePage({
     performanceRating: calcRating?.performanceRating ?? 100,
     ratingUncertainty: calcRating?.ratingUncertainty ?? 50,
     matchCount: calcRating?.matchCount ?? 0,
-    autoStrength: scoutData?.autoStrength ?? null,
-    driverStrength: scoutData?.driverStrength ?? null,
   };
 
   const isOwn = team.id === myTeamId;
@@ -58,7 +61,11 @@ export default async function TeamProfilePage({
           ← Teams
         </Link>
       </div>
-      <TeamProfileCard team={combinedTeam} />
+      <TeamProfileCard
+        team={combinedTeam}
+        autoStrength={scoutData?.autoStrength ?? null}
+        driverStrength={scoutData?.driverStrength ?? null}
+      />
 
       {myTeamId && (
         <ScoutingForm

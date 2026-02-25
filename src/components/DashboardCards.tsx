@@ -4,23 +4,17 @@ type Team = {
   performanceRating: number;
   ratingUncertainty: number;
   matchCount: number;
-  autoStrength: number | null;
-  driverStrength: number | null;
 };
-
-type Skills = {
-  driverSkillsScore: number | null;
-  autonomousSkillsScore: number | null;
-  combinedSkillsScore: number | null;
-} | null;
 
 export function DashboardCards({
   team,
-  skills,
+  autoStrength,
+  driverStrength,
   confidence,
 }: {
   team: Team;
-  skills: Skills;
+  autoStrength: number | null;
+  driverStrength: number | null;
   confidence: string;
 }) {
   const winRate = team.matchCount > 0 ? "—" : "—";
@@ -49,25 +43,12 @@ export function DashboardCards({
       <div className="stat-card c-green">
         <div className="stat-label">Scouting (Auto/Driv)</div>
         <div className="stat-value flex items-baseline gap-2">
-          <span className="text-amber-500">{team.autoStrength ?? "—"}</span>
+          <span className="text-amber-500">{autoStrength ?? "—"}</span>
           <span className="text-txt-3 text-lg">/</span>
-          <span className="text-green-500">{team.driverStrength ?? "—"}</span>
+          <span className="text-green-500">{driverStrength ?? "—"}</span>
         </div>
         <div className="stat-meta text-[10px]">
           0–10 Human evaluation
-        </div>
-      </div>
-
-      {/* Skills Score */}
-      <div className="stat-card c-red">
-        <div className="stat-label">Combined Skills</div>
-        <div className="stat-value text-red-500">{skills?.combinedSkillsScore ?? "—"}</div>
-        <div className="stat-meta text-[10px]">
-          {skills ? (
-            <span>D: {skills.driverSkillsScore ?? "—"} · A: {skills.autonomousSkillsScore ?? "—"}</span>
-          ) : (
-            <span>No skills recorded</span>
-          )}
         </div>
       </div>
     </div>

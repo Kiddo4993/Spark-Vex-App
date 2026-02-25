@@ -13,7 +13,6 @@ async function main() {
         existingTeam = await prisma.team.create({
             data: {
                 teamNumber,
-                performanceRating: 120, // imported rating
             }
         })
         console.log("Mock import created team:", existingTeam.id)
@@ -39,7 +38,6 @@ async function main() {
         const team = finalExistingTeam ?? await prisma.team.create({
             data: {
                 teamNumber,
-                performanceRating: 100,
             },
         })
         console.log("Team ID for user:", team.id)

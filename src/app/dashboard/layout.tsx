@@ -1,8 +1,10 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { Sidebar } from "@/components/Sidebar";
 import { DashboardNav } from "@/components/DashboardNav";
+import { DataSourceSelector } from "@/components/DataSourceSelector";
 
 export default async function DashboardLayout({
   children,
@@ -11,15 +13,14 @@ export default async function DashboardLayout({
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/signin");
-  const teamNumber = (session.user as { teamNumber: string }).teamNumber;
-  const isAdmin = (session.user as any).isAdmin === true;
 
-  // Auto-redirect admin to admin panel if they land on dashboard root
-  if (isAdmin && !teamNumber.includes("/")) {
-    // Actually, dashboard layout is a wrapper. We should check the current path if possible, 
-    // but getServerSession doesn't have the path.
-    // Better to do this in the dashboard/page.tsx or middleware for the root route.
-  }
+  const user = session.user as any;
+  const teamNumber = user.teamNumber as string;
+  const myTeamId = user.teamId as string;
+  const isAdmin = user.isAdmin === true;
+
+  const cookieStore = await cookies();
+  const currentViewerId = cookieStore.get("viewer_team_id")?.value;
 
   return (
     <div className="flex min-h-screen bg-surface-bg">
@@ -33,6 +34,12 @@ export default async function DashboardLayout({
             <strong className="text-txt-1 font-medium">Dashboard</strong>
           </div>
           <div className="ml-auto flex items-center gap-2.5">
+            {!isAdmin && (
+              <DataSourceSelector
+                myTeamId={myTeamId}
+                currentViewerId={currentViewerId}
+              />
+            )}
             <DashboardNav />
           </div>
         </div>

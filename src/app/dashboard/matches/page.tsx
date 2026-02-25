@@ -2,13 +2,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 export default async function MatchesPage() {
   const session = await getServerSession(authOptions);
   const teamId = session?.user ? (session.user as { teamId: string }).teamId : null;
+  const cookieStore = await cookies();
+  const viewerId = cookieStore.get("viewer_team_id")?.value || teamId;
 
   const matches = await prisma.match.findMany({
-    where: { uploaderId: teamId as string },
+    where: { uploaderId: viewerId as string },
     orderBy: { date: "desc" },
     take: 50,
     include: {
