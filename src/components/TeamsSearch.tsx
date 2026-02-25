@@ -19,23 +19,28 @@ export function TeamsSearch() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/teams", {
-      credentials: "include",
-    })
-      .then(async (r) => {
-        if (!r.ok) {
-          console.error("Failed:", r.status);
+    setLoading(true);
+
+    const url = query.trim()
+      ? `/api/teams?search=${encodeURIComponent(query)}`
+      : "/api/teams"; // fetch all teams if blank
+
+    fetch(url, { credentials: "include" })
+      .then(async (res) => {
+        if (!res.ok) {
+          console.error("Request failed:", res.status);
           return;
         }
-        const data = await r.json();
-        setTeams(data.teams ?? []);
+        const data = await res.json();
+        setTeams(data ?? []);
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
+        setTeams([]);
         setLoading(false);
       });
-  }, []);
+  }, [query]);
 
   const filtered = teams.filter((t) =>
     t.teamNumber.toLowerCase().includes(query.toLowerCase())
