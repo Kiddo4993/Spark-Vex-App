@@ -7,6 +7,7 @@ import { z } from "zod";
 const scoutSchema = z.object({
     autoStrength: z.number().min(0).max(10).nullable(),
     driverStrength: z.number().min(0).max(10).nullable(),
+    notes: z.string().optional().nullable(),
 });
 
 export async function PATCH(
@@ -43,6 +44,7 @@ export async function PATCH(
             update: {
                 autoStrength: parsed.data.autoStrength,
                 driverStrength: parsed.data.driverStrength,
+                notes: parsed.data.notes,
                 lastUpdated: new Date()
             },
             create: {
@@ -50,6 +52,7 @@ export async function PATCH(
                 subjectTeamId: subjectTeam.id,
                 autoStrength: parsed.data.autoStrength,
                 driverStrength: parsed.data.driverStrength,
+                notes: parsed.data.notes,
             },
         });
 
