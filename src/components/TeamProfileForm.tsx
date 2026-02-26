@@ -147,7 +147,6 @@ export function TeamProfileForm({
                   <option value="">Select…</option>
                   <option value="left">Left</option>
                   <option value="right">Right</option>
-                  <option value="skills">Skills</option>
                   <option value="both">Both</option>
                   <option value="none">None</option>
                 </select>

@@ -26,19 +26,19 @@ const config: Config = {
           }
         },
         gold: {
-          DEFAULT: "#F0A500",
-          dim: "rgba(240, 165, 0, 0.15)",
+          DEFAULT: "#4477FF", // Blue
+          dim: "rgba(68, 119, 255, 0.15)",
         },
         amber: {
-          DEFAULT: "#E89433",
-          dim: "rgba(232, 148, 51, 0.15)",
+          DEFAULT: "#6699FF", // Lighter blue
+          dim: "rgba(102, 153, 255, 0.15)",
         },
         success: {
-          DEFAULT: "#19D49E",
-          dim: "rgba(25, 212, 158, 0.15)",
+          DEFAULT: "#3366EE", // Strong blue
+          dim: "rgba(51, 102, 238, 0.15)",
         },
         danger: {
-          DEFAULT: "#E83333", // matching red
+          DEFAULT: "#E83333", // Red
           dim: "rgba(232, 51, 51, 0.15)",
         },
         surface: {
