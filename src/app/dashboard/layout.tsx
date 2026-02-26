@@ -3,8 +3,6 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { Sidebar } from "@/components/Sidebar";
-import { DashboardNav } from "@/components/DashboardNav";
-import { DataSourceSelector } from "@/components/DataSourceSelector";
 
 export default async function DashboardLayout({
   children,
@@ -32,15 +30,6 @@ export default async function DashboardLayout({
             <span>Spark VEX</span>
             <span>›</span>
             <strong className="text-txt-1 font-medium">Dashboard</strong>
-          </div>
-          <div className="ml-auto flex items-center gap-2.5">
-            {!isAdmin && (
-              <DataSourceSelector
-                myTeamId={myTeamId}
-                currentViewerId={currentViewerId}
-              />
-            )}
-            <DashboardNav />
           </div>
         </div>
         <main className="p-7">{children}</main>
