@@ -15,9 +15,19 @@ export async function GET(req: Request) {
     });
     if (!myTeam) return NextResponse.json({ error: "Team not found" }, { status: 404 });
 
-    // Get all potential partners
+    // Get only teams that have been imported (have CalculatedRating records from this uploader)
+    const importedRatings = await prisma.calculatedRating.findMany({
+        where: { uploaderId: myTeamId, subjectTeamId: { not: myTeam.id } },
+        select: { subjectTeamId: true },
+    });
+    const importedTeamIds = importedRatings.map(r => r.subjectTeamId);
+
+    if (importedTeamIds.length === 0) {
+        return NextResponse.json([]);
+    }
+
     const allTeams = await prisma.team.findMany({
-        where: { id: { not: myTeam.id }, teamNumber: { not: "ADMIN" } },
+        where: { id: { in: importedTeamIds }, teamNumber: { not: "ADMIN" } },
     });
 
     // Lookup scoped data

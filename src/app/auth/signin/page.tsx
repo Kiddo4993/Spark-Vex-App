@@ -81,14 +81,14 @@ export default function SignInPage() {
       <div className="auth-bg" />
       <div className="auth-card">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-gold flex items-center justify-center text-surface-bg font-mono font-bold text-lg">
+          <div className="w-10 h-10 bg-txt-1 flex items-center justify-center text-surface-bg font-mono font-bold text-lg">
             X
           </div>
           <div>
             <span className="font-head font-extrabold text-xl text-txt-1">
               Spark<span className="text-spark">VEX</span>
             </span>
-            <p className="text-[10px] font-mono text-txt-3 tracking-widest uppercase">ANALYST SUITE</p>
+            <p className="text-[10px] font-mono text-txt-3 tracking-widest uppercase">BAYESIAN PERFORMANCE MODEL</p>
           </div>
         </div>
 

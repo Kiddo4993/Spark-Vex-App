@@ -33,7 +33,6 @@ export default async function MatchesPage() {
         </div>
         <div className="flex gap-2.5">
           <Link href="/dashboard/import" className="btn-ghost">↑ Import</Link>
-          <Link href="/dashboard/matches/add" className="btn-primary">+ Add Match</Link>
         </div>
       </div>
 
@@ -85,7 +84,7 @@ export default async function MatchesPage() {
         {matches.length === 0 && (
           <div className="p-8 text-center">
             <p className="text-txt-3 text-sm mb-3">No matches yet.</p>
-            <Link href="/dashboard/matches/add" className="btn-primary text-xs">+ Add Match</Link>
+            <Link href="/dashboard/import" className="btn-primary text-xs">↑ Import Tournament Data</Link>
           </div>
         )}
       </div>

@@ -28,10 +28,25 @@ export async function GET(req: Request) {
     return NextResponse.json(team);
   }
 
+  // Get the current user's team ID to scope results to their imports
+  const myTeamId = session?.user ? (session.user as { teamId: string }).teamId : null;
+
+  // Get team IDs that have been imported (have CalculatedRating from this uploader)
+  const importedRatings = myTeamId ? await prisma.calculatedRating.findMany({
+    where: { uploaderId: myTeamId },
+    select: { subjectTeamId: true },
+  }) : [];
+  const importedTeamIds = importedRatings.map(r => r.subjectTeamId);
+
+  if (importedTeamIds.length === 0 && !teamNumber) {
+    return NextResponse.json([]);
+  }
+
   if (search && search.length >= 1) {
     const searchTeams = await prisma.team.findMany({
       where: {
         AND: [
+          { id: { in: importedTeamIds } },
           { teamNumber: { not: "ADMIN" } },
           {
             OR: [
@@ -44,15 +59,42 @@ export async function GET(req: Request) {
       },
       take: 50,
     });
-    return NextResponse.json(searchTeams);
+
+    // Attach calculated ratings for each team
+    const teamsWithRatings = await Promise.all(searchTeams.map(async (team) => {
+      const rating = await prisma.calculatedRating.findFirst({
+        where: { subjectTeamId: team.id, uploaderId: myTeamId! },
+      });
+      return {
+        ...team,
+        performanceRating: rating?.performanceRating ?? 0,
+        ratingUncertainty: rating?.ratingUncertainty ?? 50,
+        matchCount: rating?.matchCount ?? 0,
+      };
+    }));
+
+    return NextResponse.json(teamsWithRatings);
   }
 
   const allTeams = await prisma.team.findMany({
-    where: { teamNumber: { not: "ADMIN" } },
-    take: 50, // optional: limit to first 50 for performance
+    where: { id: { in: importedTeamIds }, teamNumber: { not: "ADMIN" } },
+    take: 50,
   });
 
-  return NextResponse.json(allTeams);
+  // Attach calculated ratings
+  const teamsWithRatings = await Promise.all(allTeams.map(async (team) => {
+    const rating = await prisma.calculatedRating.findFirst({
+      where: { subjectTeamId: team.id, uploaderId: myTeamId! },
+    });
+    return {
+      ...team,
+      performanceRating: rating?.performanceRating ?? 0,
+      ratingUncertainty: rating?.ratingUncertainty ?? 50,
+      matchCount: rating?.matchCount ?? 0,
+    };
+  }));
+
+  return NextResponse.json(teamsWithRatings);
 }
 
 export async function PATCH(req: Request) {

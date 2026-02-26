@@ -89,7 +89,7 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                             SparkVEX
                         </div>
                         <div className="text-[9px] font-mono text-txt-3 tracking-widest uppercase mt-[2px]">
-                            Analyst Suite
+                            Bayesian Performance
                         </div>
                     </div>
                 </div>

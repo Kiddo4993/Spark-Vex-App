@@ -22,3 +22,9 @@
  ✓ Compiled /api/auth/[...nextauth] in 1023ms (540 modules)
  GET /api/auth/session 200 in 10432ms
  GET /api/auth/session 200 in 404ms
+ ✓ Compiled in 3.1s (606 modules)
+ ✓ Compiled in 4.1s (314 modules)
+ ✓ Compiled in 609ms (314 modules)
+ ✓ Compiled in 566ms (314 modules)
+ ✓ Compiled in 2.4s (314 modules)
+ ✓ Compiled in 1249ms (766 modules)
