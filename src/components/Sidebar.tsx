@@ -9,7 +9,7 @@ const getAdminSections = () => [
     {
         label: "Management",
         items: [
-            { href: "/dashboard/admin", icon: "⚙", label: "Admin Panel" },
+            { href: "/dashboard/admin", label: "Admin Panel" },
         ],
     },
 ];
@@ -18,31 +18,31 @@ const getTeamSections = (teamNumber: string) => [
     {
         label: "Overview",
         items: [
-            { href: "/dashboard", icon: "◈", label: "Dashboard" },
-            { href: `/dashboard/teams/${teamNumber}`, icon: "◇", label: "Team Profile" },
-            { href: "/dashboard/matches", icon: "⊡", label: "Matches" },
+            { href: "/dashboard", label: "Dashboard" },
+            { href: `/dashboard/teams/${teamNumber}`, label: "Team Profile" },
+            { href: "/dashboard/matches", label: "Matches" },
         ],
     },
     {
         label: "Database",
         items: [
-            { href: "/dashboard/alliance-selection", icon: "⚑", label: "Alliance Selection" },
-            { href: "/dashboard/teams", icon: "❖", label: "Imported Teams" },
-            { href: "/dashboard/connect", icon: "⌕", label: "Find & Connect" },
-            { href: "/dashboard/connections", icon: "⊙", label: "Connections" },
+            { href: "/dashboard/alliance-selection", label: "Alliance Selection" },
+            { href: "/dashboard/teams", label: "Imported Teams" },
+            { href: "/dashboard/connect", label: "Find & Connect" },
+            { href: "/dashboard/connections", label: "Connections" },
         ],
     },
     {
         label: "Workspace",
         items: [
-            { href: "/dashboard/import", icon: "↑", label: "Import Tournament" },
-            { href: "/dashboard/notes", icon: "✎", label: "Team Notes" },
+            { href: "/dashboard/import", label: "Import Tournament" },
+            { href: "/dashboard/notes", label: "Team Notes" },
         ],
     },
     {
         label: "Help",
         items: [
-            { href: "/dashboard/guide", icon: "📖", label: "Walkthrough Guide" },
+            { href: "/dashboard/guide", label: "Walkthrough Guide" },
         ],
     },
 ];
@@ -104,7 +104,7 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                             {section.label}
                         </div>
                         {section.items.map((item) => {
-                            const { href, icon, label } = item;
+                            const { href, label } = item;
                             const isExternal = (item as any).external;
                             const isActive = pathname === href;
                             const showUnreadDot = label === "Connections" && unreadCount > 0;
@@ -117,8 +117,8 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                                     rel={isExternal ? "noopener noreferrer" : undefined}
                                     className={`nav-item ${isActive ? "active" : ""} flex items-center justify-between`}
                                 >
-                                    <div className="flex items-center">
-                                        <span className="nav-icon">{icon}</span>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-txt-3 opacity-30 group-hover:opacity-100 transition-opacity" />
                                         {label}
                                     </div>
                                     {showUnreadDot && (

@@ -55,7 +55,7 @@ export default function GuidePage() {
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 text-blue-500 hover:text-blue-400 font-bold border border-blue-500/30 bg-blue-500/10 px-4 py-2 mt-2 rounded transition-colors"
                         >
-                            📖 Read the Full Import Guide on Google Docs ↗
+                            Read the Full Import Guide on Google Docs -&gt;
                         </a>
                     </div>
                 </div>
@@ -65,7 +65,7 @@ export default function GuidePage() {
                     <h2 className="text-lg font-mono font-bold text-danger mb-3 uppercase tracking-widest border-b border-danger/20 pb-2">3. What is Re-Scout?</h2>
                     <div className="space-y-3 text-sm text-txt-1 leading-relaxed">
                         <p>
-                            You may see a <strong>⚠️ RE-SCOUT</strong> or <strong>LOW CONFIDENCE</strong> warning next to certain teams. This happens when the Bayesian model doesn't have enough consistent data to be sure of their actual performance level.
+                            You may see a <strong>[!] RE-SCOUT</strong> or <strong>LOW CONFIDENCE</strong> warning next to certain teams. This happens when the Bayesian model doesn't have enough consistent data to be sure of their actual performance level.
                         </p>
                         <p>
                             A low confidence score (usually below 50%) means their rating could fluctuate wildly in their next few matches.
