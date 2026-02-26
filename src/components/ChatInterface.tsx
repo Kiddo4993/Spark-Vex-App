@@ -88,7 +88,7 @@ export function ChatInterface({
                         const isMe = m.fromTeamId === currentTeamId;
                         return (
                             <div key={m.id} className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
-                                <div className={`px-4 py-2 rounded-2xl max-w-[85%] text-sm shadow-sm ${isMe ? "bg-cyan-600/20 text-cyan-50 border border-cyan-500/30 rounded-br-sm" : "bg-surface-card text-txt-2 border border-line rounded-bl-sm"}`}>
+                                <div className={`px-4 py-2 max-w-[85%] text-sm shadow-sm ${isMe ? "bg-red-500/20 text-red-50 border border-red-500/30 rounded-2xl rounded-br-sm" : "bg-surface-card text-txt-2 border border-line rounded-2xl rounded-bl-sm"}`}>
                                     {m.content}
                                 </div>
                                 <span className="text-[9px] text-txt-3 mt-1.5 font-mono">
