@@ -110,7 +110,6 @@ export default async function DashboardPage() {
           {!isViewingOther && (
             <>
               <Link href={`/dashboard/teams/${team.teamNumber}`} className="btn-ghost">✎ Edit Profile</Link>
-              <Link href="/dashboard/matches/add" className="btn-primary">+ Add Match</Link>
             </>
           )}
         </div>
@@ -262,7 +261,7 @@ export default async function DashboardPage() {
       {/* High uncertainty alert */}
       {ratingUncertainty > SCOUT_NEEDED_THRESHOLD && (
         <div className="alert alert-info">
-          <span className="alert-icon">⚡</span>
+          <span className="alert-icon">ℹ</span>
           <div className="alert-body">
             <strong>High uncertainty detected.</strong> Your rating confidence interval is wide (±{ratingUncertainty.toFixed(1)}). Add more match data to tighten your Bayesian estimate.
           </div>
