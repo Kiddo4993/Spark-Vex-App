@@ -45,6 +45,12 @@ export default async function TeamProfilePage({
     where: { scouterId_subjectTeamId: { scouterId: myTeamId, subjectTeamId: team.id } }
   }) : null;
 
+  // Load the current user's full team to compare Auton sides
+  const myTeamData = myTeamId && myTeamId !== team.id ? await prisma.team.findUnique({
+    where: { id: myTeamId },
+    select: { autonomousSide: true }
+  }) : null;
+
   const combinedTeam = {
     ...team,
     performanceRating: calcRating?.performanceRating ?? 100,
@@ -65,6 +71,7 @@ export default async function TeamProfilePage({
         team={combinedTeam}
         autoStrength={scoutData?.autoStrength ?? null}
         driverStrength={scoutData?.driverStrength ?? null}
+        myTeamAutonSide={myTeamData?.autonomousSide ?? null}
       />
 
       {myTeamId && (

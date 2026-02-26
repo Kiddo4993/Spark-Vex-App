@@ -41,7 +41,7 @@ const getTeamSections = (teamNumber: string) => [
     {
         label: "Help",
         items: [
-            { href: "https://google.com", icon: "📖", label: "Walkthrough Guide", external: true },
+            { href: "/dashboard/guide", icon: "📖", label: "Walkthrough Guide" },
         ],
     },
 ];

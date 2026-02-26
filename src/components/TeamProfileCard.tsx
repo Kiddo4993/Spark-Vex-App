@@ -39,11 +39,13 @@ function autonSideLabel(side: string | null) {
 export function TeamProfileCard({
   team,
   autoStrength,
-  driverStrength
+  driverStrength,
+  myTeamAutonSide
 }: {
   team: Team;
   autoStrength: number | null;
   driverStrength: number | null;
+  myTeamAutonSide?: string | null;
 }) {
   const confidence = Math.min(
     100,
@@ -82,7 +84,7 @@ export function TeamProfileCard({
         {/* Right side primary stat */}
         <div className="md:text-right flex flex-col items-start md:items-end">
           <span className="text-[10px] font-mono text-txt-3 tracking-widest uppercase mb-1">Bayesian Rating</span>
-          <div className="text-5xl font-mono font-bold text-cyan-400 leading-none">
+          <div className="text-5xl font-mono font-bold text-blue-500 leading-none">
             {team.performanceRating.toFixed(1)}
           </div>
           <div className="text-[10px] font-mono text-txt-2 mt-1">±{team.ratingUncertainty.toFixed(1)}</div>
@@ -93,17 +95,17 @@ export function TeamProfileCard({
       <div className="grid grid-cols-2 md:grid-cols-4 border-b border-line bg-surface-card/20">
         <div className="p-4 border-r border-b md:border-b-0 border-line py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Model Confidence</div>
-          <div className={`text-4xl font-mono font-bold ${confidence > 80 ? "text-success" : confidence > 50 ? "text-amber-500" : "text-danger"}`}>
+          <div className={`text-4xl font-mono font-bold ${confidence > 80 ? "text-blue-400" : confidence > 50 ? "text-txt-2" : "text-danger"}`}>
             {confidence}%
           </div>
         </div>
         <div className="p-4 border-r border-b md:border-b-0 border-line py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Auto Strength</div>
-          <div className="text-4xl font-mono font-bold text-amber-500">{autoStrength ?? "—"}</div>
+          <div className="text-4xl font-mono font-bold text-txt-1">{autoStrength ?? "—"}</div>
         </div>
         <div className="p-4 border-r border-line md:border-r py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Driver Strength</div>
-          <div className="text-4xl font-mono font-bold text-green-500">{driverStrength ?? "—"}</div>
+          <div className="text-4xl font-mono font-bold text-txt-1">{driverStrength ?? "—"}</div>
         </div>
         <div className="p-4 py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Matches Played</div>
@@ -120,11 +122,11 @@ export function TeamProfileCard({
             <div>
               <div className="flex justify-between items-baseline mb-1.5 text-[10px] font-mono">
                 <span className="text-txt-2 uppercase tracking-wider">Autonomous Routine</span>
-                <span className="text-amber-500 font-bold">{autoStrength != null ? `${autoStrength}/10` : "—"}</span>
+                <span className="text-txt-1 font-bold">{autoStrength != null ? `${autoStrength}/10` : "—"}</span>
               </div>
               <div className="h-1.5 w-full bg-line rounded-none overflow-hidden mt-1">
                 <div
-                  className="h-full bg-amber-500 transition-all"
+                  className="h-full bg-blue-500 transition-all"
                   style={{ width: autoStrength != null ? `${autoStrength * 10}%` : "0%" }}
                 />
               </div>
@@ -133,11 +135,11 @@ export function TeamProfileCard({
             <div>
               <div className="flex justify-between items-baseline mb-1.5 text-[10px] font-mono">
                 <span className="text-txt-2 uppercase tracking-wider">Driver Control</span>
-                <span className="text-green-500 font-bold">{driverStrength != null ? `${driverStrength}/10` : "—"}</span>
+                <span className="text-txt-1 font-bold">{driverStrength != null ? `${driverStrength}/10` : "—"}</span>
               </div>
               <div className="h-1.5 w-full bg-line rounded-none overflow-hidden mt-1">
                 <div
-                  className="h-full bg-green-500 transition-all"
+                  className="h-full bg-blue-400 transition-all"
                   style={{ width: driverStrength != null ? `${driverStrength * 10}%` : "0%" }}
                 />
               </div>
@@ -176,7 +178,14 @@ export function TeamProfileCard({
                   <div className="p-3 border-r border-line bg-surface-bg/30 flex items-center">
                     <span className="text-[10px] font-mono text-txt-3 tracking-widest">AUTON SIDE</span>
                   </div>
-                  <div className="p-3 font-mono font-bold text-sm text-txt-1">{autonSideLabel(team.autonomousSide)}</div>
+                  <div className="p-3 flex items-center gap-3">
+                    <span className="font-mono font-bold text-sm text-txt-1">{autonSideLabel(team.autonomousSide)}</span>
+                    {myTeamAutonSide && myTeamAutonSide !== "none" && team.autonomousSide !== "none" && (
+                      <span className="font-bold text-txt-1 text-[10px] uppercase tracking-widest border border-txt-1 px-1.5 py-0.5 ml-2">
+                        {(team.autonomousSide === myTeamAutonSide && team.autonomousSide !== "both") ? "CONFLICTING" : "COMPATIBLE"}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
               {team.autonReliabilityPct !== null && (
@@ -184,7 +193,7 @@ export function TeamProfileCard({
                   <div className="p-3 border-r border-line bg-surface-bg/30 flex items-center">
                     <span className="text-[10px] font-mono text-txt-3 tracking-widest">RELIABILITY</span>
                   </div>
-                  <div className={`p-3 font-mono font-bold text-sm ${team.autonReliabilityPct >= 70 ? "text-success" : team.autonReliabilityPct >= 40 ? "text-amber-500" : "text-danger"}`}>
+                  <div className={`p-3 font-mono font-bold text-sm ${team.autonReliabilityPct >= 70 ? "text-blue-500" : team.autonReliabilityPct >= 40 ? "text-txt-2" : "text-danger"}`}>
                     {team.autonReliabilityPct}%
                   </div>
                 </div>
