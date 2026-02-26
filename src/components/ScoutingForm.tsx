@@ -7,14 +7,17 @@ export function ScoutingForm({
     teamNumber,
     initialAuto,
     initialDriver,
+    initialNotes,
 }: {
     teamNumber: string;
     initialAuto: number | null;
     initialDriver: number | null;
+    initialNotes: string | null;
 }) {
     const router = useRouter();
     const [autoStrength, setAutoStrength] = useState<number | null>(initialAuto);
     const [driverStrength, setDriverStrength] = useState<number | null>(initialDriver);
+    const [notes, setNotes] = useState(initialNotes ?? "");
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
@@ -32,6 +35,7 @@ export function ScoutingForm({
                 body: JSON.stringify({
                     autoStrength,
                     driverStrength,
+                    notes: notes || null,
                 }),
             });
             if (!res.ok) {
@@ -142,6 +146,18 @@ export function ScoutingForm({
                                     />
                                 </>
                             )}
+                        </div>
+
+                        {/* Private Notes */}
+                        <div className="border-t border-line pt-6">
+                            <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-4">Private Notes</h4>
+                            <textarea
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                                className="input min-h-[100px] resize-y font-mono text-[13px]"
+                                placeholder="Write private notes about this team's performance, autos, interactions..."
+                                rows={4}
+                            />
                         </div>
                     </div>
 

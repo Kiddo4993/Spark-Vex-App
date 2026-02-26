@@ -24,10 +24,11 @@ const getTeamSections = (teamNumber: string) => [
         ],
     },
     {
-        label: "Competition",
+        label: "Database",
         items: [
-            { href: "/dashboard/alliance-selection", icon: "◉", label: "Alliance Selection" },
-            { href: "/dashboard/teams", icon: "⊞", label: "Teams" },
+            { href: "/dashboard/alliance-selection", icon: "⚑", label: "Alliance Selection" },
+            { href: "/dashboard/teams", icon: "❖", label: "Imported Teams" },
+            { href: "/dashboard/connect", icon: "⌕", label: "Find & Connect" },
             { href: "/dashboard/connections", icon: "⊙", label: "Connections" },
         ],
     },

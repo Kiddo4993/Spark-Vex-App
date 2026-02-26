@@ -79,6 +79,7 @@ export default async function TeamProfilePage({
           teamNumber={team.teamNumber}
           initialAuto={scoutData?.autoStrength ?? null}
           initialDriver={scoutData?.driverStrength ?? null}
+          initialNotes={scoutData?.notes ?? null}
         />
       )}
 

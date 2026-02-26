@@ -143,6 +143,7 @@ model ScoutingData {
   subjectTeam       Team     @relation("ScoutingSubject", fields: [subjectTeamId], references: [id], onDelete: Cascade)
   autoStrength      Float?    // 0-10 scale
   driverStrength    Float?    // 0-10 scale
+  notes             String?   @db.Text
   lastUpdated       DateTime @default(now())
 
   @@unique([scouterId, subjectTeamId])
