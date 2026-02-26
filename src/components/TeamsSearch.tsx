@@ -87,21 +87,23 @@ export function TeamsSearch() {
                   <div>
                     <p className="stat-label">Rating</p>
                     <p className="font-head text-2xl font-extrabold text-txt-1 tracking-tight leading-none">
-                      {Math.round(team.performanceRating)}
+                      {team.matchCount > 0 ? Math.round(team.performanceRating) : "N/A"}
                     </p>
                   </div>
 
                   <div>
                     <div className="flex justify-between items-center mb-1">
                       <span className="stat-label !mb-0">Confidence</span>
-                      <span className="text-[11px] font-mono text-txt-2">{confidence}%</span>
+                      <span className="text-[11px] font-mono text-txt-2">{team.matchCount > 0 ? `${confidence}%` : "N/A"}</span>
                     </div>
                     <div className="rating-bar-bg !h-1">
-                      <div
-                        className={`h-full rounded-full ${confidence > 80 ? "bg-success" : confidence > 50 ? "bg-amber" : "bg-danger"
-                          }`}
-                        style={{ width: `${confidence}%` }}
-                      />
+                      {team.matchCount > 0 && (
+                        <div
+                          className={`h-full rounded-full ${confidence > 80 ? "bg-success" : confidence > 50 ? "bg-txt-2" : "bg-danger"
+                            }`}
+                          style={{ width: `${confidence}%` }}
+                        />
+                      )}
                     </div>
                   </div>
 
@@ -111,11 +113,12 @@ export function TeamsSearch() {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="text-[10px] font-mono uppercase text-txt-3 tracking-wider">Confidence</div>
-                      <div className={`font-mono text-xs font-bold ${(1 - team.ratingUncertainty / 50) * 100 > 80 ? "text-success" :
-                          (1 - team.ratingUncertainty / 50) * 100 > 50 ? "text-amber" :
+                      <div className={`font-mono text-xs font-bold ${team.matchCount > 0 ? (
+                        confidence > 80 ? "text-success" :
+                          confidence > 50 ? "text-txt-2" :
                             "text-danger"
-                        }`}>
-                        {Math.max(0, Math.min(100, Math.round((1 - team.ratingUncertainty / 50) * 100)))}%
+                      ) : "text-txt-3"}`}>
+                        {team.matchCount > 0 ? `${Math.max(0, Math.min(100, Math.round((1 - team.ratingUncertainty / 50) * 100)))}%` : "N/A"}
                       </div>
                     </div>
                   </div>     {(team.provinceState || team.country) && (

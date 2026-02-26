@@ -26,12 +26,12 @@ const config: Config = {
           }
         },
         gold: {
-          DEFAULT: "#4477FF", // Blue
-          dim: "rgba(68, 119, 255, 0.15)",
+          DEFAULT: "#3366EE", // Blue
+          dim: "rgba(51, 102, 238, 0.15)",
         },
         amber: {
-          DEFAULT: "#6699FF", // Lighter blue
-          dim: "rgba(102, 153, 255, 0.15)",
+          DEFAULT: "#E83333", // Red
+          dim: "rgba(232, 51, 51, 0.15)",
         },
         success: {
           DEFAULT: "#3366EE", // Strong blue

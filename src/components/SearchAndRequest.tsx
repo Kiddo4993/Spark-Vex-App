@@ -14,7 +14,7 @@ export function SearchAndRequest({ currentTeamId }: { currentTeamId: string }) {
     setLoading(true);
     setMessage("");
     try {
-      const res = await fetch(`/api/teams?search=${encodeURIComponent(search)}`);
+      const res = await fetch(`/api/teams/global?search=${encodeURIComponent(search)}`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setTeams(data.filter((t: { id: string }) => t.id !== currentTeamId));
