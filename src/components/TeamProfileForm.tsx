@@ -129,11 +129,11 @@ export function TeamProfileForm({
                   className="input"
                 >
                   <option value="">Select…</option>
-                  <option value="tank">Tank Drive</option>
-                  <option value="mecanum">Mecanum</option>
-                  <option value="holonomic">Holonomic / X-Drive</option>
-                  <option value="swerve">Swerve</option>
-                  <option value="other">Other</option>
+                  <option value="full-omni">Full Omni Tank Drive</option>
+                  <option value="traction">Traction Tank Drive</option>
+                  <option value="x-drive">X-Drive</option>
+                  <option value="h-drive">H-Drive</option>
+                  <option value="mecanum">Mecanum drive</option>
                 </select>
               </div>
               <div>

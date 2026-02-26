@@ -58,12 +58,12 @@ export default async function LandingPage() {
                     BAYESIAN PERFORMANCE MODEL
                   </p>
                   <p className="text-txt-2 text-sm leading-relaxed">
-                    Compared to traditional ranking systems such as the Elo system, the Bayesian Performance Model accounts for inconsistencies, allocates <span className="text-gold font-medium">scoring fairly</span>, and <span className="text-gold font-medium">gives each team</span> an uncertainty rating. This results in a more layered and less volatile model.
+                    Compared to traditional ranking systems such as the Elo system, the Bayesian Performance Model accounts for inconsistencies, allocates <span className="text-blue-500 font-medium">scoring fairly</span>, and <span className="text-blue-500 font-medium">gives each team</span> an uncertainty rating. This results in a more layered and less volatile model.
                   </p>
                 </div>
 
                 <div className="space-y-3">
-                  <p className="text-sm font-bold text-cyan-400 uppercase tracking-widest border-b border-cyan-400/20 pb-1.5">
+                  <p className="text-sm font-bold text-blue-500 uppercase tracking-widest border-b border-blue-500/20 pb-1.5">
                     RANK TEAMS FROM ANY TOURNAMENT
                   </p>
                   <p className="text-txt-2 text-sm leading-relaxed">
@@ -72,7 +72,7 @@ export default async function LandingPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <p className="text-sm font-bold text-amber-500 uppercase tracking-widest border-b border-amber-500/20 pb-1.5">
+                  <p className="text-sm font-bold text-spark uppercase tracking-widest border-b border-spark/20 pb-1.5">
                     DIRECT MESSAGE OTHER TEAMS
                   </p>
                   <p className="text-txt-2 text-sm leading-relaxed">
@@ -81,20 +81,20 @@ export default async function LandingPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <p className="text-sm font-bold text-purple-400 uppercase tracking-widest border-b border-purple-400/20 pb-1.5">
+                  <p className="text-sm font-bold text-blue-400 uppercase tracking-widest border-b border-blue-400/20 pb-1.5">
                     TEAM PROFILES
                   </p>
                   <p className="text-txt-2 text-sm leading-relaxed">
-                    Make a profile for your team to make it easier for others to discover you. Add details such as pictures of your bot, your type <span className="text-gold font-medium">of match</span>, autonomous, and a description of your team.
+                    Make a profile for your team to make it easier for others to discover you. Add details such as pictures of your bot, your type <span className="text-blue-500 font-medium">of match</span>, autonomous, and a description of your team.
                   </p>
                 </div>
 
                 <div className="space-y-3">
-                  <p className="text-sm font-bold text-emerald-400 uppercase tracking-widest border-b border-emerald-400/20 pb-1.5">
+                  <p className="text-sm font-bold text-red-500 uppercase tracking-widest border-b border-red-500/20 pb-1.5">
                     SCOUTING NOTES
                   </p>
                   <p className="text-txt-2 text-sm leading-relaxed">
-                    Quickly add notes <span className="text-gold font-medium">about teams</span> you're interested in aligning with, <span className="text-gold font-medium">such as</span> driver skill, autonomous side, autonomous type, and bot type.
+                    Quickly add notes <span className="text-blue-500 font-medium">about teams</span> you're interested in aligning with, <span className="text-blue-500 font-medium">such as</span> driver skill, autonomous side, autonomous type, and bot type.
                   </p>
                 </div>
               </div>

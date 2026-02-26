@@ -2,8 +2,8 @@
 
 type Team = {
   teamNumber: string;
-  performanceRating: number;
-  ratingUncertainty: number;
+  performanceRating: number | null;
+  ratingUncertainty: number | null;
   matchCount: number;
   drivetrainType: string | null;
   autonomousSide: string | null;
@@ -16,11 +16,11 @@ type Team = {
 
 function drivetrainLabel(type: string | null) {
   const map: Record<string, string> = {
-    tank: "Tank Drive",
-    mecanum: "Mecanum",
-    holonomic: "Holonomic / X-Drive",
-    swerve: "Swerve",
-    other: "Other",
+    "full-omni": "Full Omni Tank Drive",
+    "traction": "Traction Tank Drive",
+    "x-drive": "X-Drive",
+    "h-drive": "H-Drive",
+    "mecanum": "Mecanum drive",
   };
   return type ? map[type] || type : null;
 }
@@ -47,10 +47,10 @@ export function TeamProfileCard({
   driverStrength: number | null;
   myTeamAutonSide?: string | null;
 }) {
-  const confidence = Math.min(
+  const confidence = team.ratingUncertainty !== null ? Math.min(
     100,
     Math.round(Math.max(0, 1 - team.ratingUncertainty / 50) * 100)
-  );
+  ) : null;
 
   return (
     <div className="space-y-6">
@@ -85,9 +85,11 @@ export function TeamProfileCard({
         <div className="md:text-right flex flex-col items-start md:items-end">
           <span className="text-[10px] font-mono text-txt-3 tracking-widest uppercase mb-1">Bayesian Rating</span>
           <div className="text-5xl font-mono font-bold text-blue-500 leading-none">
-            {team.performanceRating.toFixed(1)}
+            {team.performanceRating !== null ? team.performanceRating.toFixed(1) : "N/A"}
           </div>
-          <div className="text-[10px] font-mono text-txt-2 mt-1">±{team.ratingUncertainty.toFixed(1)}</div>
+          <div className="text-[10px] font-mono text-txt-2 mt-1">
+            {team.ratingUncertainty !== null ? `±${team.ratingUncertainty.toFixed(1)}` : "—"}
+          </div>
         </div>
       </div>
 
@@ -95,8 +97,8 @@ export function TeamProfileCard({
       <div className="grid grid-cols-2 md:grid-cols-4 border-b border-line bg-surface-card/20">
         <div className="p-4 border-r border-b md:border-b-0 border-line py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Model Confidence</div>
-          <div className={`text-4xl font-mono font-bold ${confidence > 80 ? "text-blue-400" : confidence > 50 ? "text-txt-2" : "text-danger"}`}>
-            {confidence}%
+          <div className={`text-4xl font-mono font-bold ${confidence !== null && confidence > 80 ? "text-blue-400" : confidence !== null && confidence > 50 ? "text-txt-2" : "text-danger"}`}>
+            {confidence !== null ? `${confidence}%` : "—"}
           </div>
         </div>
         <div className="p-4 border-r border-b md:border-b-0 border-line py-6 flex flex-col items-center text-center">
@@ -147,10 +149,9 @@ export function TeamProfileCard({
           </div>
 
           {/* Re-scout warning */}
-          {confidence < 50 && (
+          {confidence !== null && confidence < 50 && (
             <div className="mt-6 border-l-[3px] border-danger bg-danger/5 px-4 py-3">
               <div className="flex items-center gap-2 mb-1 text-danger">
-                <span className="text-xs">⚠️</span>
                 <span className="font-mono text-[10px] font-bold tracking-widest uppercase">Low Confidence</span>
               </div>
               <p className="text-xs text-txt-2">Consider scheduling a re-scout for this team.</p>

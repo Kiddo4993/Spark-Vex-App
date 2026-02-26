@@ -53,8 +53,8 @@ export default async function TeamProfilePage({
 
   const combinedTeam = {
     ...team,
-    performanceRating: calcRating?.performanceRating ?? 100,
-    ratingUncertainty: calcRating?.ratingUncertainty ?? 50,
+    performanceRating: calcRating?.performanceRating ?? null,
+    ratingUncertainty: calcRating?.ratingUncertainty ?? null,
     matchCount: calcRating?.matchCount ?? 0,
   };
 
