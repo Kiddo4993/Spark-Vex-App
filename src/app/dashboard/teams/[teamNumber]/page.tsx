@@ -40,6 +40,11 @@ export default async function TeamProfilePage({
     where: { uploaderId_subjectTeamId: { uploaderId: viewerId, subjectTeamId: team.id } }
   }) : null;
 
+  // Load the subject team's OWN self-evaluation (public data visible to everyone)
+  const selfEval = await prisma.scoutingData.findUnique({
+    where: { scouterId_subjectTeamId: { scouterId: team.id, subjectTeamId: team.id } }
+  });
+
   // Load the current user's *private* scouting records for this team
   const scoutData = myTeamId ? await prisma.scoutingData.findUnique({
     where: { scouterId_subjectTeamId: { scouterId: myTeamId, subjectTeamId: team.id } }
@@ -69,17 +74,31 @@ export default async function TeamProfilePage({
       </div>
       <TeamProfileCard
         team={combinedTeam}
-        autoStrength={scoutData?.autoStrength ?? null}
-        driverStrength={scoutData?.driverStrength ?? null}
+        autoStrength={selfEval?.autoStrength ?? null}
+        driverStrength={selfEval?.driverStrength ?? null}
         myTeamAutonSide={myTeamData?.autonomousSide ?? null}
+        selfEvalNotes={selfEval?.notes ?? null}
       />
 
-      {myTeamId && (
+      {/* Public Self-Profile (only shown when editing your OWN profile) */}
+      {isOwn && (
+        <ScoutingForm
+          teamNumber={team.teamNumber}
+          initialAuto={selfEval?.autoStrength ?? null}
+          initialDriver={selfEval?.driverStrength ?? null}
+          initialNotes={selfEval?.notes ?? null}
+          isOwnProfile={true}
+        />
+      )}
+
+      {/* Private Scouting Worksheet (shown for any team you want to scout, including yourself) */}
+      {myTeamId && !isOwn && (
         <ScoutingForm
           teamNumber={team.teamNumber}
           initialAuto={scoutData?.autoStrength ?? null}
           initialDriver={scoutData?.driverStrength ?? null}
           initialNotes={scoutData?.notes ?? null}
+          isOwnProfile={false}
         />
       )}
 

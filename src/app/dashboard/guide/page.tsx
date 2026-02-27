@@ -47,7 +47,7 @@ export default function GuidePage() {
                     <h2 className="text-lg font-mono font-bold text-txt-1 mb-3 uppercase tracking-widest border-b border-line pb-2">3. Importing Match Data</h2>
                     <div className="space-y-3 text-sm text-txt-2 leading-relaxed">
                         <p>
-                            To populate your dashboard, you must upload Excel (.xls) match data exported from Tournament Manager. For a full, step-by-step tutorial with screenshots, please read the official guide:
+                            To add to your dashboard, you must upload Excel (.xls) match data exported from Tournament Manager. For a full, step-by-step tutorial with screenshots, please read the official guide. Also, there are some other guides if you have questions with the website:
                         </p>
                         <a
                             href="https://docs.google.com/document/d/1QkZPt5vzlkWANJGR2gNyTO814pWpXtu8hT8J_cDw5Is/edit?pli=1&tab=t.0#heading=h.1knhsf7p9lel"
@@ -55,14 +55,14 @@ export default function GuidePage() {
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 text-blue-500 hover:text-blue-400 font-bold border border-blue-500/30 bg-blue-500/10 px-4 py-2 mt-2 rounded transition-colors"
                         >
-                            Read the Full Import Guide on Google Docs -&gt;
+                            Read the Full Import Guide and Other Guides on Google Docs -&gt;
                         </a>
                     </div>
                 </div>
 
-                {/* 3. Re-scouting & Confidence */}
+                {/* 4. Re-scouting & Confidence */}
                 <div className="card border-l-[3px] border-danger bg-danger/5">
-                    <h2 className="text-lg font-mono font-bold text-danger mb-3 uppercase tracking-widest border-b border-danger/20 pb-2">3. What is Re-Scout?</h2>
+                    <h2 className="text-lg font-mono font-bold text-danger mb-3 uppercase tracking-widest border-b border-danger/20 pb-2">4. What is Re-Scout?</h2>
                     <div className="space-y-3 text-sm text-txt-1 leading-relaxed">
                         <p>
                             You may see a <strong>[!] RE-SCOUT</strong> or <strong>LOW CONFIDENCE</strong> warning next to certain teams. This happens when the Bayesian model doesn't have enough consistent data to be sure of their actual performance level.
@@ -79,9 +79,9 @@ export default function GuidePage() {
                     </div>
                 </div>
 
-                {/* 4. Auton Compatibility */}
+                {/* 5. Auton Compatibility */}
                 <div className="card">
-                    <h2 className="text-lg font-mono font-bold text-txt-1 mb-3 uppercase tracking-widest border-b border-line pb-2">4. Auton Compatibility</h2>
+                    <h2 className="text-lg font-mono font-bold text-txt-1 mb-3 uppercase tracking-widest border-b border-line pb-2">5. Auton Compatibility</h2>
                     <div className="space-y-3 text-sm text-txt-2 leading-relaxed">
                         <p>
                             When preparing for Alliance Selection, autonomous compatibility is critical. Ensure you configure your own team's <strong>Auton Side</strong> (Left, Right, Both, None) in your profile.

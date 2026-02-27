@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 type Team = {
@@ -44,6 +44,25 @@ export function ConnectionsList({
 }) {
   const [processing, setProcessing] = useState<string | null>(null);
   const [chatToTeam, setChatToTeam] = useState<Team | null>(null);
+  const [unreadByTeam, setUnreadByTeam] = useState<Record<string, number>>({});
+
+  // Poll for per-team unread messages
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const res = await fetch("/api/messages/unread-per-team");
+        if (res.ok) {
+          const data = await res.json();
+          setUnreadByTeam(data.unreadByTeam || {});
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   async function acceptOrDeny(connectionId: string, action: "accept" | "deny") {
     setProcessing(connectionId);
@@ -156,10 +175,13 @@ export function ConnectionsList({
                 </Link>
                 <button
                   onClick={() => setChatToTeam(t)}
-                  className="px-3 py-2 text-txt-3 hover:text-txt-1 bg-surface-bg hover:bg-surface-hover transition-colors"
+                  className="relative px-3 py-2 text-txt-3 hover:text-txt-1 bg-surface-bg hover:bg-surface-hover transition-colors"
                   title="Open Chat"
                 >
                   💬
+                  {unreadByTeam[t.id] > 0 && (
+                    <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-danger animate-pulse border border-surface-bg" />
+                  )}
                 </button>
               </div>
             ))}
