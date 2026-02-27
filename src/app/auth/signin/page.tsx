@@ -86,7 +86,7 @@ export default function SignInPage() {
           </div>
           <div>
             <span className="font-head font-extrabold text-xl text-txt-1">
-              Spark<span className="text-spark">VEX</span>
+              SparkVEX
             </span>
             <p className="text-[10px] font-mono text-txt-3 tracking-widest uppercase">BAYESIAN PERFORMANCE MODEL</p>
           </div>

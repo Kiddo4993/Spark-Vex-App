@@ -38,17 +38,24 @@ function autonSideLabel(side: string | null) {
 
 export function TeamProfileCard({
   team,
-  autoStrength,
-  driverStrength,
+  publicAuto,
+  publicDriver,
+  scouterAuto,
+  scouterDriver,
   myTeamAutonSide,
   selfEvalNotes,
 }: {
   team: Team;
-  autoStrength: number | null;
-  driverStrength: number | null;
+  publicAuto: number | null;
+  publicDriver: number | null;
+  scouterAuto?: number | null;
+  scouterDriver?: number | null;
   myTeamAutonSide?: string | null;
   selfEvalNotes?: string | null;
 }) {
+  const displayAuto = scouterAuto ?? publicAuto;
+  const displayDriver = scouterDriver ?? publicDriver;
+
   const confidence = team.ratingUncertainty !== null ? Math.min(
     100,
     Math.round(Math.max(0, 1 - team.ratingUncertainty / 50) * 100)
@@ -74,7 +81,7 @@ export function TeamProfileCard({
               {team.strategyTags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider bg-txt-1 text-surface-bg"
+                  className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider bg-gradient-to-r from-blue-600 to-blue-400 text-white"
                 >
                   {tag}
                 </span>
@@ -86,7 +93,7 @@ export function TeamProfileCard({
         {/* Right side primary stat */}
         <div className="md:text-right flex flex-col items-start md:items-end">
           <span className="text-[10px] font-mono text-txt-3 tracking-widest uppercase mb-1">Bayesian Rating</span>
-          <div className="text-5xl font-mono font-bold text-blue-500 leading-none">
+          <div className="text-5xl font-mono font-bold bg-gradient-to-br from-blue-400 to-indigo-600 bg-clip-text text-transparent leading-none">
             {team.performanceRating !== null ? team.performanceRating.toFixed(1) : "N/A"}
           </div>
           <div className="text-[10px] font-mono text-txt-2 mt-1">
@@ -105,11 +112,17 @@ export function TeamProfileCard({
         </div>
         <div className="p-4 border-r border-b md:border-b-0 border-line py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Auto Strength</div>
-          <div className="text-4xl font-mono font-bold text-txt-1">{autoStrength ?? "—"}</div>
+          <div className="text-4xl font-mono font-bold text-txt-1">{displayAuto ?? "—"}</div>
+          {scouterAuto != null && publicAuto != null && scouterAuto !== publicAuto && (
+            <span className="text-[8px] font-mono text-blue-500 uppercase mt-1">Overridden by you</span>
+          )}
         </div>
         <div className="p-4 border-r border-line md:border-r py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Driver Strength</div>
-          <div className="text-4xl font-mono font-bold text-txt-1">{driverStrength ?? "—"}</div>
+          <div className="text-4xl font-mono font-bold text-txt-1">{displayDriver ?? "—"}</div>
+          {scouterDriver != null && publicDriver != null && scouterDriver !== publicDriver && (
+            <span className="text-[8px] font-mono text-amber uppercase mt-1">Overridden by you</span>
+          )}
         </div>
         <div className="p-4 py-6 flex flex-col items-center text-center">
           <div className="text-[10px] font-mono tracking-widest text-txt-3 uppercase mb-3">Matches Played</div>
@@ -126,12 +139,12 @@ export function TeamProfileCard({
             <div>
               <div className="flex justify-between items-baseline mb-1.5 text-[10px] font-mono">
                 <span className="text-txt-2 uppercase tracking-wider">Autonomous Routine</span>
-                <span className="text-txt-1 font-bold">{autoStrength != null ? `${autoStrength}/10` : "—"}</span>
+                <span className="text-txt-1 font-bold">{displayAuto != null ? `${displayAuto}/10` : "—"}</span>
               </div>
               <div className="h-1.5 w-full bg-line rounded-none overflow-hidden mt-1">
                 <div
-                  className="h-full bg-blue-500 transition-all"
-                  style={{ width: autoStrength != null ? `${autoStrength * 10}%` : "0%" }}
+                  className="h-full bg-gradient-to-r from-blue-600 to-blue-400 transition-all"
+                  style={{ width: displayAuto != null ? `${displayAuto * 10}%` : "0%" }}
                 />
               </div>
             </div>
@@ -139,12 +152,12 @@ export function TeamProfileCard({
             <div>
               <div className="flex justify-between items-baseline mb-1.5 text-[10px] font-mono">
                 <span className="text-txt-2 uppercase tracking-wider">Driver Control</span>
-                <span className="text-txt-1 font-bold">{driverStrength != null ? `${driverStrength}/10` : "—"}</span>
+                <span className="text-txt-1 font-bold">{displayDriver != null ? `${displayDriver}/10` : "—"}</span>
               </div>
               <div className="h-1.5 w-full bg-line rounded-none overflow-hidden mt-1">
                 <div
-                  className="h-full bg-blue-400 transition-all"
-                  style={{ width: driverStrength != null ? `${driverStrength * 10}%` : "0%" }}
+                  className="h-full bg-gradient-to-r from-indigo-600 to-blue-500 transition-all"
+                  style={{ width: displayDriver != null ? `${displayDriver * 10}%` : "0%" }}
                 />
               </div>
             </div>
