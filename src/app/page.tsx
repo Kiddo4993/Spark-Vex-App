@@ -13,13 +13,13 @@ export default async function LandingPage() {
         {/* Hero */}
         <header className="py-16 md:py-24 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-16 border-b border-line mb-16 mt-8">
           <div className="text-center md:text-left">
-            <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
-              <div className="w-12 h-12 bg-txt-1 flex items-center justify-center text-surface-bg font-mono font-bold text-2xl">
+            <div className="flex items-center gap-4 mb-6 justify-center md:justify-start">
+              <div className="w-14 h-14 bg-txt-1 text-surface-bg flex items-center justify-center font-head font-bold text-3xl rounded-sm">
                 X
               </div>
               <div>
-                <h1 className="font-head text-4xl sm:text-6xl font-extrabold text-txt-1 tracking-tighter">
-                  Spark<span className="text-spark">VEX</span>
+                <h1 className="font-head text-5xl sm:text-7xl font-extrabold text-txt-1 tracking-tighter leading-none">
+                  SparkVEX
                 </h1>
               </div>
             </div>
@@ -54,11 +54,11 @@ export default async function LandingPage() {
 
               <div className="space-y-10">
                 <div className="space-y-3">
-                  <p className="text-sm font-bold text-spark uppercase tracking-widest border-b border-spark/20 pb-1.5">
+                  <p className="text-[11px] font-bold text-blue-500 uppercase tracking-widest border-b border-blue-500/20 pb-2">
                     BAYESIAN PERFORMANCE MODEL
                   </p>
                   <p className="text-txt-2 text-sm leading-relaxed">
-                    Compared to traditional ranking systems such as the Elo system, the Bayesian Performance Model accounts for inconsistencies, allocates <span className="text-blue-500 font-medium">scoring fairly</span>, and <span className="text-blue-500 font-medium">gives each team</span> an uncertainty rating. This results in a more layered and less volatile model.
+                    Compared to traditional ranking systems such as the Elo system, the Bayesian Performance Model accounts for inconsistencies, allocates <span className="text-blue-500 font-medium tracking-tight">scoring fairly</span>, and <span className="text-blue-500 font-medium tracking-tight">gives each team</span> an uncertainty rating. This results in a more layered and less volatile model.
                   </p>
                 </div>
 
@@ -72,7 +72,7 @@ export default async function LandingPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <p className="text-sm font-bold text-spark uppercase tracking-widest border-b border-spark/20 pb-1.5">
+                  <p className="text-[11px] font-bold text-red-500 uppercase tracking-widest border-b border-red-500/20 pb-2">
                     DIRECT MESSAGE OTHER TEAMS
                   </p>
                   <p className="text-txt-2 text-sm leading-relaxed">
@@ -104,13 +104,13 @@ export default async function LandingPage() {
           {/* Sidebar: Sample Data */}
           <aside className="space-y-8 lg:pl-8 lg:border-l lg:border-line">
             <SampleLeaderboards datasets={tournamentData as any} />
-            <div className="mt-8 p-6 bg-surface-card border-l-[3px] border-l-spark border border-line">
-              <h4 className="text-[11px] font-mono text-spark uppercase tracking-widest font-bold mb-3">Notice</h4>
+            <div className="mt-8 p-6 bg-surface-card border-l-[3px] border-l-blue-600 border border-line shadow-lg shadow-blue-900/5">
+              <h4 className="text-[11px] font-mono text-blue-500 uppercase tracking-[0.2em] font-bold mb-3">Notice</h4>
               <p className="text-sm text-txt-2 leading-relaxed">
-                The rankings above are loaded from preset sample data to demonstrate the dashboard view. Sign in with your team port to map your own tournament .XLS data.
+                The rankings above are derived from specific tournament data (Space City, Mecha Mayhem, Southridge) using our Bayesian engine. Sign in to import your own data.
               </p>
               <div className="mt-5">
-                <Link href="/auth/signin" className="text-xs font-mono text-txt-1 underline tracking-widest uppercase hover:text-spark transition-colors">Log In Here →</Link>
+                <Link href="/auth/signin" className="text-xs font-mono text-txt-1 underline tracking-[0.2em] uppercase hover:text-blue-400 transition-colors">Log In Here →</Link>
               </div>
             </div>
           </aside>

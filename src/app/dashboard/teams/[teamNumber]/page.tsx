@@ -74,8 +74,10 @@ export default async function TeamProfilePage({
       </div>
       <TeamProfileCard
         team={combinedTeam}
-        autoStrength={selfEval?.autoStrength ?? null}
-        driverStrength={selfEval?.driverStrength ?? null}
+        publicAuto={selfEval?.autoStrength ?? null}
+        publicDriver={selfEval?.driverStrength ?? null}
+        scouterAuto={scoutData?.autoStrength ?? null}
+        scouterDriver={scoutData?.driverStrength ?? null}
         myTeamAutonSide={myTeamData?.autonomousSide ?? null}
         selfEvalNotes={selfEval?.notes ?? null}
       />

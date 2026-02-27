@@ -22,13 +22,13 @@ export function SampleLeaderboards({ datasets }: { datasets: SampleDataset[] }) 
     if (!datasets || datasets.length === 0) return null;
 
     const currentDataset = datasets[selectedIndex];
-    const teams = currentDataset.teams;
+    const teams = currentDataset.teams.slice(0, 10);
 
     return (
         <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-line pb-2 mb-2 gap-3">
                 <div className="flex items-center gap-3">
-                    <h2 className="section-title text-gold m-0">Sample Rankings</h2>
+                    <h2 className="section-title text-txt-1 m-0">Sample Rankings</h2>
                     <select
                         value={selectedIndex}
                         onChange={(e) => setSelectedIndex(Number(e.target.value))}
@@ -41,68 +41,72 @@ export function SampleLeaderboards({ datasets }: { datasets: SampleDataset[] }) 
                         ))}
                     </select>
                 </div>
-
-                <Link
-                    href="/skills"
-                    className="text-[11px] font-mono text-txt-3 hover:text-txt-1 transition-colors uppercase tracking-widest sm:self-center self-start"
-                >
-                    View all ↗
-                </Link>
             </div>
 
-            <table className="data-table">
-                <thead>
-                    <tr>
-                        <th className="w-12 text-center">Rank</th>
-                        <th>Team</th>
-                        <th className="text-right">Rating</th>
-                        <th className="w-32 hidden sm:table-cell">Confidence</th>
-                        <th className="text-right hidden sm:table-cell">Matches</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {teams.map((team, i) => {
-                        const confidence = Math.min(
-                            100,
-                            Math.round(Math.max(0, 1 - team.ratingUncertainty / 50) * 100)
-                        );
-                        let barColor = "bar-red";
-                        if (confidence > 80) barColor = "bar-green";
-                        else if (confidence > 50) barColor = "bar-amber";
+            <div className="overflow-hidden">
+                <table className="data-table">
+                    <thead>
+                        <tr>
+                            <th className="w-12 text-center">Rank</th>
+                            <th>Team</th>
+                            <th className="text-right">Rating</th>
+                            <th className="w-32 hidden sm:table-cell">Confidence</th>
+                            <th className="text-right hidden sm:table-cell">Matches</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {teams.map((team, i) => {
+                            const confidence = Math.min(
+                                100,
+                                Math.round(Math.max(0, 1 - team.ratingUncertainty / 50) * 100)
+                            );
+                            let barColor = "bar-red";
+                            if (confidence > 80) barColor = "bar-blue";
+                            else if (confidence > 50) barColor = "bar-blue opacity-60";
 
-                        return (
-                            <tr key={team.id || team.teamNumber}>
-                                <td className="text-center font-mono text-txt-3">{i + 1}</td>
-                                <td>
-                                    <span className="team-num-chip bg-line-hi transition-colors block w-max cursor-default">
-                                        {team.teamNumber}
-                                    </span>
-                                </td>
-                                <td className="text-right font-mono font-bold text-[15px] text-txt-1">
-                                    {Math.round(team.performanceRating * 10) / 10}
-                                </td>
-                                <td className="hidden sm:table-cell">
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex-1 mini-bar">
-                                            <div className={`mini-bar-fill ${barColor}`} style={{ width: `${confidence}%` }} />
+                            return (
+                                <tr key={team.id || team.teamNumber}>
+                                    <td className="text-center font-mono text-txt-3">{i + 1}</td>
+                                    <td>
+                                        <span className="team-num-chip bg-line-hi transition-colors block w-max cursor-default">
+                                            {team.teamNumber}
+                                        </span>
+                                    </td>
+                                    <td className="text-right font-mono font-bold text-[15px] text-txt-1">
+                                        {Math.round(team.performanceRating * 10) / 10}
+                                    </td>
+                                    <td className="hidden sm:table-cell">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1 mini-bar">
+                                                <div className={`mini-bar-fill ${barColor}`} style={{ width: `${confidence}%` }} />
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td className="text-right font-mono text-xs text-txt-3 hidden sm:table-cell">
-                                    {team.matchCount}
+                                    </td>
+                                    <td className="text-right font-mono text-xs text-txt-3 hidden sm:table-cell">
+                                        {team.matchCount}
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                        {teams.length === 0 && (
+                            <tr>
+                                <td colSpan={5} className="text-center py-6 text-txt-3 font-mono text-xs uppercase tracking-widest">
+                                    No teams in this sample.
                                 </td>
                             </tr>
-                        );
-                    })}
-                    {teams.length === 0 && (
-                        <tr>
-                            <td colSpan={5} className="text-center py-6 text-txt-3 font-mono text-xs uppercase tracking-widest">
-                                No teams in this sample.
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            <div className="pt-2 text-center">
+                <Link
+                    href="/skills"
+                    className="text-[11px] font-mono text-txt-3 hover:text-txt-1 transition-colors uppercase tracking-[0.2em] border-b border-line pb-1"
+                >
+                    View All {currentDataset.label} Rankings →
+                </Link>
+            </div>
         </div>
     );
 }

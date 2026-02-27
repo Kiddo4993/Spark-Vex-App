@@ -81,18 +81,17 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
         <aside className="w-56 flex-shrink-0 bg-surface-card border-r border-line flex flex-col sticky top-0 h-screen overflow-y-auto">
             {/* Logo */}
             <div className="px-5 py-6 border-b border-line">
-                <div className="flex items-center gap-2.5">
-                    <div className="w-[32px] h-[32px] bg-txt-1 text-surface-bg flex items-center justify-center font-head font-bold text-lg">
+                <div className="flex items-center gap-2 mb-2 p-1.5 border border-line bg-surface-card/40">
+                    <div className="w-8 h-8 bg-txt-1 text-surface-bg flex items-center justify-center font-head font-bold text-sm rounded-sm">
                         X
                     </div>
-                    <div>
-                        <div className="font-head font-bold text-[18px] tracking-tight text-txt-1">
-                            SparkVEX
-                        </div>
-                        <div className="text-[9px] font-mono text-txt-3 tracking-widest uppercase mt-[2px]">
-                            Bayesian Performance
-                        </div>
+                    <div className="flex flex-col">
+                        <span className="text-xs font-head font-black text-txt-1 leading-none tracking-tight">SPARKVEX</span>
+                        <span className="text-[7px] font-mono text-txt-3 tracking-[0.2em] mt-0.5">EST. 2025</span>
                     </div>
+                </div>
+                <div className="text-[9px] font-mono text-txt-3 tracking-widest uppercase mt-[2px] px-1">
+                    Bayesian Performance
                 </div>
             </div>
 
@@ -115,7 +114,7 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                                     href={href}
                                     target={isExternal ? "_blank" : undefined}
                                     rel={isExternal ? "noopener noreferrer" : undefined}
-                                    className={`nav-item ${isActive ? "active" : ""} flex items-center justify-between`}
+                                    className={`nav-item ${isActive ? "active" : ""} flex items-center justify-between relative group`}
                                 >
                                     <div className="flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-txt-3 opacity-30 group-hover:opacity-100 transition-opacity" />
@@ -123,6 +122,12 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                                     </div>
                                     {showUnreadDot && (
                                         <div className="w-2 h-2 rounded-full bg-danger animate-pulse mr-2" />
+                                    )}
+                                    {isActive && (
+                                        <>
+                                            <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-red-600 to-rose-600" />
+                                            <div className="absolute inset-0 bg-gradient-to-r from-red-600/5 to-transparent" />
+                                        </>
                                     )}
                                 </Link>
                             );
@@ -138,7 +143,7 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                         <div className="text-[10px] font-mono text-txt-3 uppercase tracking-widest mb-1">
                             {isAdmin ? "Admin Access" : "Active Team"}
                         </div>
-                        <div className="font-mono font-bold text-gold text-[15px]">
+                        <div className="font-mono font-bold bg-gradient-to-br from-red-400 to-rose-600 bg-clip-text text-transparent text-[15px]">
                             {teamNumber}
                         </div>
                     </div>
