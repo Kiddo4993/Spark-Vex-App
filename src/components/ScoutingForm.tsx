@@ -8,11 +8,13 @@ export function ScoutingForm({
     initialAuto,
     initialDriver,
     initialNotes,
+    isOwnProfile = false,
 }: {
     teamNumber: string;
     initialAuto: number | null;
     initialDriver: number | null;
     initialNotes: string | null;
+    isOwnProfile?: boolean;
 }) {
     const router = useRouter();
     const [autoStrength, setAutoStrength] = useState<number | null>(initialAuto);
@@ -56,8 +58,12 @@ export function ScoutingForm({
     return (
         <div className="card overflow-hidden">
             <div className="card-header bg-surface-bg border-b border-line py-2 flex justify-between items-center">
-                <span className="text-[10px] font-mono tracking-widest text-txt-3 uppercase">Scouter Worksheet (Private)</span>
-                <span className="text-[10px] text-txt-3 uppercase font-mono tracking-widest">Only visible to your team</span>
+                <span className="text-[10px] font-mono tracking-widest text-txt-3 uppercase">
+                    {isOwnProfile ? "Your Public Profile" : "Scouter Worksheet (Private)"}
+                </span>
+                <span className="text-[10px] text-txt-3 uppercase font-mono tracking-widest">
+                    {isOwnProfile ? "Visible to all teams" : "Only visible to your team"}
+                </span>
             </div>
             <div className="p-5 bg-surface-card">
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -148,14 +154,18 @@ export function ScoutingForm({
                             )}
                         </div>
 
-                        {/* Private Notes */}
+                        {/* Notes */}
                         <div className="border-t border-line pt-6">
-                            <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-4">Private Notes</h4>
+                            <h4 className="text-[11px] font-mono tracking-widest uppercase text-txt-1 mb-4">
+                                {isOwnProfile ? "Public Description" : "Private Notes"}
+                            </h4>
                             <textarea
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                                 className="input min-h-[100px] resize-y font-mono text-[13px]"
-                                placeholder="Write private notes about this team's performance, autos, interactions..."
+                                placeholder={isOwnProfile
+                                    ? "Write a public description about your team, robot, strategy..."
+                                    : "Write private notes about this team's performance, autos, interactions..."}
                                 rows={4}
                             />
                         </div>

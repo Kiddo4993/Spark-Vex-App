@@ -40,12 +40,14 @@ export function TeamProfileCard({
   team,
   autoStrength,
   driverStrength,
-  myTeamAutonSide
+  myTeamAutonSide,
+  selfEvalNotes,
 }: {
   team: Team;
   autoStrength: number | null;
   driverStrength: number | null;
   myTeamAutonSide?: string | null;
+  selfEvalNotes?: string | null;
 }) {
   const confidence = team.ratingUncertainty !== null ? Math.min(
     100,
@@ -212,6 +214,18 @@ export function TeamProfileCard({
           </div>
           <div className="p-5 bg-surface-card">
             <p className="text-[13px] font-mono text-txt-2 leading-relaxed whitespace-pre-wrap">{team.notes}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Public Self-Evaluation Description */}
+      {selfEvalNotes && (
+        <div className="card overflow-hidden mt-6">
+          <div className="card-header bg-surface-bg border-b border-line py-2">
+            <span className="text-[10px] font-mono tracking-widest text-txt-3 uppercase">Team Description</span>
+          </div>
+          <div className="p-5 bg-surface-card">
+            <p className="text-[13px] font-mono text-txt-2 leading-relaxed whitespace-pre-wrap">{selfEvalNotes}</p>
           </div>
         </div>
       )}
