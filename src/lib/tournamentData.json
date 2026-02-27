@@ -1,0 +1,1095 @@
+[
+  {
+    "label": "Space City",
+    "teams": [
+      {
+        "id": "1",
+        "teamNumber": "2570R",
+        "performanceRating": 167.4,
+        "ratingUncertainty": 33.2,
+        "matchCount": 14
+      },
+      {
+        "id": "2",
+        "teamNumber": "9189X",
+        "performanceRating": 163.9,
+        "ratingUncertainty": 32.6,
+        "matchCount": 14
+      },
+      {
+        "id": "3",
+        "teamNumber": "1065A",
+        "performanceRating": 146.5,
+        "ratingUncertainty": 34.5,
+        "matchCount": 14
+      },
+      {
+        "id": "4",
+        "teamNumber": "1239E",
+        "performanceRating": 144.8,
+        "ratingUncertainty": 36.9,
+        "matchCount": 12
+      },
+      {
+        "id": "5",
+        "teamNumber": "2115P",
+        "performanceRating": 143.3,
+        "ratingUncertainty": 36.9,
+        "matchCount": 12
+      },
+      {
+        "id": "6",
+        "teamNumber": "334C",
+        "performanceRating": 139.1,
+        "ratingUncertainty": 35.6,
+        "matchCount": 13
+      },
+      {
+        "id": "7",
+        "teamNumber": "1739C",
+        "performanceRating": 135.5,
+        "ratingUncertainty": 37.3,
+        "matchCount": 11
+      },
+      {
+        "id": "8",
+        "teamNumber": "5013X",
+        "performanceRating": 133.5,
+        "ratingUncertainty": 36.8,
+        "matchCount": 12
+      },
+      {
+        "id": "9",
+        "teamNumber": "1412J",
+        "performanceRating": 131,
+        "ratingUncertainty": 38.5,
+        "matchCount": 11
+      },
+      {
+        "id": "10",
+        "teamNumber": "1281A",
+        "performanceRating": 129.4,
+        "ratingUncertainty": 38.8,
+        "matchCount": 11
+      },
+      {
+        "id": "11",
+        "teamNumber": "10702X",
+        "performanceRating": 129.1,
+        "ratingUncertainty": 38.4,
+        "matchCount": 11
+      },
+      {
+        "id": "12",
+        "teamNumber": "654J",
+        "performanceRating": 124.8,
+        "ratingUncertainty": 37.6,
+        "matchCount": 11
+      },
+      {
+        "id": "13",
+        "teamNumber": "334U",
+        "performanceRating": 119,
+        "ratingUncertainty": 34.5,
+        "matchCount": 14
+      },
+      {
+        "id": "14",
+        "teamNumber": "3758X",
+        "performanceRating": 117.9,
+        "ratingUncertainty": 40.1,
+        "matchCount": 10
+      },
+      {
+        "id": "15",
+        "teamNumber": "7110A",
+        "performanceRating": 115.5,
+        "ratingUncertainty": 39.6,
+        "matchCount": 10
+      },
+      {
+        "id": "16",
+        "teamNumber": "1779X",
+        "performanceRating": 115.3,
+        "ratingUncertainty": 40,
+        "matchCount": 10
+      },
+      {
+        "id": "17",
+        "teamNumber": "5327K",
+        "performanceRating": 114.2,
+        "ratingUncertainty": 38.7,
+        "matchCount": 11
+      },
+      {
+        "id": "18",
+        "teamNumber": "16689A",
+        "performanceRating": 114.1,
+        "ratingUncertainty": 38.7,
+        "matchCount": 11
+      },
+      {
+        "id": "19",
+        "teamNumber": "2429V",
+        "performanceRating": 112.7,
+        "ratingUncertainty": 38.7,
+        "matchCount": 11
+      },
+      {
+        "id": "20",
+        "teamNumber": "5013Y",
+        "performanceRating": 108.8,
+        "ratingUncertainty": 37,
+        "matchCount": 11
+      },
+      {
+        "id": "21",
+        "teamNumber": "12208A",
+        "performanceRating": 108.7,
+        "ratingUncertainty": 41,
+        "matchCount": 9
+      },
+      {
+        "id": "22",
+        "teamNumber": "43146R",
+        "performanceRating": 107,
+        "ratingUncertainty": 40.9,
+        "matchCount": 9
+      },
+      {
+        "id": "23",
+        "teamNumber": "3118B",
+        "performanceRating": 106.9,
+        "ratingUncertainty": 39.1,
+        "matchCount": 10
+      },
+      {
+        "id": "24",
+        "teamNumber": "2344A",
+        "performanceRating": 106,
+        "ratingUncertainty": 39.1,
+        "matchCount": 10
+      },
+      {
+        "id": "25",
+        "teamNumber": "2668A",
+        "performanceRating": 105.9,
+        "ratingUncertainty": 37.6,
+        "matchCount": 10
+      },
+      {
+        "id": "26",
+        "teamNumber": "19697U",
+        "performanceRating": 104.4,
+        "ratingUncertainty": 39.4,
+        "matchCount": 10
+      },
+      {
+        "id": "27",
+        "teamNumber": "77360Z",
+        "performanceRating": 103.9,
+        "ratingUncertainty": 39.5,
+        "matchCount": 9
+      },
+      {
+        "id": "28",
+        "teamNumber": "4118J",
+        "performanceRating": 103.5,
+        "ratingUncertainty": 39.4,
+        "matchCount": 10
+      },
+      {
+        "id": "29",
+        "teamNumber": "99206V",
+        "performanceRating": 103,
+        "ratingUncertainty": 40.6,
+        "matchCount": 9
+      },
+      {
+        "id": "30",
+        "teamNumber": "2373C",
+        "performanceRating": 102.9,
+        "ratingUncertainty": 40.6,
+        "matchCount": 9
+      },
+      {
+        "id": "31",
+        "teamNumber": "231A",
+        "performanceRating": 102.6,
+        "ratingUncertainty": 40.7,
+        "matchCount": 9
+      },
+      {
+        "id": "32",
+        "teamNumber": "43146K",
+        "performanceRating": 102,
+        "ratingUncertainty": 39.9,
+        "matchCount": 9
+      },
+      {
+        "id": "33",
+        "teamNumber": "9576X",
+        "performanceRating": 101.6,
+        "ratingUncertainty": 40.2,
+        "matchCount": 10
+      },
+      {
+        "id": "34",
+        "teamNumber": "98548H",
+        "performanceRating": 101.3,
+        "ratingUncertainty": 40.2,
+        "matchCount": 10
+      },
+      {
+        "id": "35",
+        "teamNumber": "19697X",
+        "performanceRating": 101.2,
+        "ratingUncertainty": 40.9,
+        "matchCount": 9
+      },
+      {
+        "id": "36",
+        "teamNumber": "84260V",
+        "performanceRating": 100.3,
+        "ratingUncertainty": 40.8,
+        "matchCount": 9
+      },
+      {
+        "id": "37",
+        "teamNumber": "85142Z",
+        "performanceRating": 100.3,
+        "ratingUncertainty": 40.1,
+        "matchCount": 9
+      },
+      {
+        "id": "38",
+        "teamNumber": "38538S",
+        "performanceRating": 100.2,
+        "ratingUncertainty": 40.8,
+        "matchCount": 9
+      },
+      {
+        "id": "39",
+        "teamNumber": "19697S",
+        "performanceRating": 99.7,
+        "ratingUncertainty": 40.7,
+        "matchCount": 9
+      },
+      {
+        "id": "40",
+        "teamNumber": "67100G",
+        "performanceRating": 99.7,
+        "ratingUncertainty": 38.2,
+        "matchCount": 10
+      },
+      {
+        "id": "41",
+        "teamNumber": "7899X",
+        "performanceRating": 99.4,
+        "ratingUncertainty": 41.2,
+        "matchCount": 9
+      },
+      {
+        "id": "42",
+        "teamNumber": "91923A",
+        "performanceRating": 99.3,
+        "ratingUncertainty": 38.8,
+        "matchCount": 10
+      },
+      {
+        "id": "43",
+        "teamNumber": "4118D",
+        "performanceRating": 99.2,
+        "ratingUncertainty": 40,
+        "matchCount": 10
+      },
+      {
+        "id": "44",
+        "teamNumber": "231D",
+        "performanceRating": 98.9,
+        "ratingUncertainty": 40.5,
+        "matchCount": 9
+      },
+      {
+        "id": "45",
+        "teamNumber": "7110H",
+        "performanceRating": 98.5,
+        "ratingUncertainty": 38.9,
+        "matchCount": 10
+      },
+      {
+        "id": "46",
+        "teamNumber": "13974A",
+        "performanceRating": 98.5,
+        "ratingUncertainty": 41.8,
+        "matchCount": 9
+      },
+      {
+        "id": "47",
+        "teamNumber": "7700S",
+        "performanceRating": 97.2,
+        "ratingUncertainty": 39.5,
+        "matchCount": 9
+      },
+      {
+        "id": "48",
+        "teamNumber": "19697W",
+        "performanceRating": 94.5,
+        "ratingUncertainty": 39.3,
+        "matchCount": 10
+      },
+      {
+        "id": "49",
+        "teamNumber": "70478S",
+        "performanceRating": 93.6,
+        "ratingUncertainty": 40,
+        "matchCount": 9
+      },
+      {
+        "id": "50",
+        "teamNumber": "3118A",
+        "performanceRating": 91.4,
+        "ratingUncertainty": 40.7,
+        "matchCount": 9
+      },
+      {
+        "id": "51",
+        "teamNumber": "19697A",
+        "performanceRating": 91.1,
+        "ratingUncertainty": 41,
+        "matchCount": 9
+      },
+      {
+        "id": "52",
+        "teamNumber": "10702S",
+        "performanceRating": 89.9,
+        "ratingUncertainty": 41,
+        "matchCount": 9
+      },
+      {
+        "id": "53",
+        "teamNumber": "2373A",
+        "performanceRating": 88.6,
+        "ratingUncertainty": 40.8,
+        "matchCount": 9
+      },
+      {
+        "id": "54",
+        "teamNumber": "71909Z",
+        "performanceRating": 88.5,
+        "ratingUncertainty": 41.2,
+        "matchCount": 9
+      },
+      {
+        "id": "55",
+        "teamNumber": "19713N",
+        "performanceRating": 87.7,
+        "ratingUncertainty": 40.9,
+        "matchCount": 9
+      },
+      {
+        "id": "56",
+        "teamNumber": "231J",
+        "performanceRating": 87.5,
+        "ratingUncertainty": 40.6,
+        "matchCount": 9
+      },
+      {
+        "id": "57",
+        "teamNumber": "1412E",
+        "performanceRating": 83.4,
+        "ratingUncertainty": 39.7,
+        "matchCount": 9
+      },
+      {
+        "id": "58",
+        "teamNumber": "18908H",
+        "performanceRating": 82.1,
+        "ratingUncertainty": 40.3,
+        "matchCount": 9
+      },
+      {
+        "id": "59",
+        "teamNumber": "18908A",
+        "performanceRating": 80.5,
+        "ratingUncertainty": 40.4,
+        "matchCount": 9
+      },
+      {
+        "id": "60",
+        "teamNumber": "8756B",
+        "performanceRating": 80.3,
+        "ratingUncertainty": 40.9,
+        "matchCount": 9
+      },
+      {
+        "id": "61",
+        "teamNumber": "77360B",
+        "performanceRating": 80.1,
+        "ratingUncertainty": 40.3,
+        "matchCount": 9
+      },
+      {
+        "id": "62",
+        "teamNumber": "71909X",
+        "performanceRating": 78.4,
+        "ratingUncertainty": 40.8,
+        "matchCount": 9
+      },
+      {
+        "id": "63",
+        "teamNumber": "2373B",
+        "performanceRating": 74.3,
+        "ratingUncertainty": 39.8,
+        "matchCount": 9
+      },
+      {
+        "id": "64",
+        "teamNumber": "231R",
+        "performanceRating": 72.2,
+        "ratingUncertainty": 39.8,
+        "matchCount": 9
+      },
+      {
+        "id": "65",
+        "teamNumber": "91960X",
+        "performanceRating": 70.7,
+        "ratingUncertainty": 40.3,
+        "matchCount": 9
+      },
+      {
+        "id": "66",
+        "teamNumber": "2373D",
+        "performanceRating": 70,
+        "ratingUncertainty": 40.4,
+        "matchCount": 9
+      }
+    ]
+  },
+  {
+    "label": "Mecha Mayhem",
+    "teams": [
+      {
+        "id": "1",
+        "teamNumber": "10012Y",
+        "performanceRating": 166.7,
+        "ratingUncertainty": 33.5,
+        "matchCount": 14
+      },
+      {
+        "id": "2",
+        "teamNumber": "9568V",
+        "performanceRating": 162.2,
+        "ratingUncertainty": 28.8,
+        "matchCount": 18
+      },
+      {
+        "id": "3",
+        "teamNumber": "886M",
+        "performanceRating": 147.3,
+        "ratingUncertainty": 29.7,
+        "matchCount": 18
+      },
+      {
+        "id": "4",
+        "teamNumber": "9568Z",
+        "performanceRating": 146.5,
+        "ratingUncertainty": 30,
+        "matchCount": 18
+      },
+      {
+        "id": "5",
+        "teamNumber": "2088U",
+        "performanceRating": 136,
+        "ratingUncertainty": 32.9,
+        "matchCount": 16
+      },
+      {
+        "id": "6",
+        "teamNumber": "2885K",
+        "performanceRating": 132.4,
+        "ratingUncertainty": 32.6,
+        "matchCount": 16
+      },
+      {
+        "id": "7",
+        "teamNumber": "886R",
+        "performanceRating": 131.6,
+        "ratingUncertainty": 31.9,
+        "matchCount": 16
+      },
+      {
+        "id": "8",
+        "teamNumber": "221T",
+        "performanceRating": 129,
+        "ratingUncertainty": 32,
+        "matchCount": 16
+      },
+      {
+        "id": "9",
+        "teamNumber": "2088K",
+        "performanceRating": 128.7,
+        "ratingUncertainty": 33.1,
+        "matchCount": 16
+      },
+      {
+        "id": "10",
+        "teamNumber": "9568W",
+        "performanceRating": 123.8,
+        "ratingUncertainty": 30.8,
+        "matchCount": 18
+      },
+      {
+        "id": "11",
+        "teamNumber": "2088H",
+        "performanceRating": 119.4,
+        "ratingUncertainty": 33.2,
+        "matchCount": 16
+      },
+      {
+        "id": "12",
+        "teamNumber": "886T",
+        "performanceRating": 115.4,
+        "ratingUncertainty": 32.8,
+        "matchCount": 16
+      },
+      {
+        "id": "13",
+        "teamNumber": "10012W",
+        "performanceRating": 109.7,
+        "ratingUncertainty": 32.6,
+        "matchCount": 16
+      },
+      {
+        "id": "14",
+        "teamNumber": "10012X",
+        "performanceRating": 109.2,
+        "ratingUncertainty": 32.9,
+        "matchCount": 16
+      },
+      {
+        "id": "15",
+        "teamNumber": "886A",
+        "performanceRating": 102,
+        "ratingUncertainty": 31.9,
+        "matchCount": 16
+      },
+      {
+        "id": "16",
+        "teamNumber": "16610B",
+        "performanceRating": 99.4,
+        "ratingUncertainty": 33,
+        "matchCount": 16
+      },
+      {
+        "id": "17",
+        "teamNumber": "2088S",
+        "performanceRating": 96.8,
+        "ratingUncertainty": 33.4,
+        "matchCount": 15
+      },
+      {
+        "id": "18",
+        "teamNumber": "221J",
+        "performanceRating": 94.5,
+        "ratingUncertainty": 31.8,
+        "matchCount": 16
+      },
+      {
+        "id": "19",
+        "teamNumber": "16610G",
+        "performanceRating": 91,
+        "ratingUncertainty": 33.9,
+        "matchCount": 15
+      },
+      {
+        "id": "20",
+        "teamNumber": "886E",
+        "performanceRating": 88.5,
+        "ratingUncertainty": 33.7,
+        "matchCount": 15
+      },
+      {
+        "id": "21",
+        "teamNumber": "2885B",
+        "performanceRating": 85.3,
+        "ratingUncertainty": 33,
+        "matchCount": 15
+      },
+      {
+        "id": "22",
+        "teamNumber": "97777M",
+        "performanceRating": 84.7,
+        "ratingUncertainty": 32.7,
+        "matchCount": 15
+      },
+      {
+        "id": "23",
+        "teamNumber": "10012B",
+        "performanceRating": 82.4,
+        "ratingUncertainty": 34.8,
+        "matchCount": 14
+      },
+      {
+        "id": "24",
+        "teamNumber": "2088C",
+        "performanceRating": 77.1,
+        "ratingUncertainty": 33.2,
+        "matchCount": 15
+      },
+      {
+        "id": "25",
+        "teamNumber": "10909X",
+        "performanceRating": 75.1,
+        "ratingUncertainty": 34.3,
+        "matchCount": 15
+      },
+      {
+        "id": "26",
+        "teamNumber": "4077E",
+        "performanceRating": 73.1,
+        "ratingUncertainty": 34.7,
+        "matchCount": 14
+      },
+      {
+        "id": "27",
+        "teamNumber": "4077D",
+        "performanceRating": 71.8,
+        "ratingUncertainty": 34.7,
+        "matchCount": 14
+      },
+      {
+        "id": "28",
+        "teamNumber": "2885A",
+        "performanceRating": 56.4,
+        "ratingUncertainty": 31.9,
+        "matchCount": 15
+      }
+    ]
+  },
+  {
+    "label": "Southridge",
+    "teams": [
+      {
+        "id": "1",
+        "teamNumber": "77174A",
+        "performanceRating": 154.1,
+        "ratingUncertainty": 38.6,
+        "matchCount": 10
+      },
+      {
+        "id": "2",
+        "teamNumber": "77174Y",
+        "performanceRating": 141.9,
+        "ratingUncertainty": 38.5,
+        "matchCount": 10
+      },
+      {
+        "id": "3",
+        "teamNumber": "8894R",
+        "performanceRating": 139.9,
+        "ratingUncertainty": 40,
+        "matchCount": 9
+      },
+      {
+        "id": "4",
+        "teamNumber": "98549V",
+        "performanceRating": 136.6,
+        "ratingUncertainty": 39.5,
+        "matchCount": 10
+      },
+      {
+        "id": "5",
+        "teamNumber": "9568G",
+        "performanceRating": 135.5,
+        "ratingUncertainty": 39.2,
+        "matchCount": 10
+      },
+      {
+        "id": "6",
+        "teamNumber": "502V",
+        "performanceRating": 134.4,
+        "ratingUncertainty": 41.7,
+        "matchCount": 8
+      },
+      {
+        "id": "7",
+        "teamNumber": "9181F",
+        "performanceRating": 129.7,
+        "ratingUncertainty": 40,
+        "matchCount": 9
+      },
+      {
+        "id": "8",
+        "teamNumber": "1011X",
+        "performanceRating": 125,
+        "ratingUncertainty": 42.1,
+        "matchCount": 8
+      },
+      {
+        "id": "9",
+        "teamNumber": "98549N",
+        "performanceRating": 123.9,
+        "ratingUncertainty": 40.8,
+        "matchCount": 9
+      },
+      {
+        "id": "10",
+        "teamNumber": "8001A",
+        "performanceRating": 120.3,
+        "ratingUncertainty": 41.5,
+        "matchCount": 8
+      },
+      {
+        "id": "11",
+        "teamNumber": "9594Y",
+        "performanceRating": 119,
+        "ratingUncertainty": 42.8,
+        "matchCount": 7
+      },
+      {
+        "id": "12",
+        "teamNumber": "9181R",
+        "performanceRating": 116.4,
+        "ratingUncertainty": 42.4,
+        "matchCount": 8
+      },
+      {
+        "id": "13",
+        "teamNumber": "9181X",
+        "performanceRating": 115.9,
+        "ratingUncertainty": 41.7,
+        "matchCount": 8
+      },
+      {
+        "id": "14",
+        "teamNumber": "1011G",
+        "performanceRating": 114.1,
+        "ratingUncertainty": 41.4,
+        "matchCount": 8
+      },
+      {
+        "id": "15",
+        "teamNumber": "9594K",
+        "performanceRating": 113.2,
+        "ratingUncertainty": 44.1,
+        "matchCount": 6
+      },
+      {
+        "id": "16",
+        "teamNumber": "77174X",
+        "performanceRating": 111.5,
+        "ratingUncertainty": 42.4,
+        "matchCount": 7
+      },
+      {
+        "id": "17",
+        "teamNumber": "1010E",
+        "performanceRating": 109.8,
+        "ratingUncertainty": 43,
+        "matchCount": 7
+      },
+      {
+        "id": "18",
+        "teamNumber": "9594J",
+        "performanceRating": 109.5,
+        "ratingUncertainty": 42.8,
+        "matchCount": 7
+      },
+      {
+        "id": "19",
+        "teamNumber": "77174B",
+        "performanceRating": 109.4,
+        "ratingUncertainty": 42.8,
+        "matchCount": 7
+      },
+      {
+        "id": "20",
+        "teamNumber": "72733A",
+        "performanceRating": 109.1,
+        "ratingUncertainty": 42.6,
+        "matchCount": 7
+      },
+      {
+        "id": "21",
+        "teamNumber": "9181Y",
+        "performanceRating": 108.5,
+        "ratingUncertainty": 43,
+        "matchCount": 7
+      },
+      {
+        "id": "22",
+        "teamNumber": "502C",
+        "performanceRating": 107.6,
+        "ratingUncertainty": 43,
+        "matchCount": 7
+      },
+      {
+        "id": "23",
+        "teamNumber": "4471A",
+        "performanceRating": 105.7,
+        "ratingUncertainty": 41.8,
+        "matchCount": 8
+      },
+      {
+        "id": "24",
+        "teamNumber": "98549C",
+        "performanceRating": 104.3,
+        "ratingUncertainty": 41.2,
+        "matchCount": 9
+      },
+      {
+        "id": "25",
+        "teamNumber": "50118J",
+        "performanceRating": 104.1,
+        "ratingUncertainty": 43.8,
+        "matchCount": 6
+      },
+      {
+        "id": "26",
+        "teamNumber": "61783B",
+        "performanceRating": 103.8,
+        "ratingUncertainty": 43.8,
+        "matchCount": 6
+      },
+      {
+        "id": "27",
+        "teamNumber": "9181H",
+        "performanceRating": 103.4,
+        "ratingUncertainty": 44.2,
+        "matchCount": 6
+      },
+      {
+        "id": "28",
+        "teamNumber": "98549B",
+        "performanceRating": 102.9,
+        "ratingUncertainty": 44.3,
+        "matchCount": 6
+      },
+      {
+        "id": "29",
+        "teamNumber": "59322B",
+        "performanceRating": 102.8,
+        "ratingUncertainty": 44.3,
+        "matchCount": 6
+      },
+      {
+        "id": "30",
+        "teamNumber": "61783D",
+        "performanceRating": 101.7,
+        "ratingUncertainty": 42.9,
+        "matchCount": 7
+      },
+      {
+        "id": "31",
+        "teamNumber": "98549S",
+        "performanceRating": 101.4,
+        "ratingUncertainty": 43.7,
+        "matchCount": 6
+      },
+      {
+        "id": "32",
+        "teamNumber": "1011T",
+        "performanceRating": 101.3,
+        "ratingUncertainty": 43.6,
+        "matchCount": 6
+      },
+      {
+        "id": "33",
+        "teamNumber": "1010Y",
+        "performanceRating": 101.3,
+        "ratingUncertainty": 43.8,
+        "matchCount": 6
+      },
+      {
+        "id": "34",
+        "teamNumber": "9594X",
+        "performanceRating": 100.8,
+        "ratingUncertainty": 42.8,
+        "matchCount": 7
+      },
+      {
+        "id": "35",
+        "teamNumber": "4471S",
+        "performanceRating": 99.9,
+        "ratingUncertainty": 42.9,
+        "matchCount": 7
+      },
+      {
+        "id": "36",
+        "teamNumber": "9181P",
+        "performanceRating": 99.6,
+        "ratingUncertainty": 42.5,
+        "matchCount": 7
+      },
+      {
+        "id": "37",
+        "teamNumber": "98549Z",
+        "performanceRating": 97.6,
+        "ratingUncertainty": 43,
+        "matchCount": 7
+      },
+      {
+        "id": "38",
+        "teamNumber": "9594A",
+        "performanceRating": 94.7,
+        "ratingUncertainty": 41.7,
+        "matchCount": 8
+      },
+      {
+        "id": "39",
+        "teamNumber": "98549R",
+        "performanceRating": 94.3,
+        "ratingUncertainty": 43.7,
+        "matchCount": 6
+      },
+      {
+        "id": "40",
+        "teamNumber": "9594S",
+        "performanceRating": 94.3,
+        "ratingUncertainty": 44.1,
+        "matchCount": 6
+      },
+      {
+        "id": "41",
+        "teamNumber": "502B",
+        "performanceRating": 94,
+        "ratingUncertainty": 43.6,
+        "matchCount": 6
+      },
+      {
+        "id": "42",
+        "teamNumber": "72733F",
+        "performanceRating": 93.8,
+        "ratingUncertainty": 43.8,
+        "matchCount": 6
+      },
+      {
+        "id": "43",
+        "teamNumber": "502Y",
+        "performanceRating": 93.7,
+        "ratingUncertainty": 44.1,
+        "matchCount": 6
+      },
+      {
+        "id": "44",
+        "teamNumber": "22212A",
+        "performanceRating": 93.1,
+        "ratingUncertainty": 43.7,
+        "matchCount": 6
+      },
+      {
+        "id": "45",
+        "teamNumber": "9594E",
+        "performanceRating": 92.9,
+        "ratingUncertainty": 43.8,
+        "matchCount": 6
+      },
+      {
+        "id": "46",
+        "teamNumber": "61783C",
+        "performanceRating": 92,
+        "ratingUncertainty": 44.2,
+        "matchCount": 6
+      },
+      {
+        "id": "47",
+        "teamNumber": "61783A",
+        "performanceRating": 91.6,
+        "ratingUncertainty": 43.8,
+        "matchCount": 6
+      },
+      {
+        "id": "48",
+        "teamNumber": "10012A",
+        "performanceRating": 91.3,
+        "ratingUncertainty": 43.8,
+        "matchCount": 6
+      },
+      {
+        "id": "49",
+        "teamNumber": "9181K",
+        "performanceRating": 91.1,
+        "ratingUncertainty": 44.1,
+        "matchCount": 6
+      },
+      {
+        "id": "50",
+        "teamNumber": "61783G",
+        "performanceRating": 89,
+        "ratingUncertainty": 43.7,
+        "matchCount": 6
+      },
+      {
+        "id": "51",
+        "teamNumber": "95415A",
+        "performanceRating": 88.8,
+        "ratingUncertainty": 42.5,
+        "matchCount": 7
+      },
+      {
+        "id": "52",
+        "teamNumber": "9181B",
+        "performanceRating": 88.6,
+        "ratingUncertainty": 42.5,
+        "matchCount": 7
+      },
+      {
+        "id": "53",
+        "teamNumber": "502X",
+        "performanceRating": 88.2,
+        "ratingUncertainty": 43.1,
+        "matchCount": 7
+      },
+      {
+        "id": "54",
+        "teamNumber": "98549X",
+        "performanceRating": 81.5,
+        "ratingUncertainty": 43.8,
+        "matchCount": 6
+      },
+      {
+        "id": "55",
+        "teamNumber": "61783F",
+        "performanceRating": 81.4,
+        "ratingUncertainty": 43.5,
+        "matchCount": 6
+      },
+      {
+        "id": "56",
+        "teamNumber": "98549F",
+        "performanceRating": 80.4,
+        "ratingUncertainty": 43.8,
+        "matchCount": 6
+      },
+      {
+        "id": "57",
+        "teamNumber": "61783E",
+        "performanceRating": 79.4,
+        "ratingUncertainty": 44.1,
+        "matchCount": 6
+      },
+      {
+        "id": "58",
+        "teamNumber": "72733Z",
+        "performanceRating": 72.7,
+        "ratingUncertainty": 43.3,
+        "matchCount": 6
+      },
+      {
+        "id": "59",
+        "teamNumber": "59322A",
+        "performanceRating": 71.5,
+        "ratingUncertainty": 43.5,
+        "matchCount": 6
+      },
+      {
+        "id": "60",
+        "teamNumber": "9181D",
+        "performanceRating": 69.1,
+        "ratingUncertainty": 43.6,
+        "matchCount": 6
+      }
+    ]
+  }
+]

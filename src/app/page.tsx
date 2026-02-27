@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { SampleLeaderboards } from "@/components/SampleLeaderboards";
-import { sampleTournaments } from "@/lib/sampleData";
+import tournamentData from "@/lib/tournamentData.json";
 
 export default async function LandingPage() {
   const session = await getServerSession(authOptions);
@@ -103,7 +103,7 @@ export default async function LandingPage() {
 
           {/* Sidebar: Sample Data */}
           <aside className="space-y-8 lg:pl-8 lg:border-l lg:border-line">
-            <SampleLeaderboards datasets={sampleTournaments as any} />
+            <SampleLeaderboards datasets={tournamentData as any} />
             <div className="mt-8 p-6 bg-surface-card border-l-[3px] border-l-spark border border-line">
               <h4 className="text-[11px] font-mono text-spark uppercase tracking-widest font-bold mb-3">Notice</h4>
               <p className="text-sm text-txt-2 leading-relaxed">

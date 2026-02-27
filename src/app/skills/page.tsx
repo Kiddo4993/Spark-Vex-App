@@ -2,37 +2,37 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import skillsData from "@/lib/skillsData.json";
+import tournamentData from "@/lib/tournamentData.json";
 
-type SkillsTeam = {
+type RankedTeam = {
     rank: number;
     teamNumber: string;
-    teamName: string;
-    score: number;
-    auto: number;
-    driver: number;
-    org: string;
-    region: string;
+    performanceRating: number;
+    ratingUncertainty: number;
+    matchCount: number;
 };
 
 const PAGE_SIZE = 50;
 
-export default function SkillsPage() {
-    const [division, setDivision] = useState<"hs" | "ms">("hs");
+export default function TournamentRankingsPage() {
+    const [selectedIndex, setSelectedIndex] = useState(0);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(0);
 
-    const teams: SkillsTeam[] = division === "hs" ? skillsData.hs : skillsData.ms;
+    const currentTournament = tournamentData[selectedIndex];
+    const teams = useMemo(() => {
+        return currentTournament.teams.map((t, i) => ({
+            ...t,
+            rank: i + 1
+        })) as RankedTeam[];
+    }, [currentTournament]);
 
     const filtered = useMemo(() => {
         if (!search.trim()) return teams;
         const q = search.trim().toUpperCase();
         return teams.filter(
             (t) =>
-                t.teamNumber.toUpperCase().includes(q) ||
-                t.teamName.toUpperCase().includes(q) ||
-                t.org.toUpperCase().includes(q) ||
-                t.region.toUpperCase().includes(q)
+                t.teamNumber.toUpperCase().includes(q)
         );
     }, [teams, search]);
 
@@ -52,20 +52,23 @@ export default function SkillsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
                     <div>
                         <h1 className="font-head text-3xl font-extrabold text-txt-1 tracking-tight">
-                            World Skills Rankings
+                            Tournament Rankings
                         </h1>
                         <p className="text-sm text-txt-2 mt-1">
-                            {division === "hs" ? "High School" : "Middle School"} · {filtered.length.toLocaleString()} teams
+                            {currentTournament.label} · {filtered.length.toLocaleString()} teams
                         </p>
                     </div>
                     <div className="flex gap-3 items-center">
                         <select
-                            value={division}
-                            onChange={(e) => { setDivision(e.target.value as "hs" | "ms"); setPage(0); setSearch(""); }}
+                            value={selectedIndex}
+                            onChange={(e) => { setSelectedIndex(Number(e.target.value)); setPage(0); setSearch(""); }}
                             className="bg-surface-bg border border-line text-txt-1 text-xs font-mono py-2 px-3 uppercase tracking-widest focus:outline-none focus:border-spark transition-colors cursor-pointer"
                         >
-                            <option value="hs">High School</option>
-                            <option value="ms">Middle School</option>
+                            {tournamentData.map((ds, i) => (
+                                <option key={ds.label} value={i}>
+                                    {ds.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
                 </div>
@@ -76,7 +79,7 @@ export default function SkillsPage() {
                         type="text"
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-                        placeholder="Search by team number, name, org, or region…"
+                        placeholder="Search by team number…"
                         className="input w-full sm:max-w-md"
                     />
                 </div>
@@ -88,49 +91,36 @@ export default function SkillsPage() {
                             <tr>
                                 <th className="w-16 text-center">Rank</th>
                                 <th>Team</th>
-                                <th className="hidden sm:table-cell">Organization</th>
-                                <th className="hidden md:table-cell">Region</th>
-                                <th className="text-right">Score</th>
-                                <th className="text-right hidden sm:table-cell">Auto</th>
-                                <th className="text-right hidden sm:table-cell">Driver</th>
+                                <th className="text-right">Performance Rating</th>
+                                <th className="text-right hidden sm:table-cell">Uncertainty</th>
+                                <th className="text-right hidden sm:table-cell">Matches</th>
                             </tr>
                         </thead>
                         <tbody>
                             {pageTeams.map((team) => (
-                                <tr key={`${division}-${team.teamNumber}`}>
+                                <tr key={`${selectedIndex}-${team.teamNumber}`}>
                                     <td className="text-center font-mono text-txt-3">{team.rank}</td>
                                     <td>
                                         <div>
                                             <span className="team-num-chip bg-line-hi transition-colors block w-max cursor-default">
                                                 {team.teamNumber}
                                             </span>
-                                            {team.teamName && team.teamName !== team.teamNumber && (
-                                                <span className="text-[10px] text-txt-3 font-mono mt-0.5 block">
-                                                    {team.teamName}
-                                                </span>
-                                            )}
                                         </div>
                                     </td>
-                                    <td className="hidden sm:table-cell text-xs text-txt-2 truncate max-w-[200px]">
-                                        {team.org || "—"}
+                                    <td className="text-right font-mono font-bold text-[18px] text-txt-1">
+                                        {team.performanceRating}
                                     </td>
-                                    <td className="hidden md:table-cell text-xs text-txt-3 truncate max-w-[150px]">
-                                        {team.region || "—"}
+                                    <td className="text-right font-mono text-xs text-blue-400 hidden sm:table-cell">
+                                        ±{team.ratingUncertainty}
                                     </td>
-                                    <td className="text-right font-mono font-bold text-[15px] text-txt-1">
-                                        {team.score}
-                                    </td>
-                                    <td className="text-right font-mono text-xs text-cyan-400 hidden sm:table-cell">
-                                        {team.auto}
-                                    </td>
-                                    <td className="text-right font-mono text-xs text-amber-400 hidden sm:table-cell">
-                                        {team.driver}
+                                    <td className="text-right font-mono text-xs text-txt-3 hidden sm:table-cell">
+                                        {team.matchCount}
                                     </td>
                                 </tr>
                             ))}
                             {pageTeams.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-10 text-txt-3 font-mono text-xs uppercase tracking-widest">
+                                    <td colSpan={5} className="text-center py-10 text-txt-3 font-mono text-xs uppercase tracking-widest">
                                         No teams match your search.
                                     </td>
                                 </tr>
@@ -165,7 +155,7 @@ export default function SkillsPage() {
                 {/* Footer */}
                 <div className="mt-12 pt-6 border-t border-line text-center">
                     <p className="text-[10px] text-txt-3 uppercase tracking-[0.3em] font-mono">
-                        Data sourced from RobotEvents World Skills Standings
+                        Data generated using Bayesian Performance Model from Tournament Results
                     </p>
                 </div>
             </div>
