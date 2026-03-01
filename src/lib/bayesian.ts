@@ -77,13 +77,7 @@ export function creditDistribution(
 /**
  * Calculate alliance rating and uncertainty.
  * Uses 70/30 weighted average favoring the strongest and weakest teams (ignoring the middle if 3 teams, theoretically).
- * The user spec says:
- * 1. Sort teams by rating descending
- * 2. strongestRating = teams[0].rating, weakestRating = teams[2].rating
- * 3. allianceRating = 0.7 * strongest + 0.3 * weakest
- * 4. allianceVariance = (0.7^2 * strongestVar) + (0.3^2 * weakestVar)
- * 5. allianceUncertainty = sqrt(allianceVariance)
- *
+ 
  * NOTE: This assumes 3 teams per alliance.
  */
 export function allianceStats(teams: Array<{ rating: number; uncertainty: number }>): {
@@ -98,6 +92,7 @@ export function allianceStats(teams: Array<{ rating: number; uncertainty: number
   // And the formula explicitly says "weakestRating = teams[2].rating".
   // So we assume 3 teams.
   // If fewer than 3, we adapt gracefully.
+  
   const strongest = sorted[0];
   const weakest = sorted[sorted.length - 1];
 
@@ -208,25 +203,19 @@ export interface BayesianMatchUpdate {
 }
 
 /**
- * Compute full Bayesian match update for two alliances.
  *
  * For credit distribution with 3 teams:
  * Pair Strongest (0) with Middle (1) -> get credit for Middle
  * Pair Weakest (2) with Middle (1) -> get credit for Middle
  * Average the two credit factors for Middle?
  *
- * User prompt says:
- * "For 3-team alliances, pair teams for credit distribution:
- * - Strongest with middle
- * - Weakest with middle
- * - Average the two credit factors for the middle team"
+
  *
  * Actually, credit distribution is usually between PAIRS of teams in standard implementations,
  * but here we are distributing the ALLIANCE's "Delta" to the individual teams.
  *
  * The `creditDistribution` function takes 2 teams.
  *
- * Let's follow the user instruction strictly for the 3-team logic.
  */
 export function computeBayesianMatchUpdate(
   winningTeams: BayesianTeamInput[], // Array of 3 teams

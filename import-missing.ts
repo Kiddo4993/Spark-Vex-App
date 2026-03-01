@@ -17,7 +17,7 @@ function generatePassword(length = 6): string {
 }
 
 async function main() {
-    // 1. Load all teams from CSVs
+
     const csvTeams = new Map<string, any>();
     for (const file of ["highschool.csv", "middleschool.csv"]) {
         if (!fs.existsSync(file)) { console.warn(`Missing: ${file}`); continue; }
@@ -31,12 +31,12 @@ async function main() {
     }
     console.log(`CSV unique teams: ${csvTeams.size}`);
 
-    // 2. Fetch ALL existing team numbers from DB in one query
+
     const dbTeams = await prisma.team.findMany({ select: { teamNumber: true } });
     const existingSet = new Set(dbTeams.map(t => t.teamNumber));
     console.log(`DB existing teams: ${existingSet.size}`);
 
-    // 3. Find the missing ones
+
     const missing: [string, any][] = [];
     for (const [num, record] of csvTeams) {
         if (!existingSet.has(num)) missing.push([num, record]);
@@ -48,7 +48,7 @@ async function main() {
         return;
     }
 
-    // 4. Create missing teams sequentially (small count, fast)
+
     let created = 0;
     for (const [upNum, record] of missing) {
         try {

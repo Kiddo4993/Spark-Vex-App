@@ -58,7 +58,7 @@
     <!-- Add Task Modal (Simple Prompt replacement for now) -->
 
     <script>
-        // Default Data
+
         const defaultColumns = [
             { id: "todo", name: "To Do", order: 0 },
             { id: "inprogress", name: "In Progress", order: 1 },
@@ -71,11 +71,11 @@
             { id: "t2", title: "Code Auton", columnId: "inprogress", priority: "medium", tags: ["code"] }
         ];
 
-        // State
+
         let columns = JSON.parse(localStorage.getItem('vex_columns')) || defaultColumns;
         let tasks = JSON.parse(localStorage.getItem('vex_tasks')) || defaultTasks;
 
-        // Render
+
         function renderBoard() {
             const board = document.getElementById('board');
             board.innerHTML = '';
@@ -130,7 +130,7 @@
             });
         }
 
-        // Drag & Drop
+
         function allowDrop(ev) {
             ev.preventDefault();
             ev.currentTarget.classList.add('drag-over');
@@ -150,13 +150,13 @@
             const taskId = ev.dataTransfer.getData("text");
             const newColumnId = ev.currentTarget.id;
 
-            // Update State
+
             tasks = tasks.map(t => t.id === taskId ? { ...t, columnId: newColumnId } : t);
             save();
             renderBoard();
         }
 
-        // Actions
+
         function addNewTask(columnId) {
             const title = prompt("Enter task title:");
             if (!title) return;
@@ -165,7 +165,7 @@
                 id: 't' + Date.now(),
                 title: title,
                 columnId: columnId,
-                priority: "medium", // Default
+                priority: "medium", 
                 tags: []
             };
             
@@ -196,7 +196,7 @@
             localStorage.setItem('vex_tasks', JSON.stringify(tasks));
         }
 
-        // Init
+
         renderBoard();
 
     </script>
