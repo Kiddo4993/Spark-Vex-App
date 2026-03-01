@@ -35,7 +35,7 @@ export async function GET() {
         let hasAccount = !!t.user;
         let password = t.generatedPassword || "—";
 
-        // Auto-generate account if missing
+
         if (!t.user) {
             const plainPassword = generatePassword(6);
             const hashedPassword = await hash(plainPassword, 10); // using 10 rounds for faster bulk generation
@@ -63,7 +63,7 @@ export async function GET() {
     return NextResponse.json({ credentials });
 }
 
-// Regenerate passwords for all non-admin team accounts
+
 export async function POST() {
     const session = await getServerSession(authOptions);
     if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

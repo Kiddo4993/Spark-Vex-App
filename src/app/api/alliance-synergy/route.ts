@@ -15,7 +15,6 @@ export async function GET(req: Request) {
     });
     if (!myTeam) return NextResponse.json({ error: "Team not found" }, { status: 404 });
 
-    // Get only teams that have been imported (have CalculatedRating records from this uploader)
     const importedRatings = await prisma.calculatedRating.findMany({
         where: { uploaderId: myTeamId, subjectTeamId: { not: myTeam.id } },
         select: { subjectTeamId: true },
@@ -29,8 +28,6 @@ export async function GET(req: Request) {
     const allTeams = await prisma.team.findMany({
         where: { id: { in: importedTeamIds }, teamNumber: { not: "ADMIN" } },
     });
-
-    // Lookup scoped data
     const calcRatings = await prisma.calculatedRating.findMany({
         where: { uploaderId: myTeamId }
     });
@@ -52,8 +49,7 @@ export async function GET(req: Request) {
         const otherRating = calcMap.get(other.id);
         const otherScout = scoutMap.get(other.id);
 
-        // 1. Auto Compatibility
-        let autoScore = 75; // Default/Unknown/Skills
+        let autoScore = 75; 
         const s1 = myTeam.autonomousSide?.toLowerCase();
         const s2 = other.autonomousSide?.toLowerCase();
 
@@ -71,15 +67,15 @@ export async function GET(req: Request) {
             autoScore = 75;
         }
 
-        // 2. Strength Score
+
         const r2 = otherRating?.performanceRating ?? 100;
         const baseScore = Math.min(50, (r1 + r2) / 6);
 
         const as2 = otherScout?.autoStrength ?? 0;
-        const autoBonus = (as1 + as2) / 0.8; // Max 25
+        const autoBonus = (as1 + as2) / 0.8; 
 
         const ds2 = otherScout?.driverStrength ?? 0;
-        const driverBonus = (ds1 + ds2) / 0.8; // Max 25
+        const driverBonus = (ds1 + ds2) / 0.8;
 
         const strengthScore = baseScore + Math.min(25, autoBonus) + Math.min(25, driverBonus);
 
