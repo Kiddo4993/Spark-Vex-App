@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { useEffect, useState } from "react";
 
 const getAdminSections = () => [
     {
@@ -51,32 +50,6 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
     const pathname = usePathname();
     const sections = isAdmin ? getAdminSections() : getTeamSections(teamNumber);
 
-    // Fetch unread messages count
-    const [unreadCount, setUnreadCount] = useState(0);
-
-    useEffect(() => {
-        if (isAdmin) return;
-
-        const fetchUnread = async () => {
-            try {
-                const res = await fetch("/api/messages/unread");
-                if (res.ok) {
-                    const data = await res.json();
-                    setUnreadCount(data.unreadCount || 0);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        // Initial fetch
-        fetchUnread();
-
-        // Poll every 10 seconds
-        const interval = setInterval(fetchUnread, 10000);
-        return () => clearInterval(interval);
-    }, [isAdmin]);
-
     return (
         <aside className="w-56 flex-shrink-0 bg-surface-card border-r border-line flex flex-col sticky top-0 h-screen overflow-y-auto">
             {/* Logo */}
@@ -106,7 +79,6 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                             const { href, label } = item;
                             const isExternal = (item as any).external;
                             const isActive = pathname === href;
-                            const showUnreadDot = label === "Connections" && unreadCount > 0;
 
                             return (
                                 <Link
@@ -120,9 +92,6 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                                         <div className="w-1.5 h-1.5 rounded-full bg-txt-3 opacity-30 group-hover:opacity-100 transition-opacity" />
                                         {label}
                                     </div>
-                                    {showUnreadDot && (
-                                        <div className="w-2 h-2 rounded-full bg-danger animate-pulse mr-2" />
-                                    )}
                                     {isActive && (
                                         <>
                                             <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-red-600 to-rose-600" />

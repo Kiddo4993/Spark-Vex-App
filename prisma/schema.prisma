@@ -1,5 +1,5 @@
-// VEX Robotics ELO & Skills - Prisma Schema
-// Vercel-compatible PostgreSQL
+// sparkvex database schema - postgres on neon
+// everything we need for ratings, scouting, messaging, connections, and tasks
 
 generator client {
   provider = "prisma-client-js"

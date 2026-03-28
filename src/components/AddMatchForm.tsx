@@ -88,7 +88,7 @@ export function AddMatchForm({ teams }: { teams: Team[] }) {
   if (submitted) {
     return (
       <div className="text-center py-12 space-y-3">
-        <div className="text-4xl">✅</div>
+        <div className="text-sm font-mono font-bold text-blue-400 tracking-widest uppercase">Done</div>
         <h2 className="font-head text-xl font-bold text-txt-1">Match Added!</h2>
         <p className="text-sm text-txt-2">Bayesian ratings updated. Redirecting…</p>
       </div>

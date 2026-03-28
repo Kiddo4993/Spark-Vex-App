@@ -1,20 +1,18 @@
-// --- Constants ---
-export const K = 32; // Rating variance multiplier
-export const W = 0.7; // Weight for credit distribution (0.7 to stronger, 0.3 to weaker)
-export const U_MATCH = 20; // Global uncertainty variance for random match errors
-export const U_MIN = 10; // Minimum uncertainty floor
+// the core constants for the model - these values came from
+// a paper on bayesian game rating. tweaked them a bit at regionals
+// and they seemed to work well
+export const K = 32;
+export const W = 0.7; // 70% credit to the stronger bot
+export const U_MATCH = 20; // noise from random match stuff
+export const U_MIN = 10; // don't let uncertainty go below this
 export const INITIAL_RATING = 100;
 export const INITIAL_UNCERTAINTY = 50;
 export const SKILLS_BONUS_DIVISOR = 5;
 export const REGIME_CHANGE_THRESHOLD = 0.7;
-export const SCOUT_NEEDED_THRESHOLD = U_MIN * 2.5; // 25
+export const SCOUT_NEEDED_THRESHOLD = U_MIN * 2.5; // 25 - this is when we flag teams for re-scout
 
-// --- Helper Utilities ---
-
-/**
- * Error function approximation (Abramowitz and Stegun 7.1.26)
- * Max error: 1.5e-7
- */
+// error function approximation from Abramowitz & Stegun
+// grabbed this formula from wikipedia, max error around 1.5e-7 which is fine for us
 function erf(x: number): number {
   const sign = x >= 0 ? 1 : -1;
   x = Math.abs(x);
@@ -30,27 +28,20 @@ function erf(x: number): number {
   return sign * y;
 }
 
-/**
- * Normal Cumulative Distribution Function (CDF)
- * Formula: 0.5 * (1 + erf(x / sqrt(2)))
- */
+// normal CDF - basically gives us win probability
 export function normalCDF(x: number): number {
   return 0.5 * (1 + erf(x / Math.sqrt(2)));
 }
 
-/**
- * Calculate strenght score for credit distribution.
- * Sa = Ra / Ua
- */
+// how "strong" a bot looks to the model - rating divided by uncertainty
+// higher means we're more confident they're actually good
 export function botStrength(rating: number, uncertainty: number): number {
-  if (uncertainty === 0) return rating; // Prevent division by zero, though U_MIN should prevent this
+  if (uncertainty === 0) return rating;
   return rating / uncertainty;
 }
 
-/**
- * Distribute credit/blame between two alliance partners based on their strength.
- * Stronger bots get more credit/blame.
- */
+// splits credit between two partners based on who's stronger
+// the better bot gets more blame/credit for how the match went
 export function creditDistribution(
   rating1: number,
   uncertainty1: number,
@@ -61,7 +52,7 @@ export function creditDistribution(
   const sa = botStrength(rating1, uncertainty1);
   const sb = botStrength(rating2, uncertainty2);
 
-  // Avoid division by zero if both strengths are 0 (unlikely with U_MIN)
+  // shouldn't happen with U_MIN but just in case
   const sumS = sa + sb;
   if (sumS === 0) return { credit1: 0.5, credit2: 0.5 };
 
@@ -74,25 +65,18 @@ export function creditDistribution(
   return { credit1: da, credit2: db };
 }
 
-/**
- * Calculate alliance rating and uncertainty.
- * Uses 70/30 weighted average favoring the strongest and weakest teams (ignoring the middle if 3 teams, theoretically).
- 
- * NOTE: This assumes 3 teams per alliance.
- */
+// combines the alliance into one rating + uncertainty
+// weights it 70/30 between strongest and weakest team
+// this worked pretty well - the middle bot doesn't matter as much
+// for predicting alliance outcomes
 export function allianceStats(teams: Array<{ rating: number; uncertainty: number }>): {
   rating: number;
   uncertainty: number;
 } {
-  // Sort by rating descending
   const sorted = [...teams].sort((a, b) => b.rating - a.rating);
 
-  // Guard against < 3 teams just in case, though VEX is usually 2v2 or 3v3? User says 3v3 in prompt.
-  // Actually VEX VRC is 2v2 usually. But prompt explicitly mentions "Red Team 1, Red Team 2, Red Team 3".
-  // And the formula explicitly says "weakestRating = teams[2].rating".
-  // So we assume 3 teams.
-  // If fewer than 3, we adapt gracefully.
-  
+  // we handle 2v2 and 3v3 - VRC does both depending on the event format
+  // the schema has 3 slots per alliance so we just handle whatever we get
   const strongest = sorted[0];
   const weakest = sorted[sorted.length - 1];
 
@@ -109,9 +93,7 @@ export function allianceStats(teams: Array<{ rating: number; uncertainty: number
   return { rating, uncertainty };
 }
 
-/**
- * Calculate expected outcome (win probability 0-1).
- */
+// uses normal CDF to get win probability between two alliances
 export function expectedOutcome(
   alliance1Rating: number,
   alliance1Uncertainty: number,
@@ -129,9 +111,7 @@ export function expectedOutcome(
   return normalCDF(ratingDiff / totalUncertainty);
 }
 
-/**
- * Update rating based on delta (Actual - Expected).
- */
+// the actual rating update - classic elo-style but with credit weighting
 export function updateTeamRating(
   currentRating: number,
   creditFactor: number,
@@ -142,9 +122,9 @@ export function updateTeamRating(
   return Math.max(0, newRating);
 }
 
-/**
- * Update uncertainty based on surprise.
- */
+// updates how uncertain we are about a team
+// if the result was really surprising, we actually increase uncertainty
+// because maybe something changed with their bot (regime change)
 export function updateTeamUncertainty(
   currentUncertainty: number,
   creditFactor: number,
@@ -152,8 +132,7 @@ export function updateTeamUncertainty(
   k: number = 0.5,
   uMin: number = U_MIN
 ): number {
-  // Regime change detection: if the result is a major surprise,
-  // expand uncertainty to signal the model may need to recalibrate.
+  // big surprise = maybe their bot changed, expand uncertainty
   if (surpriseFactor > REGIME_CHANGE_THRESHOLD) {
     return Math.min(INITIAL_UNCERTAINTY, currentUncertainty * 1.2);
   }
@@ -161,9 +140,7 @@ export function updateTeamUncertainty(
   return Math.max(uMin, newUncertainty);
 }
 
-/**
- * Calculate initial rating boost from skills.
- */
+// if a team has driver skills scores, give them a small initial bump
 export function initialRatingWithSkillsBoost(
   driverSkillsScore: number | null,
   baseRating: number = INITIAL_RATING,
@@ -173,9 +150,7 @@ export function initialRatingWithSkillsBoost(
   return baseRating + driverSkillsScore / divisor;
 }
 
-/**
- * Convert uncertainty to 0-100 confidence percentage.
- */
+// turns uncertainty into a 0-100 confidence percentage for the UI
 export function confidenceFromUncertainty(
   uncertainty: number,
   baseUncertainty: number = INITIAL_UNCERTAINTY
@@ -202,24 +177,16 @@ export interface BayesianMatchUpdate {
   surpriseFactor: number;
 }
 
-/**
- *
- * For credit distribution with 3 teams:
- * Pair Strongest (0) with Middle (1) -> get credit for Middle
- * Pair Weakest (2) with Middle (1) -> get credit for Middle
- * Average the two credit factors for Middle?
- *
-
- *
- * Actually, credit distribution is usually between PAIRS of teams in standard implementations,
- * but here we are distributing the ALLIANCE's "Delta" to the individual teams.
- *
- * The `creditDistribution` function takes 2 teams.
- *
- */
+// the big function - takes winning and losing teams from a match
+// and computes how everyone's rating should change
+//
+// credit distribution for 3 teams works by pairing them:
+//   strongest<->middle and middle<->weakest
+//   then averaging the middle bot's credit from both pairs
+// this was the part that took me the longest to figure out lol
 export function computeBayesianMatchUpdate(
-  winningTeams: BayesianTeamInput[], // Array of 3 teams
-  losingTeams: BayesianTeamInput[],  // Array of 3 teams
+  winningTeams: BayesianTeamInput[],
+  losingTeams: BayesianTeamInput[],
   constants: { k: number; w: number; uMatch: number; uMin: number } = {
     k: K,
     w: W,
@@ -230,12 +197,11 @@ export function computeBayesianMatchUpdate(
   winning: BayesianMatchUpdate[];
   losing: BayesianMatchUpdate[];
 } {
-  // 1. Alliance Stats
+  // get combined alliance stats
   const winStats = allianceStats(winningTeams);
   const loseStats = allianceStats(losingTeams);
 
-  // 2. Expected Outcome
-  // E for Winning alliance (A=1)
+  // how likely was the winning alliance to win?
   const expectedWin = expectedOutcome(
     winStats.rating,
     winStats.uncertainty,
@@ -248,11 +214,7 @@ export function computeBayesianMatchUpdate(
   const deltaWin = actualWin - expectedWin;
   const surpriseWin = Math.abs(deltaWin);
 
-  // For Losing alliance (A=0), Expected is (1 - E_win) or calculated reverse
-  // Note: normalCDF(-x) = 1 - normalCDF(x).
-  // So expectedLose = 1 - expectedWin.
-  // DeltaLose = 0 - expectedLose = 0 - (1 - E_win) = E_win - 1 = - (1 - E_win) = - deltaWin?
-  // Let's explicitly calculate expectedLose.
+  // same thing from the losers' perspective
   const expectedLose = expectedOutcome(
     loseStats.rating,
     loseStats.uncertainty,
@@ -264,34 +226,28 @@ export function computeBayesianMatchUpdate(
   const deltaLose = actualLose - expectedLose;
   const surpriseLose = Math.abs(deltaLose);
 
-  // 3. Process Winning Teams
-  // We need to calculate credit factors.
-  // Sort teams by rating to identify strongest/middle/weakest for credit calc logic
-  // BUT we need to map back to original indices/IDs.
+  // figure out credit for each winning team
   const winningSorted = [...winningTeams].map((t, i) => ({ ...t, originalIndex: i }))
     .sort((a, b) => b.rating - a.rating);
 
   const winningCredits = new Map<string, number>();
 
   if (winningSorted.length === 2) {
-    // 2-team alliance (VEX VRC 2v2)
     const cv = creditDistribution(winningSorted[0].rating, winningSorted[0].uncertainty, winningSorted[1].rating, winningSorted[1].uncertainty, constants.w);
     winningCredits.set(winningSorted[0].id, cv.credit1);
     winningCredits.set(winningSorted[1].id, cv.credit2);
   } else if (winningSorted.length >= 3) {
-    // 3-team alliance
     const cv_Strong_Mid = creditDistribution(winningSorted[0].rating, winningSorted[0].uncertainty, winningSorted[1].rating, winningSorted[1].uncertainty, constants.w);
     const cv_Mid_Weak = creditDistribution(winningSorted[1].rating, winningSorted[1].uncertainty, winningSorted[2].rating, winningSorted[2].uncertainty, constants.w);
     winningCredits.set(winningSorted[0].id, cv_Strong_Mid.credit1);
     winningCredits.set(winningSorted[2].id, cv_Mid_Weak.credit2);
     winningCredits.set(winningSorted[1].id, (cv_Strong_Mid.credit2 + cv_Mid_Weak.credit1) / 2);
   } else {
-    // 1-team alliance fallback
     winningCredits.set(winningSorted[0].id, 1);
   }
 
   const winningUpdates: BayesianMatchUpdate[] = winningTeams.map(team => {
-    const da = winningCredits.get(team.id) || 0.33; // Fallback
+    const da = winningCredits.get(team.id) || 0.33;
     const rAfter = updateTeamRating(team.rating, da, deltaWin, constants.k);
     const uAfter = updateTeamUncertainty(team.uncertainty, da, surpriseWin, 0.5, constants.uMin);
 
@@ -307,7 +263,7 @@ export function computeBayesianMatchUpdate(
     };
   });
 
-  // 4. Process Losing Teams
+  // same process for losing teams
   const losingSorted = [...losingTeams].map((t, i) => ({ ...t, originalIndex: i }))
     .sort((a, b) => b.rating - a.rating);
 
@@ -329,7 +285,7 @@ export function computeBayesianMatchUpdate(
 
   const losingUpdates: BayesianMatchUpdate[] = losingTeams.map(team => {
     const db = losingCredits.get(team.id) || 0.33;
-    const rAfter = updateTeamRating(team.rating, db, deltaLose, constants.k); // deltaLose is negative usually
+    const rAfter = updateTeamRating(team.rating, db, deltaLose, constants.k);
     const uAfter = updateTeamUncertainty(team.uncertainty, db, surpriseLose, 0.5, constants.uMin);
 
     return {
@@ -347,10 +303,7 @@ export function computeBayesianMatchUpdate(
   return { winning: winningUpdates, losing: losingUpdates };
 }
 
-/**
- * Compute Bayesian match update for a tie (A=0.5 for both alliances).
- * Returns a flat array of updates for all teams.
- */
+// handles ties - both alliances get deltaed toward 0.5
 export function computeBayesianTieUpdate(
   redTeams: BayesianTeamInput[],
   blueTeams: BayesianTeamInput[],
@@ -361,9 +314,9 @@ export function computeBayesianTieUpdate(
   const redStats = allianceStats(redTeams);
   const blueStats = allianceStats(blueTeams);
 
-  const actual = 0.5; // Tie
+  const actual = 0.5;
 
-  // Red's perspective
+  // red's side
   const expectedRed = expectedOutcome(
     redStats.rating, redStats.uncertainty,
     blueStats.rating, blueStats.uncertainty,
@@ -372,7 +325,7 @@ export function computeBayesianTieUpdate(
   const deltaRed = actual - expectedRed;
   const surpriseRed = Math.abs(deltaRed);
 
-  // Blue's perspective
+  // blue's side
   const expectedBlue = expectedOutcome(
     blueStats.rating, blueStats.uncertainty,
     redStats.rating, redStats.uncertainty,

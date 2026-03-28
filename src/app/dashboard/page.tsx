@@ -109,7 +109,7 @@ export default async function DashboardPage() {
         <div className="flex gap-2.5">
           {!isViewingOther && (
             <>
-              <Link href={`/dashboard/teams/${team.teamNumber}`} className="btn-ghost">✎ Edit Profile</Link>
+              <Link href={`/dashboard/teams/${team.teamNumber}`} className="btn-ghost">Edit Profile</Link>
             </>
           )}
         </div>

@@ -26,7 +26,7 @@ export async function GET() {
 
         return NextResponse.json({ unreadByTeam });
     } catch (error) {
-        console.error("Failed to fetch unread messages per team:", error);
+        console.error("couldn't get per-team unreads:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
