@@ -18,13 +18,13 @@ export const authOptions: NextAuthOptions = {
 
         const login = credentials.login.trim();
 
-        // Try to find user by email first (for admin accounts)
+        // check email first (admins use email), then fall back to team number
         let user = await prisma.user.findFirst({
           where: { email: login },
           include: { team: true },
         });
 
-        // If not found by email, try to find by team number
+        // no email match, try team number instead
         if (!user) {
           const team = await prisma.team.findUnique({
             where: { teamNumber: login.toUpperCase() },

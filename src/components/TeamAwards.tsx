@@ -125,7 +125,7 @@ export function TeamAwards({ teamNumber, awards }: { teamNumber: string, awards:
                             <ul className="mt-2 space-y-1.5">
                                 {awardNames.map((name, i) => (
                                     <li key={`${event}-${i}`} className="text-sm text-txt-2 flex items-center gap-2">
-                                        <span className="text-amber">🏆</span> {name}
+                                        <span className="text-amber">—</span> {name}
                                     </li>
                                 ))}
                             </ul>

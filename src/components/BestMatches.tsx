@@ -23,7 +23,7 @@ export function BestMatches({ matches }: { matches: Match[] }) {
         <div className="card border-l-[3px] border-l-amber">
             <div className="card-header flex items-center justify-between">
                 <div className="section-title flex items-center gap-2">
-                    <span>🔥</span> Best Matches
+                    Top Matches
                 </div>
             </div>
             <div className="px-5 py-2">

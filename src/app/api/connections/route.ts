@@ -87,3 +87,31 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Request failed" }, { status: 500 });
   }
 }
+
+// disconnect from a team
+export async function DELETE(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.teamId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const myTeamId = (session.user as { teamId: string }).teamId;
+
+  const { searchParams } = new URL(req.url);
+  const connectionId = searchParams.get("connectionId");
+  if (!connectionId) return NextResponse.json({ error: "connectionId required" }, { status: 400 });
+
+  try {
+    // make sure this user is actually part of this connection
+    const conn = await prisma.connection.findFirst({
+      where: {
+        id: connectionId,
+        OR: [{ fromTeamId: myTeamId }, { toTeamId: myTeamId }],
+      },
+    });
+    if (!conn) return NextResponse.json({ error: "Connection not found" }, { status: 404 });
+
+    await prisma.connection.delete({ where: { id: connectionId } });
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Failed to disconnect" }, { status: 500 });
+  }
+}

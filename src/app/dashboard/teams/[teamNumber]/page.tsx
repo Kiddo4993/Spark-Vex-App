@@ -6,6 +6,7 @@ import Link from "next/link";
 import { TeamProfileCard } from "@/components/TeamProfileCard";
 import { TeamProfileForm } from "@/components/TeamProfileForm";
 import { ScoutingForm } from "@/components/ScoutingForm";
+import { MessageTeamButton } from "@/components/MessageTeamButton";
 
 import { cookies } from "next/headers";
 
@@ -67,10 +68,13 @@ export default async function TeamProfilePage({
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between">
         <Link href="/dashboard/teams" className="text-txt-3 hover:text-txt-1 transition-colors text-sm">
           ← Teams
         </Link>
+        {!isOwn && myTeamId && (
+          <MessageTeamButton teamId={team.id} teamNumber={team.teamNumber} />
+        )}
       </div>
       <TeamProfileCard
         team={combinedTeam}

@@ -30,7 +30,7 @@ export async function GET(req: Request) {
             },
         });
 
-        // Mark unread messages from the other team as read
+        // mark messages from the other team as read while we're here
         await prisma.message.updateMany({
             where: {
                 fromTeamId: withTeamId,
@@ -42,7 +42,7 @@ export async function GET(req: Request) {
 
         return NextResponse.json({ messages });
     } catch (error) {
-        console.error("Failed to fetch messages:", error);
+        console.error("couldn't load messages:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
@@ -60,7 +60,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        // Optional: Verify that a connection exists between the two teams
+        // make sure these teams are actually connected before letting them chat
+        // had a bug where anyone could message anyone lol
         const connection = await prisma.connection.findFirst({
             where: {
                 OR: [
@@ -88,7 +89,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ message });
     } catch (error) {
-        console.error("Failed to send message:", error);
+        console.error("couldn't send message:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

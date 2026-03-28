@@ -19,7 +19,7 @@ export async function GET(req: Request) {
 
         return NextResponse.json({ unreadCount });
     } catch (error) {
-        console.error("Failed to fetch unread messages count:", error);
+        console.error("couldn't get unread count:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
