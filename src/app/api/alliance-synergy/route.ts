@@ -106,5 +106,14 @@ export async function GET(req: Request) {
 
     results.sort((a, b) => b.synergyScore - a.synergyScore);
 
-    return NextResponse.json(results);
+    return NextResponse.json({
+        myTeam: {
+            teamNumber: myTeam.teamNumber,
+            autonomousSide: myTeam.autonomousSide,
+            drivetrainType: myTeam.drivetrainType,
+            autoStrength: myScout?.autoStrength ?? null,
+            driverStrength: myScout?.driverStrength ?? null,
+        },
+        results,
+    });
 }

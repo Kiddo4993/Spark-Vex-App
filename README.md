@@ -5,8 +5,7 @@
 
 **Live:** [spark-vex-app.vercel.app](https://spark-vex-app.vercel.app)  
 **Team:** 77174A Holy Airball!  
-**Author:** Dylan Duan  
-**License:** MIT
+**Author:** Dylan Duan
 
 ---
 
@@ -106,13 +105,6 @@ npm run dev
 
 Deployed on Vercel with auto-deploy from GitHub. Database is Neon PostgreSQL with connection pooling. Auth uses JWT sessions (30 day expiry).
 
----
-
-## License
-
-MIT — see [LICENSE](./LICENSE)
-
----
 
 <p align="center">
   <strong>Built by 77174A Holy Airball!</strong><br>
