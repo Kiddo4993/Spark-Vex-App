@@ -91,6 +91,46 @@ export default function GuidePage() {
                         </p>
                     </div>
                 </div>
+
+                {/* 6. Auto Strength, Driver Strength & Reliability */}
+                <div className="card border-l-[3px] border-blue-500 bg-blue-500/5">
+                    <h2 className="text-lg font-mono font-bold text-blue-400 mb-3 uppercase tracking-widest border-b border-blue-500/20 pb-2">6. Auto Strength, Driver Strength & Reliability</h2>
+                    <div className="space-y-4 text-sm text-txt-2 leading-relaxed">
+                        <p>
+                            SparkVEX tracks two layers of team assessment — <strong className="text-txt-1">self-reported</strong> data and <strong className="text-txt-1">privately scouted</strong> data. Understanding the difference is essential for accurate alliance selection.
+                        </p>
+
+                        <div className="bg-surface-card border border-line p-4 rounded space-y-3">
+                            <p className="font-bold text-txt-1 text-xs font-mono uppercase tracking-widest">Auton Reliability % <span className="text-txt-3 font-normal">(Team Profile — Self-Reported)</span></p>
+                            <p>
+                                This is a percentage that a team sets on their own profile. It represents <strong className="text-txt-1">how reliable they believe their autonomous routine is</strong> — for example, a team that lands their auton 8 out of 10 times might set this to 80%. This value is publicly visible and set by the team themselves.
+                            </p>
+                        </div>
+
+                        <div className="bg-surface-card border border-line p-4 rounded space-y-3">
+                            <p className="font-bold text-txt-1 text-xs font-mono uppercase tracking-widest">Auto Strength <span className="text-txt-3 font-normal">(Public Profile or Private Scout)</span></p>
+                            <p>
+                                This is a <strong className="text-txt-1">0–10 scale</strong> that represents <strong className="text-txt-1">how strong a team's autonomous routine is</strong>. A score of 10 means exceptional precision, while a 1 means unreliable. Teams can rate themselves on their Public Profile. However, you can privately <em>override</em> this rating for any team using the Scouter Worksheet, and that overridden rating is only visible to you.
+                            </p>
+                        </div>
+
+                        <div className="bg-surface-card border border-line p-4 rounded space-y-3">
+                            <p className="font-bold text-txt-1 text-xs font-mono uppercase tracking-widest">Driver Strength <span className="text-txt-3 font-normal">(Public Profile or Private Scout)</span></p>
+                            <p>
+                                This is a <strong className="text-txt-1">0–10 scale</strong> representing <strong className="text-txt-1">how strong the driver is</strong>. Like Auto Strength, teams can assign themselves a public rating, but you are free to replace it with your own private rating based on your observations.
+                            </p>
+                        </div>
+
+                        <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded">
+                            <p className="font-bold text-blue-400 mb-2 font-mono uppercase tracking-widest text-xs">How the Fallback Works:</p>
+                            <ul className="list-disc pl-5 space-y-2 text-txt-2">
+                                <li>If you haven't scouted a team yourself, the Alliance Selection table points back to the <strong className="text-txt-1">team's public self-reported rating</strong> from their profile.</li>
+                                <li>Once you enter numbers into their private Scouter Worksheet, the table <strong className="text-txt-1">overrides the public fallback</strong> and strictly shows your private ratings.</li>
+                                <li><strong>Privacy check:</strong> Other teams' private scouting notes or averages will <em>never</em> bleed over into your display. You are only ever looking at their self-report or your own private scouting data.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

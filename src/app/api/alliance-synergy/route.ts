@@ -35,6 +35,18 @@ export async function GET(req: Request) {
         where: { scouterId: myTeamId }
     });
 
+    // Fetch ALL scouting data to find self-reported ratings (where subjectTeamId === scouterId)
+    const allScoutingData = await prisma.scoutingData.findMany({
+        where: { subjectTeamId: { in: importedTeamIds } }
+    });
+
+    const selfScoutMap = new Map<string, typeof allScoutingData[0]>();
+    for (const s of allScoutingData) {
+        if (s.scouterId === s.subjectTeamId) {
+            selfScoutMap.set(s.subjectTeamId, s);
+        }
+    }
+
     const calcMap = new Map(calcRatings.map(c => [c.subjectTeamId, c]));
     const scoutMap = new Map(scoutingDataList.map(s => [s.subjectTeamId, s]));
 
@@ -48,12 +60,20 @@ export async function GET(req: Request) {
     const results = allTeams.map((other) => {
         const otherRating = calcMap.get(other.id);
         const otherScout = scoutMap.get(other.id);
+        const theirSelfScout = selfScoutMap.get(other.id);
+
+        // Resolve auto/driver: prefer current user's scouting, fallback to their self-reported public rating
+        const resolvedAuto = otherScout?.autoStrength ?? theirSelfScout?.autoStrength ?? null;
+        const resolvedDriver = otherScout?.driverStrength ?? theirSelfScout?.driverStrength ?? null;
 
         let autoScore = 75; 
         const s1 = myTeam.autonomousSide?.toLowerCase();
         const s2 = other.autonomousSide?.toLowerCase();
 
-        const missingScouting = (otherScout?.autoStrength ?? null) === null || (otherScout?.driverStrength ?? null) === null;
+        // Missing data: only flag if the team has NO autonomous side AND no scouting data at all
+        const hasAutoInfo = !!other.autonomousSide;
+        const hasAnyScouting = resolvedAuto !== null || resolvedDriver !== null;
+        const missingScouting = !hasAutoInfo && !hasAnyScouting;
         let autoConflict = false;
 
         if (s1 && s2 && s1 !== "skills" && s2 !== "skills") {
@@ -67,14 +87,13 @@ export async function GET(req: Request) {
             autoScore = 75;
         }
 
-
         const r2 = otherRating?.performanceRating ?? 100;
         const baseScore = Math.min(50, (r1 + r2) / 6);
 
-        const as2 = otherScout?.autoStrength ?? 0;
+        const as2 = resolvedAuto ?? 0;
         const autoBonus = (as1 + as2) / 0.8; 
 
-        const ds2 = otherScout?.driverStrength ?? 0;
+        const ds2 = resolvedDriver ?? 0;
         const driverBonus = (ds1 + ds2) / 0.8;
 
         const strengthScore = baseScore + Math.min(25, autoBonus) + Math.min(25, driverBonus);
@@ -91,8 +110,8 @@ export async function GET(req: Request) {
                 id: other.id,
                 teamNumber: other.teamNumber,
                 autonomousSide: other.autonomousSide,
-                autoStrength: otherScout?.autoStrength ?? null,
-                driverStrength: otherScout?.driverStrength ?? null,
+                autoStrength: resolvedAuto,
+                driverStrength: resolvedDriver,
                 performanceRating: otherRating?.performanceRating ?? 100,
             },
             synergyScore,
