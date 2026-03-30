@@ -120,6 +120,9 @@ export default async function LandingPage() {
           <p className="text-[10px] text-txt-3 uppercase tracking-[0.3em] font-mono">
             © 2026 77174A Holy Airball! · Spark VEX
           </p>
+          <p className="text-[10px] text-txt-3 uppercase tracking-[0.3em] font-mono mt-2">
+            Designed and coded by Dylan Duan
+          </p>
         </footer>
       </div>
     </main>

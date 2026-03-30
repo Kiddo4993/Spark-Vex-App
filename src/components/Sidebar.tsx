@@ -60,7 +60,7 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                     </div>
                     <div className="flex flex-col">
                         <span className="text-xs font-head font-black text-txt-1 leading-none tracking-tight">SPARKVEX</span>
-                        <span className="text-[7px] font-mono text-txt-3 tracking-[0.2em] mt-0.5">EST. 2025</span>
+                        <span className="text-[7px] font-mono text-txt-3 tracking-[0.2em] mt-0.5">EST. 2026</span>
                     </div>
                 </div>
                 <div className="text-[9px] font-mono text-txt-3 tracking-widest uppercase mt-[2px] px-1">
@@ -122,6 +122,9 @@ export function Sidebar({ teamNumber, isAdmin = false }: { teamNumber: string; i
                     >
                         Sign out
                     </button>
+                </div>
+                <div className="mt-5 text-[8px] font-mono text-txt-3 uppercase tracking-widest text-center opacity-60">
+                    Designed and coded by Dylan Duan
                 </div>
             </div>
         </aside>
