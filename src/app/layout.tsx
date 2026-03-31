@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
+
+// Preloading Google fonts to prevent layout shift
 import { Syne, Space_Mono, Inter } from "next/font/google";
+// NextAuth session provider
 import { SessionProvider } from "@/components/SessionProvider";
+// Global stylesheet (contains Tailwind directives)
 import "./globals.css";
+// Global toast container for notifications
 import { Toaster } from "react-hot-toast";
 
 const syne = Syne({
@@ -25,11 +30,17 @@ const inter = Inter({
   weight: ["300", "400", "500", "600"],
 });
 
+// Static metadata for SEO/og tags
 export const metadata: Metadata = {
   title: "Spark VEX: Bayesian Alliance Engine",
   description: "Advanced VRC scouting and alliance selection powered by Bayesian statistics.",
 };
 
+/**
+ * Root Layout
+ * Wraps the entire application. Injects global fonts, NextAuth session state,
+ * and the react-hot-toast container.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
