@@ -28,6 +28,17 @@ export function useChatContext() {
 const CHAT_OPEN_KEY = "sparkvex_chat_open";
 const CHAT_TEAM_KEY = "sparkvex_chat_team";
 
+/**
+ * ==========================================
+ * GLOBAL CHAT STATE (THE DM SYSTEM)
+ * ==========================================
+ * Keeps track of who we're talking to and if they left us on read lol.
+ * This polling setup is kinda jank but we didn't want to mess with WebSockets
+ * right now tbh, iykyk. 
+ * 
+ * LocalStorage persists everything so if you hit refresh during a heated strategy
+ * convo, you don't lose the tab.
+ */
 export function ChatProvider({
   children,
   currentTeamId,

@@ -30,6 +30,17 @@ type ConnectionAccepted = {
   toTeam: Team;
 };
 
+/**
+ * ==========================================
+ * THE HOMIES LIST (CONNECTIONS DASHBOARD)
+ * ==========================================
+ * This component basically shows who we're cool with and who wants to be cool with us.
+ * 
+ * - Sent: requests we fired off
+ * - Received: people sliding into our strategic DMs tbh
+ * - Accepted: our trusted besties we actually share data with bc we ain't sharing 
+ *   scouting info with ops lmao.
+ */
 export function ConnectionsList({
   sent,
   received,
@@ -47,6 +58,7 @@ export function ConnectionsList({
   const { openChatWith, unreadByTeam } = useChatContext();
 
   async function acceptOrDeny(connectionId: string, action: "accept" | "deny") {
+    // Lock the button down so users don't spam click it and break the db lol
     setProcessing(connectionId);
     try {
       await fetch("/api/connections", {
@@ -54,6 +66,7 @@ export function ConnectionsList({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, connectionId }),
       });
+      // Just full reload baby, React state is too much work rn iykyk
       window.location.reload();
     } finally {
       setProcessing(null);

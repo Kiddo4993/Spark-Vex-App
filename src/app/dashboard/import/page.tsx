@@ -6,6 +6,18 @@ import { ColumnMappingTable, ColumnMapping } from "@/components/ColumnMappingTab
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
+/**
+ * ==========================================
+ * DATA IMPORT WIZARD (AKA THE EXCEL EATER)
+ * ==========================================
+ * Yo this is where we absorb all the match data from VEX. 
+ * Basically, teams upload their messy .XLS files and we parse it,
+ * map the columns (because VEX changes their export format randomly lmao),
+ * and feed it into the Bayesian rating engine.
+ * 
+ * Be careful with the "Wipe Data" button lol it actually deletes everything.
+ * iykyk. 
+ */
 export default function ImportPage() {
     const router = useRouter();
     const { data: session, status: sessionStatus } = useSession();
