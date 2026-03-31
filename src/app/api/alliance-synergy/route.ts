@@ -4,6 +4,20 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { confidenceFromUncertainty, INITIAL_UNCERTAINTY } from "@/lib/bayesian";
 
+/**
+ * ==========================================
+ * ALLIANCE SYNERGY ENGINE (AKA THE MATCHMAKER)
+ * ==========================================
+ * Basically figuring out if we're actually compatible with these guys 
+ * or if it's gonna be a disaster in auto lmao.
+ * 
+ * We check a bunch of stuff:
+ * - Did they self-report? (sus, but we'll use it if we have to)
+ * - Do we have scouting data on them? (way better, iykyk)
+ * - Do our autonomous paths collide? (if they do, RIP)
+ * 
+ * Honestly this math is kinda wild but it works ok lol. 
+ */
 export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.teamId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -63,6 +77,7 @@ export async function GET(req: Request) {
         const theirSelfScout = selfScoutMap.get(other.id);
 
         // Resolve auto/driver: prefer current user's scouting, fallback to their self-reported public rating
+        // lmao basically if we scouted them, trust our scouts over whatever they claim they can do 
         const resolvedAuto = otherScout?.autoStrength ?? theirSelfScout?.autoStrength ?? null;
         const resolvedDriver = otherScout?.driverStrength ?? theirSelfScout?.driverStrength ?? null;
 
@@ -78,9 +93,11 @@ export async function GET(req: Request) {
 
         if (s1 && s2 && s1 !== "skills" && s2 !== "skills") {
             if (s1 === s2) {
+                // Bruh if we're both on the same side of the field in auto we're cooked 💀
                 autoScore = 50;
                 autoConflict = true;
             } else {
+                // Free real estate lmao
                 autoScore = 100;
             }
         } else if (s1 && s2 && (s1 === "skills" || s2 === "skills")) {
