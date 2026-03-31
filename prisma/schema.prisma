@@ -1,5 +1,6 @@
-// sparkvex database schema - postgres on neon
-// everything we need for ratings, scouting, messaging, connections, and tasks
+// SparkVEX Database Schema
+// We threw this together to track everything from raw match scores to our Bayesian rating system.
+// Trying to keep it as simple as possible while still supporting the deep scouting features.
 
 generator client {
   provider = "prisma-client-js"
@@ -10,6 +11,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Basic auth setup. We decided to keep it tied directly to the team, 
+// so each team basically shares one login account for scouting.
 model User {
   id        String   @id @default(cuid())
   email     String?  @unique
@@ -21,18 +24,20 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+// The core profile for every robot. We use the official VEX team number (like 1234A) 
+// everywhere because that's how we all actually talk about teams.
 model Team {
   id                    String    @id @default(cuid())
-  teamNumber            String    @unique // Unique robot team number (e.g. "1234A")
-  generatedPassword     String?   // Plaintext password for admin display
+  teamNumber            String    @unique
+  generatedPassword     String?
   provinceState         String?
   country               String?
   drivetrainType        String?
-  autonomousSide        String?   // left / right / skills / etc
+  autonomousSide        String?
   autonReliabilityPct   Float?
   notes                 String?  @db.Text
-  strategyTags          String[] // e.g. ["defensive", "fast auton"]
-  // Relations
+  strategyTags          String[]
+
   user                  User?
   performanceHistory    PerformanceHistory[]
   teamMatchStats        TeamMatchStats[]
@@ -59,6 +64,8 @@ model Team {
   updatedAt             DateTime  @updatedAt
 }
 
+// Stores the raw results from competition matches. We feed this into the math models
+// to get objective data instead of just relying on human scouters who might be biased.
 model Match {
   id          String   @id @default(cuid())
   eventName   String
@@ -67,7 +74,7 @@ model Match {
   blueScore   Int
   uploaderId  String
   uploader    Team     @relation("UploaderLocation", fields: [uploaderId], references: [id], onDelete: Cascade)
-  // Alliance team IDs (stored as team numbers for clarity; we join via Team)
+
   redTeam1Id  String
   redTeam2Id  String
   redTeam3Id  String
@@ -86,28 +93,32 @@ model Match {
   updatedAt   DateTime @updatedAt
 }
 
+// The secret sauce for our Bayesian system. This breaks down exactly how much 
+// a specific team contributed to their alliance's win or loss based on expected outcomes.
 model TeamMatchStats {
   id          String   @id @default(cuid())
   matchId     String
   teamId      String
   match       Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
   team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  alliance    String   // "red" | "blue"
+  alliance    String
   score       Int
 
   performanceBefore     Float
   performanceAfter      Float
   uncertaintyBefore     Float
   uncertaintyAfter      Float
-  expectedOutcome       Float   // 0-1 probability
-  carryFactor           Float   // Credit distribution for this team
-  surpriseFactor        Float   // |A - E| for uncertainty update
+  expectedOutcome       Float
+  carryFactor           Float
+  surpriseFactor        Float
   createdAt   DateTime @default(now())
   @@unique([matchId, teamId])
   @@index([teamId])
   @@index([matchId])
 }
 
+// Lets us graph out a team's progress over the season to see if their 
+// bot is getting better over time, or if they peaked early.
 model PerformanceHistory {
   id                String   @id @default(cuid())
   teamId            String
@@ -119,6 +130,8 @@ model PerformanceHistory {
   @@index([teamId])
 }
 
+// These are the overarching ratings calculated for a team after running all their stats.
+// We use this to rank teams in the alliance selection process.
 model CalculatedRating {
   id                String   @id @default(cuid())
   uploaderId        String
@@ -135,14 +148,16 @@ model CalculatedRating {
   @@index([subjectTeamId])
 }
 
+// The manual scouting stuff. Things you can't get from API data, like how good
+// their driver actually is, or if their autonomous totally bricks sometimes.
 model ScoutingData {
   id                String   @id @default(cuid())
   scouterId         String
   subjectTeamId     String
   scouter           Team     @relation("Scouter", fields: [scouterId], references: [id], onDelete: Cascade)
   subjectTeam       Team     @relation("ScoutingSubject", fields: [subjectTeamId], references: [id], onDelete: Cascade)
-  autoStrength      Float?    // 0-10 scale
-  driverStrength    Float?    // 0-10 scale
+  autoStrength      Float?
+  driverStrength    Float?
   notes             String?   @db.Text
   lastUpdated       DateTime @default(now())
 
@@ -151,11 +166,13 @@ model ScoutingData {
   @@index([subjectTeamId])
 }
 
+// Connect system so teams can link up on the app, kind of like adding friends.
+// Super useful for organizing practice matches or building alliances early.
 model Connection {
   id        String   @id @default(cuid())
   fromTeamId String
   toTeamId   String
-  status    String   // "pending" | "accepted" | "denied"
+  status    String
   fromTeam  Team     @relation("ConnectionFrom", fields: [fromTeamId], references: [id], onDelete: Cascade)
   toTeam    Team     @relation("ConnectionTo", fields: [toTeamId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -165,11 +182,13 @@ model Connection {
   @@index([fromTeamId])
 }
 
+// Shared notebook so teams in a connection can drop strategy intel 
+// or let each other know what to watch out for against mutual opponents.
 model Note {
   id        String   @id @default(cuid())
   fromTeamId String
   toTeamId   String
-  type      String   // "strategy" | "scouting"
+  type      String
   content   String   @db.Text
   fromTeam  Team     @relation("NoteFrom", fields: [fromTeamId], references: [id], onDelete: Cascade)
   toTeam    Team     @relation("NoteTo", fields: [toTeamId], references: [id], onDelete: Cascade)
@@ -179,6 +198,8 @@ model Note {
   @@index([toTeamId])
 }
 
+// Quick discussion board attached to a specific match, in case a referee made a bad call
+// or someone wants to point out something crazy that happened.
 model MatchComment {
   id        String   @id @default(cuid())
   matchId   String
@@ -192,6 +213,8 @@ model MatchComment {
   @@index([teamId])
 }
 
+// Direct messaging between teams. Had to add this because Discord is too distracting
+// during an actual event and we needed a place to coordinate.
 model Message {
   id        String   @id @default(cuid())
   fromTeamId String
@@ -201,16 +224,16 @@ model Message {
   fromTeam  Team     @relation("MessageFrom", fields: [fromTeamId], references: [id], onDelete: Cascade)
   toTeam    Team     @relation("MessageTo", fields: [toTeamId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
-  
+
   @@index([fromTeamId])
   @@index([toTeamId])
 }
 
-// ============== Task Board Models ==============
-
+// A built-in Kanban board for project management. We kept forgetting who was building what
+// on the robot, so we baked this right into the team dashboard.
 model TaskColumn {
   id        String   @id @default(cuid())
-  name      String   // e.g., "To Do", "In Progress", "Done"
+  name      String
   order     Int      @default(0)
   teamId    String
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
@@ -224,13 +247,13 @@ model Task {
   id          String       @id @default(cuid())
   title       String
   description String?      @db.Text
-  priority    String       @default("medium") // low, medium, high
+  priority    String       @default("medium")
   dueDate     DateTime?
   order       Int          @default(0)
   columnId    String
   column      TaskColumn   @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  assignees   String[]     // Array of team member names
-  tags        String[]     // e.g., ["mechanical", "programming"]
+  assignees   String[]
+  tags        String[]
   subtasks    Subtask[]
   comments    TaskComment[]
   createdAt   DateTime     @default(now())
@@ -251,7 +274,7 @@ model Subtask {
 model TaskComment {
   id        String   @id @default(cuid())
   taskId    String
-  author    String   // Name of commenter
+  author    String
   content   String   @db.Text
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

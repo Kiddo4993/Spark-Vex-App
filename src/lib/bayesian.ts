@@ -1,14 +1,4 @@
-/**
- * ==========================================
- * THE BAYESIAN MATH MAGIC (RATING ENGINE)
- * ==========================================
- * Yo this is the secret sauce that calculates how good everyone actually is,
- * completely ignoring the official VEX rankings because we all know they 
- * get carried sometimes lmao. 
- * 
- * Basically TrueSkill but modified for VRC.
- */
-// the core constants for the model - these values came from
+// the core constants for the model: these values came from
 // a paper on bayesian game rating. tweaked them a bit at regionals
 // and they seemed to work well
 export const K = 32;
@@ -193,7 +183,7 @@ export interface BayesianMatchUpdate {
 // credit distribution for 3 teams works by pairing them:
 //   strongest<->middle and middle<->weakest
 //   then averaging the middle bot's credit from both pairs
-// this was the part that took me the longest to figure out lol, math is hard iykyk
+// this was the part that took me the longest to figure out lol
 export function computeBayesianMatchUpdate(
   winningTeams: BayesianTeamInput[],
   losingTeams: BayesianTeamInput[],

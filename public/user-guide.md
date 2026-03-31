@@ -17,8 +17,8 @@ Our engine basically "watches" every single match you imported in chronological 
 ## 3. The Alliance Selection Engine
 The Alliance Selection dashboard is your command center for when eliminations roll around. It compares your team against every other team on the board to figure out:
 - **Combined Synergy Win Probability**: If you actually picked Team X, what is your genuine mathematical chance of winning a match?
-- **Auto Conflicts**: The system will literally throw up a warning sign (⚔️) if a potential pick runs their autonomous routine on the exact same side of the field as you. Nobody likes a traffic jam!
-- **Scout Needed**: The system flags teams (⚠️) if their ratings have a super high uncertainty. That usually means they are either hidden gems or completely unpredictable, so we highly recommend you send a scouter to watch them manually.
+- **Auto Conflicts**: The system will literally throw up a warning sign if a potential pick runs their autonomous routine on the exact same side of the field as you. Nobody likes a traffic jam!
+- **Scout Needed**: The system flags teams if their ratings have a super high uncertainty. That usually means they are either hidden gems or completely unpredictable, so we highly recommend you send a scouter to watch them manually.
 
 ## 4. Team Profiles & Collaboration
 - **Editable Profiles**: Click on your Team Profile to jot down Private Notes, lock in your Drivetrain type, and drop in Strategy Tags (like `defensive` or `fast auton`) so everyone knows what you're capable of.

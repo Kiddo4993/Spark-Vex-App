@@ -110,7 +110,11 @@ We host the live site on Vercel with automatic deployments straight from GitHub.
 
 
 <p align="center">
+<<<<<<< HEAD
   <strong> by 77174A Holy Airball!</strong><br>
+=======
+  <strong>Built with love by 77174A Holy Airball!</strong><br>
+>>>>>>> 4f9079c (more comments)
   <em>SparkVEX: Bayesian Alliance Engine</em>
 </p>
 
