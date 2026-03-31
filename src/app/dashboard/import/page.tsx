@@ -125,7 +125,7 @@ export default function ImportPage() {
             {step === "map" && (
                 <div className="space-y-5">
                     <div className="card p-5 border-l-[3px] border-l-spark">
-                        <h3 className="section-title mb-1">Map Columns — {importType === "match" ? "Matches" : "Skills"}</h3>
+                        <h3 className="section-title mb-1">Map Columns: {importType === "match" ? "Matches" : "Skills"}</h3>
                         <p className="text-xs text-txt-3 mb-5">Select which column corresponds to each field.</p>
                         <ColumnMappingTable columns={headers} preview={preview} mapping={mapping} onMappingChange={setMapping} mode={importType} />
                     </div>

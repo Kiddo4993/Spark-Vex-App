@@ -263,7 +263,7 @@ export default async function DashboardPage() {
         <div className="alert alert-info">
           <span className="alert-icon">ℹ</span>
           <div className="alert-body">
-            <strong>High uncertainty detected.</strong> Your rating confidence interval is wide (±{ratingUncertainty.toFixed(1)}). Add more match data to tighten your Bayesian estimate.
+            <strong>High uncertainty detected.</strong> We don't have enough match data to be certain! Your confidence rating is a bit wide right now (±{ratingUncertainty.toFixed(1)}). Upload some more matches to help the Bayesian model figure things out.
           </div>
         </div>
       )}

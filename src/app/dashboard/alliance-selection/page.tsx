@@ -60,7 +60,7 @@ export default function AllianceSelectionPage() {
                     {myTeam && (
                         <div className="flex flex-wrap items-center gap-3 mt-3">
                             <span className="text-[10px] font-mono text-txt-3 tracking-widest uppercase">
-                                {myTeam.teamNumber} (You) —
+                                {myTeam.teamNumber} (You):
                             </span>
                             {myTeam.autonomousSide ? (
                                 <span className="text-[10px] font-mono bg-surface-card border border-line px-2 py-0.5 text-txt-2 tracking-widest uppercase">
@@ -116,7 +116,7 @@ export default function AllianceSelectionPage() {
                         <div className="alert alert-warn mb-4">
                             <span className="alert-icon">[!]</span>
                             <div className="alert-body">
-                                Some teams have missing scouting data. Update their driver and autonomous strengths for accurate synergy scores.
+                                Some teams are missing their scouting data. Make sure to update their driver and autonomous scores so we can calculate an accurate synergy score!
                             </div>
                         </div>
                     )}
@@ -124,7 +124,7 @@ export default function AllianceSelectionPage() {
                         <div className="alert alert-danger mb-4">
                             <span className="alert-icon">[!]</span>
                             <div className="alert-body">
-                                Some potential partners have matching autonomous routines. This may cause conflicts during the match.
+                                A few potential partners run the same autonomous routines as you. This might cause some serious traffic jams on the field!
                             </div>
                         </div>
                     )}
@@ -132,7 +132,7 @@ export default function AllianceSelectionPage() {
                         <div className="alert alert-warn mb-4">
                             <span className="alert-icon">[!]</span>
                             <div className="alert-body">
-                                Some teams have low confidence ratings. Consider re-scouting before finalizing your alliance picks.
+                                We don't have enough match data to be completely confident about some of these teams yet. You might want to get a scouter to watch them before making your final picks!
                             </div>
                         </div>
                     )}
