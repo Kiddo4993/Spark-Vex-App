@@ -1,4 +1,4 @@
-# SparkVEX: Bayesian Alliance Engine
+# SparkVEX (Imbued with Bayesian Performence Model)
 
 > **Smarter, data-driven alliance selection for VEX Robotics.**  
 > Upload your match data, track true performance ratings, scout your opponents, and find the absolute perfect alliance partner for your team.
@@ -17,7 +17,7 @@ Our app looks closely at who was on each alliance, who they played against, and 
 
 ---
 
-## What can you do with it?
+## What can you do with it? (Intro)
 
 - **Bayesian Ratings**: Every team gets a true performance score plus an uncertainty margin. It's way deeper than just "did they win or lose?"
 - **Pain-Free Imports**: Just upload the `.xls` file straight from Tournament Manager and the app handles the rest.
@@ -48,7 +48,7 @@ The math constants actually come from a university paper on Bayesian game rating
 
 ---
 
-## Want to poke around the code?
+## Tech Stack and Layout
 
 All the good stuff is built on Next.js 14 and Postgres. Here is a quick map of the project:
 
@@ -70,7 +70,7 @@ src/
 
 ---
 
-## How to run it locally
+## Run Locally (Just use the link above if you are too lazy)
 
 Want to spin it up on your own machine? It's super easy:
 
@@ -104,7 +104,7 @@ npm run dev
 
 ---
 
-## Deployment stuff
+## Deployment stuff (Just a heads up that the import match will last until 30 days of the same import)
 
 We host the live site on Vercel with automatic deployments straight from GitHub. The database is running on Neon PostgreSQL using connection pooling so it doesn't crash under pressure, and we keep user sessions safe using NextAuth JWTs (which expire every 30 days).
 
