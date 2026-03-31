@@ -26,7 +26,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Spark VEX — Bayesian Alliance Engine",
+  title: "Spark VEX: Bayesian Alliance Engine",
   description: "Advanced VRC scouting and alliance selection powered by Bayesian statistics.",
 };
 

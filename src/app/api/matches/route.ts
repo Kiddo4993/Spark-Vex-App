@@ -75,7 +75,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // Auth guard — prevent unauthenticated match submission
+  // Auth guard: prevent unauthenticated match submission
   const session = await getServerSession(authOptions);
   if (!session?.user?.teamId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

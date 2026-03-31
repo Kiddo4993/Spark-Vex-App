@@ -15,29 +15,29 @@ export default function GuidePage() {
             <div className="grid gap-6">
                 {/* 1. Website Overview */}
                 <div className="card">
-                    <h2 className="text-lg font-mono font-bold text-txt-1 mb-3 uppercase tracking-widest border-b border-line pb-2">1. Website Overview</h2>
+                    <h2 className="text-lg font-mono font-bold text-txt-1 mb-3 uppercase tracking-widest border-b border-line pb-2">1. Welcome to SparkVEX</h2>
                     <div className="space-y-4 text-sm text-txt-2 leading-relaxed">
                         <p>
-                            <strong>SparkVEX</strong> is a comprehensive, data-driven platform designed to power your robotics team. Our system revolves around a custom Bayesian Performance Model that intelligently ranks teams by extracting their true value from alliance match play.
+                            Hey there! <strong>SparkVEX</strong> is a smart, data-driven tool we built to help robotics teams succeed. We use a cool math concept called a Bayesian Performance Model to evaluate how good teams truly are based on their match play. Here's a quick tour of what you can do:
                         </p>
                         <ul className="list-disc pl-5 space-y-2">
-                            <li><strong className="text-txt-1">Dashboard (Imported Teams):</strong> Contains all teams present in tournaments you have explicitly uploaded data for. This view is exclusively filtered to your imported events.</li>
-                            <li><strong className="text-txt-1">Alliance Selection:</strong> Uses the Bayesian model to rank your imported teams, identifying top partner candidates based on performance, consistency, and automated routine compatibility.</li>
-                            <li><strong className="text-txt-1">Find & Connect:</strong> A global search tool allowing you to explore the entirety of the SparkVEX database (nearly 10,000 teams). Use this to scout teams outside your region or check up on world-class programs.</li>
-                            <li><strong className="text-txt-1">Team Profiles & Private Notes:</strong> Dive deep into any team's stats. Add private Scouting Analysis (auto strength, driver control) and Scout Notes that are securely locked and visible only to your own team.</li>
+                            <li><strong className="text-txt-1">Dashboard (Imported Teams):</strong> This is your home base. It shows all the teams from tournaments you've uploaded data for, keeping things super relevant to your current event.</li>
+                            <li><strong className="text-txt-1">Alliance Selection:</strong> We crunch the numbers using our Bayesian model to rank your opponents and potential partners. It's the perfect way to find teams that match your playstyle and consistency.</li>
+                            <li><strong className="text-txt-1">Find & Connect:</strong> Looking for a team outside your region? You can search our entire database of almost 10,000 teams to see what world-class programs are up to.</li>
+                            <li><strong className="text-txt-1">Team Profiles & Private Notes:</strong> Want to keep track of a specific team? You can dive into their stats and leave private scouting notes that only your team can see.</li>
                         </ul>
                     </div>
                 </div>
 
                 {/* 2. The Bayesian Model */}
                 <div className="card">
-                    <h2 className="text-lg font-mono font-bold text-txt-1 mb-3 uppercase tracking-widest border-b border-line pb-2">2. The Bayesian Model</h2>
+                    <h2 className="text-lg font-mono font-bold text-txt-1 mb-3 uppercase tracking-widest border-b border-line pb-2">2. How Our Model Works</h2>
                     <div className="space-y-3 text-sm text-txt-2 leading-relaxed">
                         <p>
-                            Unlike traditional ranking systems, SparkVEX uses a <strong>Bayesian Performance Model</strong> to evaluate teams. This means that instead of just looking at win/loss records, the system analyzes <em>who</em> a team played against and <em>who</em> their partners were to isolate their individual contribution to a match.
+                            Most ranking systems just look at wins and losses, which doesn't really tell the whole story. SparkVEX uses a <strong>Bayesian Performance Model</strong>. Instead of just checking if a team won, we look closely at <em>who</em> they played against and <em>who</em> their partners were. This helps us figure out their actual contribution to the match.
                         </p>
                         <p>
-                            Every team starts with a baseline rating. As you upload match data, their rating adjusts based on performance, and their <strong>Confidence Interval</strong> shrinks.
+                            When a team starts out, they get a baseline rating. As you upload more matches, we adjust their rating based on how they performed, and our <strong>Confidence Interval</strong> gets smaller, which means we're more sure of their actual skill level.
                         </p>
                     </div>
                 </div>
@@ -47,7 +47,7 @@ export default function GuidePage() {
                     <h2 className="text-lg font-mono font-bold text-txt-1 mb-3 uppercase tracking-widest border-b border-line pb-2">3. Importing Match Data</h2>
                     <div className="space-y-3 text-sm text-txt-2 leading-relaxed">
                         <p>
-                            To add to your dashboard, you must upload Excel (.xls) match data exported from Tournament Manager. For a full, step-by-step tutorial with screenshots, please read the official guide. Also, there are some other guides if you have questions with the website:
+                            If you want teams to show up on your dashboard, you'll need to upload the Excel (.xls) match data straight from Tournament Manager. Don't worry, we have a step-by-step tutorial with screenshots to guide you through it!
                         </p>
                         <a
                             href="https://docs.google.com/document/d/1QkZPt5vzlkWANJGR2gNyTO814pWpXtu8hT8J_cDw5Is/edit?pli=1&tab=t.0#heading=h.1knhsf7p9lel"
@@ -55,78 +55,78 @@ export default function GuidePage() {
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 text-blue-500 hover:text-blue-400 font-bold border border-blue-500/30 bg-blue-500/10 px-4 py-2 mt-2 rounded transition-colors"
                         >
-                            Read the Full Import Guide and Other Guides on Google Docs -&gt;
+                            Check out the Full Import Guide on Google Docs -&gt;
                         </a>
                     </div>
                 </div>
 
                 {/* 4. Re-scouting & Confidence */}
                 <div className="card border-l-[3px] border-danger bg-danger/5">
-                    <h2 className="text-lg font-mono font-bold text-danger mb-3 uppercase tracking-widest border-b border-danger/20 pb-2">4. What is Re-Scout?</h2>
+                    <h2 className="text-lg font-mono font-bold text-danger mb-3 uppercase tracking-widest border-b border-danger/20 pb-2">4. Wait, what does [!] RE-SCOUT mean?</h2>
                     <div className="space-y-3 text-sm text-txt-1 leading-relaxed">
                         <p>
-                            You may see a <strong>[!] RE-SCOUT</strong> or <strong>LOW CONFIDENCE</strong> warning next to certain teams. This happens when the Bayesian model doesn't have enough consistent data to be sure of their actual performance level.
+                            Sometimes you'll spot a <strong>[!] RE-SCOUT</strong> or <strong>LOW CONFIDENCE</strong> warning next to a team. This simply means our model doesn't have enough data to confidently rate them just yet. 
                         </p>
                         <p>
-                            A low confidence score (usually below 50%) means their rating could fluctuate wildly in their next few matches.
+                            If their confidence score is super low (like under 50%), their rating might jump around a lot in the next few matches.
                         </p>
-                        <p className="font-bold">What you should do:</p>
+                        <p className="font-bold">Here is what you should do:</p>
                         <ul className="list-disc pl-5 space-y-1 text-txt-2">
-                            <li>Send a scouter to watch their next match.</li>
-                            <li>Open their <Link href="/dashboard/teams" className="text-blue-400 hover:underline">Team Profile</Link> and update their Autonomous and Driver Control strengths manually.</li>
-                            <li>Check their robot configuration and note their actual performance to offset the model's uncertainty.</li>
+                            <li>Send one of your scouters to watch their next match.</li>
+                            <li>Head over to their <Link href="/dashboard/teams" className="text-blue-400 hover:underline">Team Profile</Link> and manually adjust their Autonomous and Driver Control numbers.</li>
+                            <li>Check out their robot and update your notes so you aren't guessing later.</li>
                         </ul>
                     </div>
                 </div>
 
                 {/* 5. Auton Compatibility */}
                 <div className="card">
-                    <h2 className="text-lg font-mono font-bold text-txt-1 mb-3 uppercase tracking-widest border-b border-line pb-2">5. Auton Compatibility</h2>
+                    <h2 className="text-lg font-mono font-bold text-txt-1 mb-3 uppercase tracking-widest border-b border-line pb-2">5. Finding the Right Auton Fit</h2>
                     <div className="space-y-3 text-sm text-txt-2 leading-relaxed">
                         <p>
-                            When preparing for Alliance Selection, autonomous compatibility is critical. Ensure you configure your own team's <strong>Auton Side</strong> (Left, Right, Both, None) in your profile.
+                            We all know how important the autonomous period is during Alliance Selection. Make sure you set your team's <strong>Auton Side</strong> (Left, Right, Both, or None) in your profile.
                         </p>
                         <p>
-                            When viewing other team profiles in the database, SparkVEX will automatically compare their Auton Side to yours. If both teams are locked to the same side (e.g., both only run Left routines), you will see a <strong><span className="text-txt-1 px-1 border border-txt-1">CONFLICTING</span></strong> tag. If your routines don't overlap, it will say <strong><span className="text-txt-1 px-1 border border-txt-1">COMPATIBLE</span></strong>.
+                            When you're looking at other teams, SparkVEX checks their Auton Side against yours. If you both only run on the Left side, you'll see a <strong><span className="text-txt-1 px-1 border border-txt-1">CONFLICTING</span></strong> tag. If your routines fit together nicely, it'll say <strong><span className="text-txt-1 px-1 border border-txt-1">COMPATIBLE</span></strong>.
                         </p>
                     </div>
                 </div>
 
                 {/* 6. Auto Strength, Driver Strength & Reliability */}
                 <div className="card border-l-[3px] border-blue-500 bg-blue-500/5">
-                    <h2 className="text-lg font-mono font-bold text-blue-400 mb-3 uppercase tracking-widest border-b border-blue-500/20 pb-2">6. Auto Strength, Driver Strength & Reliability</h2>
+                    <h2 className="text-lg font-mono font-bold text-blue-400 mb-3 uppercase tracking-widest border-b border-blue-500/20 pb-2">6. Scouting Stats Explained</h2>
                     <div className="space-y-4 text-sm text-txt-2 leading-relaxed">
                         <p>
-                            SparkVEX tracks two layers of team assessment — <strong className="text-txt-1">self-reported</strong> data and <strong className="text-txt-1">privately scouted</strong> data. Understanding the difference is essential for accurate alliance selection.
+                            SparkVEX keeps track of two kinds of scouting data: the stuff teams <strong className="text-txt-1">self-report</strong> on their profiles, and the <strong className="text-txt-1">private notes</strong> you write. Knowing the difference really helps when picking your alliance partners.
                         </p>
 
                         <div className="bg-surface-card border border-line p-4 rounded space-y-3">
-                            <p className="font-bold text-txt-1 text-xs font-mono uppercase tracking-widest">Auton Reliability % <span className="text-txt-3 font-normal">(Team Profile — Self-Reported)</span></p>
+                            <p className="font-bold text-txt-1 text-xs font-mono uppercase tracking-widest">Auton Reliability % <span className="text-txt-3 font-normal">(Team Profile: Self-Reported)</span></p>
                             <p>
-                                This is a percentage that a team sets on their own profile. It represents <strong className="text-txt-1">how reliable they believe their autonomous routine is</strong> — for example, a team that lands their auton 8 out of 10 times might set this to 80%. This value is publicly visible and set by the team themselves.
+                                This is a percentage that teams set for themselves. It shows <strong className="text-txt-1">how reliably they think they can hit their auton</strong>: for example, if they land it 8 times out of 10, they'd put down 80%. This one is public and totally up to the team itself.
                             </p>
                         </div>
 
                         <div className="bg-surface-card border border-line p-4 rounded space-y-3">
                             <p className="font-bold text-txt-1 text-xs font-mono uppercase tracking-widest">Auto Strength <span className="text-txt-3 font-normal">(Public Profile or Private Scout)</span></p>
                             <p>
-                                This is a <strong className="text-txt-1">0–10 scale</strong> that represents <strong className="text-txt-1">how strong a team's autonomous routine is</strong>. A score of 10 means exceptional precision, while a 1 means unreliable. Teams can rate themselves on their Public Profile. However, you can privately <em>override</em> this rating for any team using the Scouter Worksheet, and that overridden rating is only visible to you.
+                                This is a simple <strong className="text-txt-1">0 to 10 scale</strong> showing <strong className="text-txt-1">how strong their autonomous routine is</strong>, with 10 being amazing and 1 being pretty unreliable. Teams can rate themselves publicly, but if you don't agree, you can <em>override</em> it with your own private rating using the Scouter Worksheet.
                             </p>
                         </div>
 
                         <div className="bg-surface-card border border-line p-4 rounded space-y-3">
                             <p className="font-bold text-txt-1 text-xs font-mono uppercase tracking-widest">Driver Strength <span className="text-txt-3 font-normal">(Public Profile or Private Scout)</span></p>
                             <p>
-                                This is a <strong className="text-txt-1">0–10 scale</strong> representing <strong className="text-txt-1">how strong the driver is</strong>. Like Auto Strength, teams can assign themselves a public rating, but you are free to replace it with your own private rating based on your observations.
+                                Just like Auto Strength, this is a <strong className="text-txt-1">0 to 10 scale</strong> for <strong className="text-txt-1">driver skill</strong>. Teams can post a public score, but you can always enter your own private rating based on what you actually see on the field.
                             </p>
                         </div>
 
                         <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded">
                             <p className="font-bold text-blue-400 mb-2 font-mono uppercase tracking-widest text-xs">How the Fallback Works:</p>
                             <ul className="list-disc pl-5 space-y-2 text-txt-2">
-                                <li>If you haven't scouted a team yourself, the Alliance Selection table points back to the <strong className="text-txt-1">team's public self-reported rating</strong> from their profile.</li>
-                                <li>Once you enter numbers into their private Scouter Worksheet, the table <strong className="text-txt-1">overrides the public fallback</strong> and strictly shows your private ratings.</li>
-                                <li><strong>Privacy check:</strong> Other teams' private scouting notes or averages will <em>never</em> bleed over into your display. You are only ever looking at their self-report or your own private scouting data.</li>
+                                <li>If you haven't written any private notes on a team yet, the Alliance Selection table just uses the <strong className="text-txt-1">public rating they gave themselves</strong>.</li>
+                                <li>As soon as you enter a number in their private Scouter Worksheet, the table <strong className="text-txt-1">ignores their public score</strong> and only uses yours.</li>
+                                <li><strong>Privacy check:</strong> We keep your data safe. Other teams' private notes will <em>never</em> show up on your screen. You're only seeing the team's self-reported info or your own private notes.</li>
                             </ul>
                         </div>
                     </div>
