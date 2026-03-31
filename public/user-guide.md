@@ -1,30 +1,30 @@
-# Spark VEX — User Guide & Rules Book
+# SparkVEX: User Guide & Rules Book
 
-Welcome to Spark VEX! This platform is a powerful, Bayesian-driven scouting and alliance selection tool designed to help your team dominate competitions.
+Welcome to SparkVEX! We built this platform as a ridiculously powerful, math-driven scouting and alliance selection tool to help your team absolutely dominate your next competition.
 
 ## 1. Getting Started
-- **One Account Per Team**: The platform is organized by teams. Only **one email account** can be registered per VEX Team Number (e.g., `1421A`). 
-- **The Dashboard**: Once logged in, you will see your dashboard. By default, your rating is 100 with an uncertainty of 50.
+- **One Account Per Team**: We keep things organized by team number. That means only **one email account** can be registered per official VEX Team Number (like `1421A`). Work with your teammates to decide who holds the keys!
+- **Your Dashboard**: As soon as you log in, you'll hit your dashboard. If you're completely brand new to the system, our Bayesian model drops you in with a baseline rating of 100 and an uncertainty margin of 50.
 
-## 2. Importing Data
-Data is what powers the Bayesian model. You can import matches and skills data in two ways:
-- **RobotEvents API**: Head to the Import page, enter a RobotEvents API key, and search for the event you want to import. The app will fetch all matches automatically.
-- **XLS File Upload**: Download the official `.xls` match or skills file from RobotEvents or Tournament Manager and drop it into the Import section. The engine will intelligently map the columns.
+## 2. Pumping in the Data
+The math engine needs match data to actually work. Fortunately, getting it in is super easy. You have two options:
+- **RobotEvents API**: Jump over to the Import page, paste in a RobotEvents API key, and just search for your event. The app will scrape all the matches automatically.
+- **XLS File Upload**: Not into APIs? Just download the official `.xls` match or skills file straight from Tournament Manager and drop it right into the Import section. Our engine will map out all the columns for you.
 
-*What happens during import?*
-Our engine will replay every single imported match chronologically. It uses a Bayesian rating system to analyze the outcome of the match, compare it to expectations, and distribute rating rewards/penalties to each of the 4 teams involved based on their individual strength and uncertainty.
+*What actually happens when you hit import?*
+Our engine basically "watches" every single match you imported in chronological order. It uses a custom Bayesian rating system to look at who won, compare it to who *should* have won, and then hands out rating bumps or penalties to all four teams on the field based on how hard the match was.
 
 ## 3. The Alliance Selection Engine
-The Alliance Selection dashboard is your command center during the final hours of a competition. It analyzes your team against every other team in the database to calculate:
-- **Combined Synergy Win Probability**: If you pick Team X, what is your mathematical chance of winning against an average alliance?
-- **Auto Conflicts**: The system warns you (⚔️) if a potential pick runs their autonomous routine on the exact same side of the field as you, preventing collisions.
-- **Scout Needed**: The system flags teams (⚠️) whose ratings have high uncertainty, meaning they might be hidden gems or false positives, encouraging you to scout them manually.
+The Alliance Selection dashboard is your command center for when eliminations roll around. It compares your team against every other team on the board to figure out:
+- **Combined Synergy Win Probability**: If you actually picked Team X, what is your genuine mathematical chance of winning a match?
+- **Auto Conflicts**: The system will literally throw up a warning sign (⚔️) if a potential pick runs their autonomous routine on the exact same side of the field as you. Nobody likes a traffic jam!
+- **Scout Needed**: The system flags teams (⚠️) if their ratings have a super high uncertainty. That usually means they are either hidden gems or completely unpredictable, so we highly recommend you send a scouter to watch them manually.
 
 ## 4. Team Profiles & Collaboration
-- **Editable Profiles**: Click on your Team Profile to add Private Notes, specify your Drivetrain type, and list Strategy Tags (e.g., `defensive`, `fast auton`).
-- **Awards Tracking**: Press the "Sync Awards" button on your profile to securely fetch and freeze your team's historical RobotEvents awards.
-- **Connections & Tasks**: You can send connection requests to allied teams and assign tasks to your members using the Kanban-style Task Board.
+- **Editable Profiles**: Click on your Team Profile to jot down Private Notes, lock in your Drivetrain type, and drop in Strategy Tags (like `defensive` or `fast auton`) so everyone knows what you're capable of.
+- **Awards Tracking**: Smash the "Sync Awards" button on your profile to securely pull down your team's historical RobotEvents awards to show off your hardware.
+- **Connections & Tasks**: You can shoot connection requests over to allied teams, or manage your own team's messy to-do list using our built-in Kanban Task Board.
 
 ## Troubleshooting FAQ
-**I imported matches for my team, but I can't create an account!**
-When you import an XLS file, the database creates a mathematical profile for every single team in that document. If your team is in there, the system already knows about you! You can still sign up normally—just enter your team number and email, and the system will link your new login directly to that existing mathematical profile. *Make sure you type your team number exactly as it appeared in the tournament.*
+**I imported matches for my team, but it won't let me create an account!**
+Here is the deal: when you import an XLS file, the database creates a mathematical profile for every single team listed in that document. If your team played at that tournament, the system already knows who you are! You can still sign up normally: just punch in your team number and email, and the system will link your brand new login directly to the mathematical profile we already built for you. *Just make absolutely sure you type your team number exactly as it appeared on the tournament schedule.*
