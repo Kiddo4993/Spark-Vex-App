@@ -131,6 +131,22 @@ export default function GuidePage() {
                         </div>
                     </div>
                 </div>
+
+                {/* 7. Connections & Chat */}
+                <div className="card border-l-[3px] border-green-500 bg-green-500/5">
+                    <h2 className="text-lg font-mono font-bold text-green-400 mb-3 uppercase tracking-widest border-b border-green-500/20 pb-2">7. Connections & Chat</h2>
+                    <div className="space-y-4 text-sm text-txt-2 leading-relaxed">
+                        <p>
+                            SparkVEX makes it easy to collaborate with other teams. Using our built-in networking features, you can easily chat and strategize with potential alliance partners.
+                        </p>
+                        <ul className="list-disc pl-5 space-y-2">
+                            <li><strong className="text-txt-1">Connecting:</strong> When you send a connection request, it stays in a <strong>Pending</strong> state until the other team accepts. Once approved, you can start messaging.</li>
+                            <li><strong className="text-txt-1">The Red Bulb:</strong> Keep an eye out for the glowing <strong>red notification bulb</strong> in the navigation! It lights up to let you know you have unread messages or new pending connection requests waiting.</li>
+                            <li><strong className="text-txt-1">Timestamps:</strong> Inside the chat, every message clearly shows the <strong>time</strong> it was sent, so you never lose track of the conversation flow during a busy event.</li>
+                            <li><strong className="text-txt-1">Managing Contacts:</strong> Keeping your contact list clean is simple. If you need to remove a team from your network, you can easily <strong>Delete</strong> the connection from your contacts.</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     );
