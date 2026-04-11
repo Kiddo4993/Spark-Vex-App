@@ -9,7 +9,7 @@ export default function NotesPage() {
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        fetch("/api/teams")
+        fetch("/api/teams/me")
             .then((res) => res.json())
             .then((data) => {
                 setNotes(data.notes || "");

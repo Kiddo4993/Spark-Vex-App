@@ -214,7 +214,7 @@ export function computeBayesianMatchUpdate(
   const deltaWin = actualWin - expectedWin;
   const surpriseWin = Math.abs(deltaWin);
 
-  // same thing from the losers' perspective
+  // same thing from the losers perspective
   const expectedLose = expectedOutcome(
     loseStats.rating,
     loseStats.uncertainty,
