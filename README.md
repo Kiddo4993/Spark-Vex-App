@@ -5,7 +5,7 @@
 
 **Live Site:** [spark-vex-app.vercel.app](https://spark-vex-app.vercel.app)  
 **Built By:** Team 77174A Holy Airball!  
-**Creator:** Dylan Duan
+**Creators:** Dylan Duan & Adrian Pun
 
 ---
 
